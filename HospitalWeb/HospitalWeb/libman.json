@@ -6,5 +6,11 @@
       "library": "twitter-bootstrap@5.2.2",
       "destination": "wwwroot/lib/bootstrap/"
     }
-  ]
+  ,
+{
+  "provider": "cdnjs",
+  "library": "font-awesome@6.2.0",
+  "destination": "wwwroot/lib/font-awesome/"
+}
+]
 }
