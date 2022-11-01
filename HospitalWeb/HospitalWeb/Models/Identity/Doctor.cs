@@ -1,5 +1,8 @@
-﻿namespace HospitalWeb.Models.Identity
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace HospitalWeb.Models.Identity
 {
+    [Table("Doctors")]
     public class Doctor : AppUser
     {
         public Doctor()
@@ -8,7 +11,6 @@
             Schedules = new List<Schedule>();
         }
 
-        public int SpecialtyId { get; set; }
         public Specialty Specialty { get; set; }
         public ICollection<Record> Records { get; set; }
         public ICollection<Schedule> Schedules { get; set; }

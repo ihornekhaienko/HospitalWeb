@@ -1,4 +1,6 @@
-﻿namespace HospitalWeb.Models.Identity
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace HospitalWeb.Models.Identity
 {
     public enum Sex
     {
@@ -6,6 +8,7 @@
         Female
     }
 
+    [Table("Patients")]
     public class Patient : AppUser
     {
         public Patient()
@@ -16,7 +19,6 @@
         public Sex Sex { get; set; }
         public DateTime BirthDate { get; set; }
 
-        public int AddressId { get; set; }
         public Address Address { get; set; }
         public ICollection<Record> Records { get; set; }
     }
