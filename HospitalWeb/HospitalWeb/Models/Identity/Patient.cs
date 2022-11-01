@@ -6,7 +6,7 @@
         Female
     }
 
-    public class Patient : User
+    public class Patient : AppUser
     {
         public Patient()
         {

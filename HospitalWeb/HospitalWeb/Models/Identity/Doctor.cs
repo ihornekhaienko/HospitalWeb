@@ -1,6 +1,6 @@
 ﻿namespace HospitalWeb.Models.Identity
 {
-    public class Doctor : User
+    public class Doctor : AppUser
     {
         public Doctor()
         {
