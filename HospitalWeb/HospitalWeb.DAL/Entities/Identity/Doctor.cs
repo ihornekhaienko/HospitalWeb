@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HospitalWeb.Models.Identity
+namespace HospitalWeb.DAL.Entities.Identity
 {
     [Table("Doctors")]
     public class Doctor : AppUser

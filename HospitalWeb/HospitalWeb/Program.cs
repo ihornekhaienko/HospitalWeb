@@ -1,5 +1,5 @@
-using HospitalWeb.Data;
-using HospitalWeb.Models.Identity;
+using HospitalWeb.DAL.Data;
+using HospitalWeb.DAL.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

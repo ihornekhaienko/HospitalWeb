@@ -1,4 +1,4 @@
-﻿namespace HospitalWeb.Models
+﻿namespace HospitalWeb.DAL.Entities
 {
     public class Locality
     {

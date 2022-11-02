@@ -1,9 +1,9 @@
-﻿using HospitalWeb.Models;
-using HospitalWeb.Models.Identity;
+﻿using HospitalWeb.DAL.Entities;
+using HospitalWeb.DAL.Entities.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace HospitalWeb.Data
+namespace HospitalWeb.DAL.Data
 {
     public class AppDbContext : IdentityDbContext<AppUser>
     {

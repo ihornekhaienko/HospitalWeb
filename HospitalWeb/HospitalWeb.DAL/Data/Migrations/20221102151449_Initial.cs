@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace HospitalWeb.Data.Migrations
+namespace HospitalWeb.DAL.Data.Migrations
 {
     public partial class Initial : Migration
     {

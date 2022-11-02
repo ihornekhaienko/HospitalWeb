@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace HospitalWeb.Models.Identity
+namespace HospitalWeb.DAL.Entities.Identity
 {
     public class AppUser : IdentityUser
     {

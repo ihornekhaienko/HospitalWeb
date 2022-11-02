@@ -1,6 +1,6 @@
-﻿using HospitalWeb.Models.Identity;
+﻿using HospitalWeb.DAL.Entities.Identity;
 
-namespace HospitalWeb.Models
+namespace HospitalWeb.DAL.Entities
 {
     public class Specialty
     {
