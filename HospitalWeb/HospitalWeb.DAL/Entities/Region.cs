@@ -8,8 +8,8 @@
         }
 
         public int RegionId { get; set; }
-        public string RegionName { get; set; }
+        public string? RegionName { get; set; }
 
-        public ICollection<Locality> Localities { get; set; }
+        public ICollection<Locality>? Localities { get; set; }
     }
 }

@@ -19,12 +19,12 @@ namespace HospitalWeb.DAL.Entities
         }
 
         public int RecordId { get; set; }
-        public string Diagnosis { get; set; }
-        public string Prescription { get; set; }
+        public string? Diagnosis { get; set; }
+        public string? Prescription { get; set; }
         public DateTime RecordDate { get; set; }
         public State State { get; set; }
         
-        public Doctor Doctor { get; set; }
-        public Patient Patient { get; set; }
+        public Doctor? Doctor { get; set; }
+        public Patient? Patient { get; set; }
     }
 }

@@ -9,6 +9,6 @@ namespace HospitalWeb.DAL.Entities
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         
-        public Doctor Doctor { get; set; }
+        public Doctor? Doctor { get; set; }
     }
 }

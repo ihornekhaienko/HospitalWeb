@@ -19,7 +19,7 @@ namespace HospitalWeb.DAL.Entities.Identity
         public Sex Sex { get; set; }
         public DateTime BirthDate { get; set; }
 
-        public Address Address { get; set; }
-        public ICollection<Record> Records { get; set; }
+        public Address? Address { get; set; }
+        public ICollection<Record>? Records { get; set; }
     }
 }
