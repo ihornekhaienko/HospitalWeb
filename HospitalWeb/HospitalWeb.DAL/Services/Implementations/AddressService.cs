@@ -14,15 +14,15 @@ namespace HospitalWeb.DAL.Services.Implementations
             _db = db;
         }
 
-        public async Task<Address?> Create(string? address)
+        public async Task<Address?> Create(string? address, Locality? locality)
         {
-            if (GetAll().Any(a => a.FullAddress == address))
+            if (GetAll().Any(a => a.FullAddress == address && a.Locality == locality))
             {
-                return GetAll()?.FirstOrDefault(a => a.FullAddress == address);
+                return GetAll()?.FirstOrDefault(a => a.FullAddress == address && a.Locality == locality);
             }
             else
             {
-                var obj = new Address { FullAddress = address };
+                var obj = new Address { FullAddress = address, Locality = locality };
                 _db.Addresses?.Add(obj);
                 await _db.SaveChangesAsync();
                 return obj;
@@ -42,7 +42,7 @@ namespace HospitalWeb.DAL.Services.Implementations
 
         public IEnumerable<Address>? GetAll()
         {
-            return _db.Addresses?.Include(a => a.Patients).ToList();
+            return _db.Addresses?.Include(a => a.Locality).ToList();
         }
 
         public async Task Update(Address address)

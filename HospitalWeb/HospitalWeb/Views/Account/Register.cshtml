@@ -84,7 +84,20 @@
 
             <div class="mb-3">
                 <div class="input-group">
-                    <textarea asp-for="Address" class="form-control" placeholder="Address" rows="4" cols="50"></textarea>
+                    <span class="input-group-text">
+                        <i class="fa fa-location-dot"></i>
+                    </span>
+                    <input type="text" asp-for="Locality" class="form-control" placeholder="Locality"/>
+                </div>
+                <span asp-validation-for="Locality" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fa fa-city"></i>
+                    </span>
+                    <input type="text" asp-for="Address" class="form-control" placeholder="Address"/>
                 </div>
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>

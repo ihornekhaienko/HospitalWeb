@@ -8,5 +8,6 @@ namespace HospitalWeb.DAL.Entities
         public string? FullAddress { get; set; }
 
         public ICollection<Patient>? Patients { get; set; }
+        public Locality? Locality { get; set; }
     }
 }

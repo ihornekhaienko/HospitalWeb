@@ -43,6 +43,10 @@ namespace HospitalWeb.ViewModels.Account
         public string? Address { get; set; }
 
         [Required]
+        [Display(Name = "Locality")]
+        public string? Locality { get; set; }
+
+        [Required]
         [Display(Name = "Sex")]
         public string? Sex { get; set; }
     }

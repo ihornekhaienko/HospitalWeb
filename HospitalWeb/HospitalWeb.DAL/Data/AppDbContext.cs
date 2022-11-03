@@ -10,6 +10,7 @@ namespace HospitalWeb.DAL.Data
         public DbSet<Address>? Addresses { get; set; }
         public DbSet<Admin>? Admins { get; set; }
         public DbSet<Doctor>? Doctors { get; set; }
+        public DbSet<Locality>? Localities { get; set; }
         public DbSet<Patient>? Patients { get; set; }
         public DbSet<Record>? Records { get; set; }
         public DbSet<Schedule>? Schedules { get; set; }
