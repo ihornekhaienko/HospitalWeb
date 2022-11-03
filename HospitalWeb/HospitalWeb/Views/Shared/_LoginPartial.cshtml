@@ -26,7 +26,7 @@ else
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" asp-controller="Account" asp-action="Login">
+        <a class="nav-link" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Index", "Home")">
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
             Login
         </a>

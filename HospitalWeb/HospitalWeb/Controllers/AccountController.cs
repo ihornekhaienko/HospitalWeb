@@ -2,6 +2,7 @@
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.ViewModels.Account;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -75,6 +76,46 @@ namespace HospitalWeb.Controllers
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
+                }
+            }
+
+            return View(model);
+        }
+        
+        [HttpGet]    
+        public async Task<IActionResult> Login(string? returnUrl = null)
+        {
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            ViewBag.ReturnUrl = returnUrl;
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+
+                _logger.LogCritical(_signInManager.IsSignedIn(User).ToString());
+
+                if (result.Succeeded)
+                {
+                    if (!string.IsNullOrEmpty(ViewBag.ReturnUrl) && Url.IsLocalUrl(ViewBag.ReturnUrl))
+                    {
+                        return Redirect(ViewBag.ReturnUrl);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Wrong email or password");
+                    return View(model);
                 }
             }
 
