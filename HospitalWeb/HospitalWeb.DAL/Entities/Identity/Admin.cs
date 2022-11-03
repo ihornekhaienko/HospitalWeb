@@ -5,5 +5,6 @@ namespace HospitalWeb.DAL.Entities.Identity
     [Table("Admins")]
     public class Admin : AppUser
     {
+        public bool IsSuperAdmin { get; set; }
     }
 }
