@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="wwwroot\images\icons\" />
     <Folder Include="wwwroot\images\profile\" />
-    <Folder Include="ViewModels\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
@@ -24,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HospitalWeb.BLL\HospitalWeb.BLL.csproj" />
     <ProjectReference Include="..\HospitalWeb.DAL\HospitalWeb.DAL.csproj" />
   </ItemGroup>
 

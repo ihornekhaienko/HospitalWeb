@@ -1,5 +1,7 @@
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
+using HospitalWeb.DAL.Services.Extensions;
+using HospitalWeb.Middlewares.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,9 +13,17 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(conn
 
 builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.AddAddressService();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+if (builder.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseDbInitializer();
+}
 
 app.UseHttpsRedirection();
 
