@@ -20,13 +20,15 @@ namespace HospitalWeb.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IPasswordGenerator _passwordGenerator;
         private readonly ISpecialtyService _specialtyService;
+        private readonly ILocalityService _localityService;
 
         public ManageController(
             ILogger<ManageController> logger,
             AppDbContext db,
             UserManager<AppUser> userManager,
             IPasswordGenerator passwordGenerator,
-            ISpecialtyService specialtyService
+            ISpecialtyService specialtyService,
+            ILocalityService localityService
             )
         {
             _logger = logger;
@@ -34,6 +36,7 @@ namespace HospitalWeb.Controllers
             _userManager = userManager;
             _passwordGenerator = passwordGenerator;
             _specialtyService = specialtyService;
+            _localityService = localityService;
         }
 
         [HttpGet]
@@ -127,8 +130,7 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            _db.Admins.Remove(admin);
-            await _db.SaveChangesAsync();
+            await _userManager.DeleteAsync(admin);
 
             return RedirectToAction("Admins", "Manage");
         }
@@ -331,8 +333,7 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            _db.Doctors.Remove(doctor);
-            await _db.SaveChangesAsync();
+            await _userManager.DeleteAsync(doctor);
 
             return RedirectToAction("Doctors", "Manage");
         }
@@ -449,6 +450,113 @@ namespace HospitalWeb.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Patients(
+            string? searchString,
+            int? locality,
+            int page = 1,
+            PatientSortState sortOrder = PatientSortState.Id)
+        {
+            int pageSize = 10;
+            IQueryable<Patient> patients = _db.Patients
+                .Include(p => p.Address)
+                .ThenInclude(a => a.Locality);
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                patients = patients.Where(p =>
+                    p.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                    p.Surname.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                    p.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+                );
+            }
+
+            if (locality != null && locality != 0)
+            {
+                patients = patients
+                    .Where(p => p.Address.Locality.LocalityId == locality);
+            }
+
+            switch (sortOrder)
+            {
+                case PatientSortState.NameAsc:
+                    patients = patients.OrderBy(p => p.Name);
+                    break;
+                case PatientSortState.NameDesc:
+                    patients = patients.OrderByDescending(p => p.Name);
+                    break;
+                case PatientSortState.SurnameAsc:
+                    patients = patients.OrderBy(p => p.Surname);
+                    break;
+                case PatientSortState.SurnameDesc:
+                    patients = patients.OrderByDescending(p => p.Surname);
+                    break;
+                case PatientSortState.EmailAsc:
+                    patients = patients.OrderBy(p => p.Email);
+                    break;
+                case PatientSortState.EmailDesc:
+                    patients = patients.OrderByDescending(p => p.Email);
+                    break;
+                case PatientSortState.PhoneAsc:
+                    patients = patients.OrderBy(p => p.PhoneNumber);
+                    break;
+                case PatientSortState.PhoneDesc:
+                    patients = patients.OrderByDescending(p => p.PhoneNumber);
+                    break;
+                case PatientSortState.AddressAsc:
+                    patients = patients
+                        .OrderBy(p => p.Address.FullAddress)
+                        .ThenBy(a => a.Address.Locality.LocalityName);
+                    break;
+                case PatientSortState.AddressDesc:
+                    patients = patients
+                        .OrderByDescending(p => p.Address.FullAddress)
+                        .ThenByDescending(a => a.Address.Locality.LocalityName);
+                    break;
+                default:
+                    patients = patients.OrderBy(d => d.Id);
+                    break;
+            }
+
+            var count = await patients.CountAsync();
+            var items = await patients
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var pageModel = new PageModel(count, page, pageSize);
+            var viewModel = new PatientsViewModel
+            {
+                PageModel = pageModel,
+                SortModel = new PatientSortModel(sortOrder),
+                FilterModel = new PatientFilterModel(searchString, _db.Localities.ToList(), locality),
+                Patients = items
+            };
+
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> DeletePatient(string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+
+            var patient = await _db.Patients
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (patient == null)
+            {
+                return NotFound();
+            }
+
+            await _userManager.DeleteAsync(patient);
+
+            return RedirectToAction("Patients", "Manage");
         }
     }
 }

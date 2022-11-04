@@ -1,0 +1,97 @@
+﻿@{
+    ViewBag.Title = "Patients";
+}
+@model PatientsViewModel
+
+<h1>Patients list</h1>
+<form method="get">
+    <div class="mb-3">
+        <label>Search: </label>
+        <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
+        <span class="input-group-btn input-space"><label>Locality</label></span>
+        <span class="input-group-btn input-space">
+            <select name="locality" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Localities, 
+                            "LocalityId", 
+                            "LocalityName", 
+                            Model.FilterModel.SelectedLocality))">
+            </select>
+        </span>
+        <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">Search</button></span>
+        <span class="input-group-btn input-space"><a asp-action="Patients"> Back to Full List</a></span>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-action="Patients"
+                   asp-route-sortOrder="@(Model.SortModel.NameSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   Name
+                </a>
+            </th>
+            <th>
+                <a asp-action="Patients"
+                   asp-route-sortOrder="@(Model.SortModel.SurnameSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   Surname
+                </a>
+            </th>
+            <th>
+                <a asp-action="Patients"
+                   asp-route-sortOrder="@(Model.SortModel.EmailSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   Email
+                </a>
+            </th>
+            <th>
+                <a asp-action="Patients"
+                   asp-route-sortOrder="@(Model.SortModel.PhoneSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   Phone
+                </a>
+            </th>
+            <th>
+                <a asp-action="Patients"
+                   asp-route-sortOrder="@(Model.SortModel.AddressSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   Address
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody> 
+        @foreach(var patient in Model.Patients)
+        {
+            <tr>
+                <td>
+                    @patient.Name
+                </td>
+                <td>
+                    @patient.Surname
+                </td>
+                <td>
+                    @patient.Email
+                </td>
+                <td>
+                    @patient.PhoneNumber
+                </td>
+                <td>
+                    @(patient.Address.FullAddress + "; " + patient.Address.Locality.LocalityName)
+                </td>
+                <td>
+                    <a asp-action="DeletePatient" asp-route-id="@patient.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<page-link page-model="@(Model.PageModel)" page-action="Patients"
+page-url-locality="@(Model.FilterModel.SelectedLocality)"
+page-url-searchString="@(Model.FilterModel.SearchString)"
+page-url-sortOrder="@(Model.SortModel.Current)"></page-link>

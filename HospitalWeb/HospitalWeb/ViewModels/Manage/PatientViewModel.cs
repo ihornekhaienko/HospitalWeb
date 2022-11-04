@@ -2,7 +2,7 @@
 
 namespace HospitalWeb.ViewModels.Manage
 {
-    public class DoctorViewModel
+    public class PatientViewModel
     {
         [Required]
         [EmailAddress]
@@ -23,7 +23,11 @@ namespace HospitalWeb.ViewModels.Manage
         public string? Phone { get; set; }
 
         [Required]
-        [Display(Name = "Specialty")]
-        public string? Specialty { get; set; }
+        [Display(Name = "Address")]
+        public string? Address { get; set; }
+
+        [Required]
+        [Display(Name = "Locality")]
+        public string? Locality { get; set; }
     }
 }
