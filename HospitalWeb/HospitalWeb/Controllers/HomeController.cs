@@ -5,16 +5,26 @@ namespace HospitalWeb.Controllers
 {
     public class HomeController : Controller
     {
-        private ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> _logger;
+        private readonly INotifier _notifier;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            ILogger<HomeController> logger,
+            INotifier notifier)
         {
             _logger = logger;
+            _notifier = notifier;
         }
 
         public IActionResult Index()
         {
             return View();
+        }
+
+        public IActionResult Test()
+        {
+            _notifier.SendMessage("gordeybeatkiller@gmail.com", "Test", "test");
+            return Content("ok");
         }
     }
 }

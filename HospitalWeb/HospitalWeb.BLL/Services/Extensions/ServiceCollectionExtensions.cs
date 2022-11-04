@@ -6,9 +6,9 @@ namespace HospitalWeb.BLL.Services.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddEmailService(this IServiceCollection services)
+        public static void AddEmailNotifier(this IServiceCollection services)
         {
-            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<INotifier, EmailNotifier>();
         }
 
         public static void AddPasswordGenerator(this IServiceCollection services)

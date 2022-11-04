@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(conn
 builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddUnitOfWork();
+builder.Services.AddEmailNotifier();
 builder.Services.AddPasswordGenerator();
 
 builder.Services.AddControllersWithViews();
