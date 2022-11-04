@@ -33,3 +33,5 @@ There are 9 tables:
 - Records - history of appointments.
 - Schedules - for interaction with doctors shifts and planning appointments.
 - Specialties - doctors specialties.
+
+PS: current development state you are able to find on the Developer branch.
