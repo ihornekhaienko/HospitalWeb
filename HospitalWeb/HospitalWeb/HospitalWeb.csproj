@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HospitalWeb.BLL\HospitalWeb.BLL.csproj" />
     <ProjectReference Include="..\HospitalWeb.DAL\HospitalWeb.DAL.csproj" />
+    <ProjectReference Include="..\HospitalWeb.Filters\HospitalWeb.Filters.csproj" />
   </ItemGroup>
 
 </Project>

@@ -67,7 +67,6 @@ namespace HospitalWeb.Controllers
                     await _userManager.AddToRoleAsync(patient, "Patient");
                     await _signInManager.SignInAsync(patient, false);
 
-                    _logger.LogCritical($"{_signInManager.IsSignedIn(User)}");
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -98,8 +97,6 @@ namespace HospitalWeb.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-
-                _logger.LogCritical(_signInManager.IsSignedIn(User).ToString());
 
                 if (result.Succeeded)
                 {
