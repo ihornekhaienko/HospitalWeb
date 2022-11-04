@@ -6,7 +6,7 @@ namespace HospitalWeb.DAL.Entities.Identity
     {
         public string? Name { get; set; }
         public string? Surname { get; set; }
-        public string? ProfileImageUrl { get; set; }
+        public byte[]? Image { get; set; }
 
         public override string ToString()
         {
