@@ -15,5 +15,10 @@ namespace HospitalWeb.DAL.Services.Extensions
         {
             services.AddScoped<ILocalityService, LocalityService>();
         }
+
+        public static void AddSpecialtyService(this IServiceCollection services)
+        {
+            services.AddScoped<ISpecialtyService, SpecialtyService>();
+        }
     }
 }
