@@ -5,11 +5,11 @@ namespace HospitalWeb.DAL.Services.Implementations
     public class UnitOfWork : IDisposable
     {
         private readonly AppDbContext _db;
-        private AddressRepository addressRepository;
-        private LocalityRepository localityRepository;
-        private RecordRepository recordRepository;
-        private ScheduleRepository scheduleRepository;
-        private SpecialtyRepository specialtyRepository;
+        private AddressRepository _addressRepository;
+        private LocalityRepository _localityRepository;
+        private RecordRepository _recordRepository;
+        private ScheduleRepository _scheduleRepository;
+        private SpecialtyRepository _specialtyRepository;
 
         public UnitOfWork(AppDbContext db)
         {
@@ -20,9 +20,9 @@ namespace HospitalWeb.DAL.Services.Implementations
         {
             get
             {
-                if (addressRepository == null)
-                    addressRepository = new AddressRepository(_db);
-                return addressRepository;
+                if (_addressRepository == null)
+                    _addressRepository = new AddressRepository(_db);
+                return _addressRepository;
             }
         }
 
@@ -30,9 +30,9 @@ namespace HospitalWeb.DAL.Services.Implementations
         {
             get
             {
-                if (localityRepository == null)
-                    localityRepository = new LocalityRepository(_db);
-                return localityRepository;
+                if (_localityRepository == null)
+                    _localityRepository = new LocalityRepository(_db);
+                return _localityRepository;
             }
         }
 
@@ -40,9 +40,9 @@ namespace HospitalWeb.DAL.Services.Implementations
         {
             get
             {
-                if (recordRepository == null)
-                    recordRepository = new RecordRepository(_db);
-                return recordRepository;
+                if (_recordRepository == null)
+                    _recordRepository = new RecordRepository(_db);
+                return _recordRepository;
             }
         }
 
@@ -50,9 +50,9 @@ namespace HospitalWeb.DAL.Services.Implementations
         {
             get
             {
-                if (scheduleRepository == null)
-                    scheduleRepository = new ScheduleRepository(_db);
-                return scheduleRepository;
+                if (_scheduleRepository == null)
+                    _scheduleRepository = new ScheduleRepository(_db);
+                return _scheduleRepository;
             }
         }
 
@@ -60,9 +60,9 @@ namespace HospitalWeb.DAL.Services.Implementations
         {
             get
             {
-                if (specialtyRepository == null)
-                    specialtyRepository = new SpecialtyRepository(_db);
-                return specialtyRepository;
+                if (_specialtyRepository == null)
+                    _specialtyRepository = new SpecialtyRepository(_db);
+                return _specialtyRepository;
             }
         }
 
