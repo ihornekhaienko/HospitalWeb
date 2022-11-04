@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title = "Edit admin";
+}
+@model AdminViewModel
+
+<h2>Edit admin</h2>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-controller="Manage" asp-action="EditAdmin">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" type="email"/>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" type="tel"/>
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+             <div class="mb-3">
+                <input asp-for="IsSuperAdmin" type="checkbox"/>
+                <label asp-for="IsSuperAdmin" class="control-label"></label>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-success">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Manage" asp-action="Admins">Back to List</a>
+</div>
