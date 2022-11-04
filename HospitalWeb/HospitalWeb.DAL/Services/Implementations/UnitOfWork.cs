@@ -1,9 +1,4 @@
 ﻿using HospitalWeb.DAL.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HospitalWeb.DAL.Services.Implementations
 {
@@ -13,6 +8,7 @@ namespace HospitalWeb.DAL.Services.Implementations
         private AddressRepository addressRepository;
         private LocalityRepository localityRepository;
         private RecordRepository recordRepository;
+        private ScheduleRepository scheduleRepository;
         private SpecialtyRepository specialtyRepository;
 
         public UnitOfWork(AppDbContext db)
@@ -47,6 +43,16 @@ namespace HospitalWeb.DAL.Services.Implementations
                 if (recordRepository == null)
                     recordRepository = new RecordRepository(_db);
                 return recordRepository;
+            }
+        }
+
+        public ScheduleRepository Schedules
+        {
+            get
+            {
+                if (scheduleRepository == null)
+                    scheduleRepository = new ScheduleRepository(_db);
+                return scheduleRepository;
             }
         }
 
