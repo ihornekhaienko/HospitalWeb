@@ -27,3 +27,11 @@
 .validation {
     margin-bottom: 0px;
 }
+
+.search-input {
+    max-width: 300px;
+}
+
+.input-group-btn.input-space {
+    padding-left: 15px;
+}
