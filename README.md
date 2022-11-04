@@ -34,4 +34,4 @@ There are 9 tables:
 - Schedules - for interaction with doctors shifts and planning appointments.
 - Specialties - doctors specialties.
 
-PS: current development state you are able to find on the Developer branch.
+PS: current development state you are able to check on the Developer branch.
