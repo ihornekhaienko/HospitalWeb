@@ -1,6 +1,5 @@
-﻿using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Interfaces;
+﻿using HospitalWeb.DAL.Entities.Identity;
+using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.ViewModels.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -13,22 +12,19 @@ namespace HospitalWeb.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly IAddressService _addressService;
-        private readonly ILocalityService _localityService;
+        private readonly UnitOfWork _uof;
 
         public AccountController(
             ILogger<AccountController> logger, 
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            IAddressService addressService,
-            ILocalityService localityService
+            UnitOfWork uof
             )
         {
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
-            _addressService = addressService;
-            _localityService = localityService;
+            _uof = uof;
         }
 
         [HttpGet]
@@ -43,8 +39,8 @@ namespace HospitalWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var locality = await _localityService.Create(model.Locality);
-                var address = await _addressService.Create(model.Address, locality);
+                var locality = _uof.Localities.GetOrCreate(model.Locality);
+                var address = _uof.Addresses.GetOrCreate(model.Address, locality);
                 Sex sex;
                 Enum.TryParse(model.Sex, out sex);
 

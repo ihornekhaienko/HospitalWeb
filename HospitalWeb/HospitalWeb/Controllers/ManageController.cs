@@ -1,6 +1,7 @@
 ﻿using HospitalWeb.BLL.Services.Interfaces;
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
+using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.Filters.Models;
 using HospitalWeb.Filters.Models.FilterModels;
@@ -18,25 +19,22 @@ namespace HospitalWeb.Controllers
         private readonly ILogger<ManageController> _logger;
         private readonly AppDbContext _db;
         private readonly UserManager<AppUser> _userManager;
+        private readonly UnitOfWork _uof;
         private readonly IPasswordGenerator _passwordGenerator;
-        private readonly ISpecialtyService _specialtyService;
-        private readonly ILocalityService _localityService;
 
         public ManageController(
             ILogger<ManageController> logger,
             AppDbContext db,
             UserManager<AppUser> userManager,
-            IPasswordGenerator passwordGenerator,
-            ISpecialtyService specialtyService,
-            ILocalityService localityService
+            UnitOfWork uof,
+            IPasswordGenerator passwordGenerator
             )
         {
             _logger = logger;
             _db = db;
             _userManager = userManager;
+            _uof = uof;
             _passwordGenerator = passwordGenerator;
-            _specialtyService = specialtyService;
-            _localityService = localityService;
         }
 
         [HttpGet]
@@ -341,7 +339,7 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult CreateDoctor()
         {
-            ViewBag.Specialties = _specialtyService?.GetAll()?.Select(s => s.SpecialtyName);
+            ViewBag.Specialties = _uof.Specialties.GetAll().Select(s => s.SpecialtyName);
             return View();
         }
 
@@ -350,7 +348,7 @@ namespace HospitalWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var specialty = await _specialtyService.Create(model.Specialty);
+                var specialty = _uof.Specialties.GetOrCreate(model.Specialty);
                 var doctor = new Doctor
                 {
                     Name = model.Name,
@@ -385,7 +383,7 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> EditDoctor(string id)
         {
-            ViewBag.Specialties = _specialtyService?.GetAll()?.Select(s => s.SpecialtyName);
+            ViewBag.Specialties = _uof.Specialties.GetAll().Select(s => s.SpecialtyName);
             if (string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
@@ -417,7 +415,7 @@ namespace HospitalWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var specialty = await _specialtyService.Create(model.Specialty);
+                var specialty = _uof.Specialties.GetOrCreate(model.Specialty);
                 var doctor = await _db.Doctors
                     .Include(d => d.Specialty)
                     .FirstOrDefaultAsync(a => a.Email == model.Email);
