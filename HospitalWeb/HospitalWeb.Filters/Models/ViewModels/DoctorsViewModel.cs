@@ -4,11 +4,11 @@ using HospitalWeb.Filters.Models.SortModels;
 
 namespace HospitalWeb.Filters.Models.ViewModels
 {
-    public class AdminsViewModel
+    public class DoctorsViewModel
     {
-        public IEnumerable<Admin>? Admins { get; set; }
+        public IEnumerable<Doctor>? Doctors { get; set; }
         public PageModel? PageModel { get; set; }
-        public AdminFilterModel? FilterModel { get; set; }
-        public AdminSortModel? SortModel { get; set; } 
+        public DoctorFilterModel? FilterModel { get; set; }
+        public DoctorSortModel? SortModel { get; set; }
     }
 }
