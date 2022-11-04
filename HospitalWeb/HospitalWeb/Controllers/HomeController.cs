@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HospitalWeb.BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.Controllers
 {

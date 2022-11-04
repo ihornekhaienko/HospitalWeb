@@ -2,7 +2,6 @@
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
-using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.Filters.Models;
 using HospitalWeb.Filters.Models.FilterModels;
 using HospitalWeb.Filters.Models.SortModels;
@@ -308,7 +307,7 @@ namespace HospitalWeb.Controllers
             {
                 PageModel = pageModel,
                 SortModel = new DoctorSortModel(sortOrder),
-                FilterModel = new DoctorFilterModel(searchString, _db.Specialties.ToList(), specialty),
+                FilterModel = new DoctorFilterModel(searchString, _uof.Specialties.GetAll().ToList(), specialty),
                 Doctors = items
             };
 
@@ -529,7 +528,7 @@ namespace HospitalWeb.Controllers
             {
                 PageModel = pageModel,
                 SortModel = new PatientSortModel(sortOrder),
-                FilterModel = new PatientFilterModel(searchString, _db.Localities.ToList(), locality),
+                FilterModel = new PatientFilterModel(searchString, _uof.Localities.GetAll().ToList(), locality),
                 Patients = items
             };
 
