@@ -88,8 +88,9 @@
                 </td>
                 <td>
                     <span>
-                        <a asp-action="EditDoctor" asp-route-id="@doctor.Id">Edit</a> |
-                        <a asp-action="DeleteDoctor" asp-route-id="@doctor.Id">Delete</a>
+                        <a asp-controller="Manage" asp-action="EditDoctor" asp-route-id="@doctor.Id">Edit</a> |
+                        <a asp-controller="Manage" asp-action="DoctorSchedule" asp-route-id="@doctor.Id" asp-route-day="Monday">Schedule</a> |
+                        <a asp-controller="Manage" asp-action="DeleteDoctor" asp-route-id="@doctor.Id">Delete</a>
                     </span>
                 </td>
             </tr>
