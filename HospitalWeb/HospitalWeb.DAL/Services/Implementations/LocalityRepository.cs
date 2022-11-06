@@ -1,6 +1,7 @@
 ﻿using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.DAL.Services.Implementations
 {
@@ -48,7 +49,8 @@ namespace HospitalWeb.DAL.Services.Implementations
 
         public IEnumerable<Locality> GetAll()
         {
-            return _db.Localities;
+            return _db.Localities
+                .Include(a => a.Addresses);
         }
 
         public void Update(Locality item)

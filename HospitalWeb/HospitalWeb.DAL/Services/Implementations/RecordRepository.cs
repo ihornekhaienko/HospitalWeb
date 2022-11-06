@@ -1,6 +1,7 @@
 ﻿using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.DAL.Services.Implementations
 {
@@ -32,7 +33,10 @@ namespace HospitalWeb.DAL.Services.Implementations
 
         public IEnumerable<Record> GetAll()
         {
-            return _db.Records;
+            return _db.Records
+                .Include(r => r.Doctor)
+                .Include(r => r.Patient)
+                .ToList();
         }
 
         public void Update(Record item)

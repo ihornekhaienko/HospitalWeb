@@ -1,6 +1,7 @@
 ﻿using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.DAL.Services.Implementations
 {
@@ -56,7 +57,8 @@ namespace HospitalWeb.DAL.Services.Implementations
 
         public IEnumerable<Specialty> GetAll()
         {
-            return _db.Specialties;
+            return _db.Specialties
+                .Include(s => s.Doctors).ToList();
         }
 
         public void Update(Specialty item)

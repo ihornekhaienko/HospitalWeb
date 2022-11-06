@@ -1,6 +1,7 @@
 ﻿using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.DAL.Services.Implementations
 {
@@ -32,7 +33,9 @@ namespace HospitalWeb.DAL.Services.Implementations
 
         public IEnumerable<Schedule> GetAll()
         {
-            return _db.Schedules;
+            return _db.Schedules
+                .Include(s => s.Doctor)
+                .ToList();
         }
 
         public void Update(Schedule item)

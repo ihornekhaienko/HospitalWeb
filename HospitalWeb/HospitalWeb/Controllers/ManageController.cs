@@ -555,5 +555,12 @@ namespace HospitalWeb.Controllers
 
             return RedirectToAction("Patients", "Manage");
         }
+
+        [HttpGet]
+        public IActionResult DoctorSchedule(string id)
+        {
+
+            return View();
+        }
     }
 }
