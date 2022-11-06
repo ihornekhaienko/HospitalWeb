@@ -1,5 +1,6 @@
 ﻿using HospitalWeb.BLL.Services.Interfaces;
 using HospitalWeb.DAL.Data;
+using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.Filters.Models;
@@ -15,24 +16,25 @@ namespace HospitalWeb.Controllers
 {
     public class ManageController : Controller
     {
+        int _pageSize = 10;
         private readonly ILogger<ManageController> _logger;
         private readonly AppDbContext _db;
         private readonly UserManager<AppUser> _userManager;
-        private readonly UnitOfWork _uof;
+        private readonly UnitOfWork _uow;
         private readonly IPasswordGenerator _passwordGenerator;
 
         public ManageController(
             ILogger<ManageController> logger,
             AppDbContext db,
             UserManager<AppUser> userManager,
-            UnitOfWork uof,
+            UnitOfWork uow,
             IPasswordGenerator passwordGenerator
             )
         {
             _logger = logger;
             _db = db;
             _userManager = userManager;
-            _uof = uof;
+            _uow = uow;
             _passwordGenerator = passwordGenerator;
         }
 
@@ -44,7 +46,6 @@ namespace HospitalWeb.Controllers
         {
             ViewBag.CurrentAdmin = _db.Admins.Where(a => a.UserName == User.Identity.Name).FirstOrDefault();
 
-            int pageSize = 10;
             IQueryable<Admin> admins = _db.Admins;
 
             if (!string.IsNullOrWhiteSpace(searchString))
@@ -95,11 +96,11 @@ namespace HospitalWeb.Controllers
 
             var count = await admins.CountAsync();
             var items = await admins
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((page - 1) * _pageSize)
+                .Take(_pageSize)
                 .ToListAsync();
 
-            var pageModel = new PageModel(count, page, pageSize);
+            var pageModel = new PageModel(count, page, _pageSize);
             var viewModel = new AdminsViewModel
             {
                 PageModel = pageModel,
@@ -242,7 +243,6 @@ namespace HospitalWeb.Controllers
             int page = 1,
             DoctorSortState sortOrder = DoctorSortState.Id)
         {
-            int pageSize = 10;
             IQueryable<Doctor> doctors = _db.Doctors.Include(d => d.Specialty);
 
             if (!string.IsNullOrWhiteSpace(searchString))
@@ -298,16 +298,16 @@ namespace HospitalWeb.Controllers
 
             var count = await doctors.CountAsync();
             var items = await doctors
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((page - 1) * _pageSize)
+                .Take(_pageSize)
                 .ToListAsync();
 
-            var pageModel = new PageModel(count, page, pageSize);
+            var pageModel = new PageModel(count, page, _pageSize);
             var viewModel = new DoctorsViewModel
             {
                 PageModel = pageModel,
                 SortModel = new DoctorSortModel(sortOrder),
-                FilterModel = new DoctorFilterModel(searchString, _uof.Specialties.GetAll().ToList(), specialty),
+                FilterModel = new DoctorFilterModel(searchString, _uow.Specialties.GetAll().ToList(), specialty),
                 Doctors = items
             };
 
@@ -338,7 +338,7 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult CreateDoctor()
         {
-            ViewBag.Specialties = _uof.Specialties.GetAll().Select(s => s.SpecialtyName);
+            ViewBag.Specialties = _uow.Specialties.GetAll().Select(s => s.SpecialtyName);
             return View();
         }
 
@@ -347,7 +347,7 @@ namespace HospitalWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var specialty = _uof.Specialties.GetOrCreate(model.Specialty);
+                var specialty = _uow.Specialties.GetOrCreate(model.Specialty);
                 var doctor = new Doctor
                 {
                     Name = model.Name,
@@ -382,7 +382,7 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> EditDoctor(string id)
         {
-            ViewBag.Specialties = _uof.Specialties.GetAll().Select(s => s.SpecialtyName);
+            ViewBag.Specialties = _uow.Specialties.GetAll().Select(s => s.SpecialtyName);
             if (string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
@@ -414,7 +414,7 @@ namespace HospitalWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var specialty = _uof.Specialties.GetOrCreate(model.Specialty);
+                var specialty = _uow.Specialties.GetOrCreate(model.Specialty);
                 var doctor = await _db.Doctors
                     .Include(d => d.Specialty)
                     .FirstOrDefaultAsync(a => a.Email == model.Email);
@@ -456,7 +456,6 @@ namespace HospitalWeb.Controllers
             int page = 1,
             PatientSortState sortOrder = PatientSortState.Id)
         {
-            int pageSize = 10;
             IQueryable<Patient> patients = _db.Patients
                 .Include(p => p.Address)
                 .ThenInclude(a => a.Locality);
@@ -519,16 +518,16 @@ namespace HospitalWeb.Controllers
 
             var count = await patients.CountAsync();
             var items = await patients
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((page - 1) * _pageSize)
+                .Take(_pageSize)
                 .ToListAsync();
 
-            var pageModel = new PageModel(count, page, pageSize);
+            var pageModel = new PageModel(count, page, _pageSize);
             var viewModel = new PatientsViewModel
             {
                 PageModel = pageModel,
                 SortModel = new PatientSortModel(sortOrder),
-                FilterModel = new PatientFilterModel(searchString, _uof.Localities.GetAll().ToList(), locality),
+                FilterModel = new PatientFilterModel(searchString, _uow.Localities.GetAll().ToList(), locality),
                 Patients = items
             };
 
@@ -555,12 +554,114 @@ namespace HospitalWeb.Controllers
 
             return RedirectToAction("Patients", "Manage");
         }
+        
+        public IActionResult DoctorSchedule(string id, string day)
+        {
+            if (_uow.Schedules.GetAll().Any(s => s.Doctor.Id == id && s.DayOfWeek.ToString() == day))
+            {
+                return RedirectToAction("EditDoctorSchedule", "Manage", new { id = id, day = day });
+            }
+            else
+            {
+                return RedirectToAction("AddDoctorSchedule", "Manage", new { id = id, day = day });
+            }
+        }
 
         [HttpGet]
-        public IActionResult DoctorSchedule(string id)
+        public async Task<IActionResult> AddDoctorSchedule(string id, string day)
         {
+            DoctorSlotViewModel model;
 
-            return View();
+            RedirectToAction("AddDoctorSchedule", "Manage", new { id = id, day = day });
+            var doctor = await _userManager.FindByIdAsync(id);
+
+            model = new DoctorSlotViewModel
+            {
+                DoctorId = id,
+                DoctorFullName = doctor.ToString(),
+                DayOfWeek = day
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddDoctorSchedule(DoctorSlotViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var doctor = await _userManager.FindByIdAsync(model.DoctorId) as Doctor;
+                DayOfWeek dayOfWeek;
+                Enum.TryParse(model.DayOfWeek, out dayOfWeek);
+
+                var schedule = new Schedule
+                {
+                    Doctor = doctor,
+                    DayOfWeek = dayOfWeek,
+                    StartTime = model.StartTime,
+                    EndTime = model.EndTime
+                };
+
+                _uow.Schedules.Create(schedule);
+
+                return RedirectToAction("Doctors", "Manage");
+            }
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult EditDoctorSchedule(string id, string day)
+        {
+            var schedule = _uow.Schedules.GetDoctorScheduleByDay(id, day);
+
+            DoctorSlotViewModel model;
+
+            model = new DoctorSlotViewModel
+            {
+                ScheduleId = schedule.ScheduleId,
+                DoctorId = id,
+                DoctorFullName = schedule.Doctor.ToString(),
+                DayOfWeek = schedule.DayOfWeek.ToString(),
+                StartTime = schedule.StartTime,
+                EndTime = schedule.EndTime
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditDoctorSchedule(DoctorSlotViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (model.ScheduleId == null)
+                {
+                    return NotFound();
+                }
+
+                var schedule = _uow.Schedules.Get((int)model.ScheduleId);
+
+                schedule.StartTime = model.StartTime;
+                schedule.EndTime = model.EndTime;
+
+                _uow.Schedules.Update(schedule);
+
+                return RedirectToAction("Doctors", "Manage");
+            }
+            return View(model);
+        }
+
+        public IActionResult DeleteDoctorSchedule(DoctorSlotViewModel model)
+        {
+            if (model.ScheduleId == null)
+            {
+                return NotFound();
+            }
+
+            var schedule = _uow.Schedules.Get((int)model.ScheduleId);
+            _uow.Schedules.Delete(schedule);
+
+            return RedirectToAction("Doctors", "Manage");
         }
     }
 }
