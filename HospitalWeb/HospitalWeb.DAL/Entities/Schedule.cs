@@ -6,8 +6,8 @@ namespace HospitalWeb.DAL.Entities
     {
         public int ScheduleId { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
         
         public Doctor? Doctor { get; set; }
     }
