@@ -15,7 +15,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-envelope"></i>
                     </span>
-                    <input type="text" asp-for="Email" class="form-control" placeholder="Email"/>                
+                    <input type="text" asp-for="Email" class="form-control input-validation-error" placeholder="Email"/>                
                 </div>
                 <span asp-validation-for="Email" class="validator text-danger"></span>
             </div>
@@ -25,7 +25,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-lock"></i>
                     </span>
-                    <input type="password" asp-for="Password" class="form-control" placeholder="Password"/>
+                    <input type="password" asp-for="Password" class="form-control input-validation-error" placeholder="Password"/>
                 </div>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>

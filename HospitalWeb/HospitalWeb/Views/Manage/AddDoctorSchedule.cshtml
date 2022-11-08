@@ -33,7 +33,7 @@
     <div class="row mb-3">
         <label asp-for="StartTime" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
-            <input type="time" min="08:00" max="18:00" asp-for="StartTime" value="08:00"/>
+            <input type="time" min="08:00" max="18:00" asp-for="StartTime" class="input-validation-error" value="08:00"/>
         </div>
         <span asp-validation-for="StartTime" class="text-danger"></span>
     </div>
@@ -41,7 +41,7 @@
     <div class="row mb-3">
         <label asp-for="EndTime" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
-            <input type="time" min="08:00" max="18:00" asp-for="EndTime" value="18:00"/>
+            <input type="time" min="08:00" max="18:00" asp-for="EndTime" class="input-validation-error" value="18:00"/>
         </div>
         <span asp-validation-for="EndTime" class="text-danger"></span>
     </div>

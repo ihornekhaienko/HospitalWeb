@@ -6,13 +6,22 @@
     if (User.IsInRole("Admin"))
     {
         <li class="nav-item">
-            <a class="nav-link" asp-controller="Manage" asp-action="Admins">Admins</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="Manage" asp-action="Doctors">Doctors</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="Manage" asp-action="Patients">Patients</a>
+            <div class="dropdown">
+                <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Administration
+                </button>
+                <ul class="dropdown-menu bg-dark">
+                    <li>
+                        <a class="nav-link bg-dark" asp-controller="Manage" asp-action="Admins">Admins</a>
+                    </li>
+                    <li>
+                        <a class="nav-link bg-dark" asp-controller="Manage" asp-action="Doctors">Doctors</a>
+                    </li>
+                    <li>
+                        <a class="nav-link bg-dark" asp-controller="Manage" asp-action="Patients">Patients</a>
+                    </li>
+                </ul>
+            </div>
         </li>
     }
 }
