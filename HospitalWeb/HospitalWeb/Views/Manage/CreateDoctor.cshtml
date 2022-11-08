@@ -10,27 +10,27 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control input-validation-error" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Surname" class="control-label"></label>
-                <input asp-for="Surname" class="form-control" />
+                <input asp-for="Surname" class="form-control input-validation-error" />
                 <span asp-validation-for="Surname" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" type="email"/>
+                <input asp-for="Email" class="form-control input-validation-error" type="email"/>
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Phone" class="control-label"></label>
-                <input asp-for="Phone" class="form-control" type="tel"/>
+                <input asp-for="Phone" class="form-control input-validation-error" type="tel"/>
                 <span asp-validation-for="Phone" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Specialty" class="control-label"></label>
-                <input asp-for="Specialty" class="form-control" type="text" list="specialties"/>
+                <input asp-for="Specialty" class="form-control input-validation-error" type="text" list="specialties"/>
                 <datalist id="specialties">
                     @foreach (var specialty in ViewBag.Specialties)
                     {
