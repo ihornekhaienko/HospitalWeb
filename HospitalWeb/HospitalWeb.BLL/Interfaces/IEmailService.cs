@@ -1,4 +1,4 @@
-﻿namespace HospitalWeb.BLL.Services.Interfaces
+﻿namespace HospitalWeb.Services.Interfaces
 {
     public interface INotifier
     {

@@ -1,7 +1,7 @@
-﻿using HospitalWeb.BLL.Services.Interfaces;
+﻿using HospitalWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
-namespace HospitalWeb.BLL.Services.Implementations
+namespace HospitalWeb.Services.Implementations
 {
     public class PasswordGenerator : IPasswordGenerator
     {

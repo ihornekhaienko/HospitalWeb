@@ -1,9 +1,9 @@
-﻿using HospitalWeb.BLL.Services.Interfaces;
+﻿using HospitalWeb.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.Mail;
 
-namespace HospitalWeb.BLL.Services.Implementations
+namespace HospitalWeb.Services.Implementations
 {
     public class EmailNotifier : INotifier
     {
@@ -33,7 +33,7 @@ namespace HospitalWeb.BLL.Services.Implementations
         {
             try
             {
-                MailAddress from = new MailAddress("hospital0311@gmail.com", "Hospital");
+                MailAddress from = new MailAddress("hospital_0711@ukr.net", "Hospital");
                 MailAddress to = new MailAddress(receiver);
                 MailMessage mailMessage = new MailMessage(from, to)
                 {
@@ -42,9 +42,9 @@ namespace HospitalWeb.BLL.Services.Implementations
                     IsBodyHtml = true
                 };
 
-                SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
+                SmtpClient smtp = new SmtpClient("smtp.ukr.net", 465)
                 {
-                    Credentials = new NetworkCredential("hospital0311@gmail.com", "pgxjtrjsiloimxrf"),
+                    Credentials = new NetworkCredential("hospital_0711@ukr.net", "pass_0711"),
                     EnableSsl = true,
                     DeliveryMethod = SmtpDeliveryMethod.Network
                 };
