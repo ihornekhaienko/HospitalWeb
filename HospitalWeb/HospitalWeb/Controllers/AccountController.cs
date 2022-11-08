@@ -1,46 +1,63 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
+﻿using HospitalWeb.Services.Extensions;
+using HospitalWeb.Services.Interfaces;
+using HospitalWeb.DAL.Data;
+using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.ViewModels.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HospitalWeb.Controllers
 {
+    [Authorize]
+    [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
         private readonly ILogger<AccountController> _logger;
+        private readonly IWebHostEnvironment _environment;
+        private readonly AppDbContext _db;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly UnitOfWork _uof;
+        private readonly UnitOfWork _uow;
+        private readonly IFileManager _fileManager;
 
         public AccountController(
-            ILogger<AccountController> logger, 
+            ILogger<AccountController> logger,
+            IWebHostEnvironment environment,
+            AppDbContext db,
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            UnitOfWork uof
+            UnitOfWork uow,
+            IFileManager fileManager
             )
         {
             _logger = logger;
+            _environment = environment;
+            _db = db;
             _userManager = userManager;
             _signInManager = signInManager;
-            _uof = uof;
+            _uow = uow;
+            _fileManager = fileManager;
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var locality = _uof.Localities.GetOrCreate(model.Locality);
-                var address = _uof.Addresses.GetOrCreate(model.Address, locality);
+                var locality = _uow.Localities.GetOrCreate(model.Locality);
+                var address = _uow.Addresses.GetOrCreate(model.Address, locality);
                 Sex sex;
                 Enum.TryParse(model.Sex, out sex);
 
@@ -77,7 +94,8 @@ namespace HospitalWeb.Controllers
             return View(model);
         }
         
-        [HttpGet]    
+        [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(string? returnUrl = null)
         {
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
@@ -87,6 +105,7 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -117,7 +136,7 @@ namespace HospitalWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout(string returnUrl)
+        public async Task<IActionResult> Logout(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
 
