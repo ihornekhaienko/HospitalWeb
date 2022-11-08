@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace HospitalWeb.Services.Implementations
 {
-    public class PasswordGenerator : IPasswordGenerator
+    internal class PasswordGenerator : IPasswordGenerator
     {
         public string? GeneratePassword(PasswordOptions? opts = null)
         {

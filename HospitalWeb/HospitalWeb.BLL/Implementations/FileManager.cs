@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace HospitalWeb.Services.Implementations
 {
-    public class FileManager : IFileManager
+    internal class FileManager : IFileManager
     {
         private string? _filePath;
 

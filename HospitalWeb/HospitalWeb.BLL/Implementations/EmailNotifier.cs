@@ -5,7 +5,7 @@ using System.Net.Mail;
 
 namespace HospitalWeb.Services.Implementations
 {
-    public class EmailNotifier : INotifier
+    internal class EmailNotifier : INotifier
     {
         private readonly ILogger<EmailNotifier> _logger;
 
