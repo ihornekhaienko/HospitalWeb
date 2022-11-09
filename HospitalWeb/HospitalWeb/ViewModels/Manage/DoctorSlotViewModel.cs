@@ -5,15 +5,15 @@ namespace HospitalWeb.ViewModels.Manage
 {
     public class DoctorSlotViewModel
     {
-        public string? DoctorId { get; set; }
+        public string DoctorId { get; set; }
 
-        public string? DoctorFullName { get; set; }
+        public string DoctorFullName { get; set; }
 
         public int? ScheduleId { get; set; }
 
         [Required]
         [Display(Name = "Select day")]
-        public string? DayOfWeek { get; set; }
+        public string DayOfWeek { get; set; }
 
         [Required]
         [TimeLessThan("EndTime", ErrorMessage = "The start time must lower than the end time")]

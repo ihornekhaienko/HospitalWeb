@@ -6,9 +6,9 @@ namespace HospitalWeb.Filters.Models.ViewModels
 {
     public class PatientsViewModel
     {
-        public IEnumerable<Patient>? Patients { get; set; }
-        public PageModel? PageModel { get; set; }
-        public PatientFilterModel? FilterModel { get; set; }
-        public PatientSortModel? SortModel { get; set; }
+        public IEnumerable<Patient> Patients { get; set; }
+        public PageModel PageModel { get; set; }
+        public PatientFilterModel FilterModel { get; set; }
+        public PatientSortModel SortModel { get; set; }
     }
 }

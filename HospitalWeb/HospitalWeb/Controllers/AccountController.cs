@@ -96,7 +96,7 @@ namespace HospitalWeb.Controllers
         
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string? returnUrl = null)
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
             ViewBag.ReturnUrl = returnUrl;
@@ -136,7 +136,7 @@ namespace HospitalWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout(string? returnUrl = null)
+        public async Task<IActionResult> Logout(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
 
@@ -155,7 +155,7 @@ namespace HospitalWeb.Controllers
         {
             var user = await _userManager.FindByEmailAsync(User.Identity.Name);
 
-            byte[]? image;
+            byte[] image;
 
             if (user.Image != null)
             {

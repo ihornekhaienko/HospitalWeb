@@ -7,20 +7,20 @@ namespace HospitalWeb.ViewModels.Manage
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         [Required]
         [Display(Name = "Name")]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [Display(Name = "Surname")]
-        public string? Surname { get; set; }
+        public string Surname { get; set; }
 
         [Required]
         [RegularExpression("^\\+?[1-9][0-9]{7,14}$")]
         [Display(Name = "Phone")]
-        public string? Phone { get; set; }
+        public string Phone { get; set; }
 
         [Required]
         [Display(Name = "Super admin")]

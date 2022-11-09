@@ -5,9 +5,9 @@ namespace HospitalWeb.Services.Implementations
 {
     internal class FileManager : IFileManager
     {
-        private string? _filePath;
+        private string _filePath;
 
-        public async Task<byte[]?> GetBytes(IFormFile file)
+        public async Task<byte[]> GetBytes(IFormFile file)
         {
             Stream stream = file.OpenReadStream();
             using var memoryStream = new MemoryStream();
@@ -15,7 +15,7 @@ namespace HospitalWeb.Services.Implementations
             return memoryStream.ToArray();
         }
 
-        public async Task<byte[]?> GetBytes(string path)
+        public async Task<byte[]> GetBytes(string path)
         {
             using FileStream fstream = File.OpenRead(path);
             byte[] buffer = new byte[fstream.Length];
@@ -24,7 +24,7 @@ namespace HospitalWeb.Services.Implementations
             return buffer;
         }
 
-        public async Task<string?> UploadToServer(byte[] file, string path)
+        public async Task<string> UploadToServer(byte[] file, string path)
         {
             if (file != null && file.Length > 0)
             {
@@ -38,7 +38,7 @@ namespace HospitalWeb.Services.Implementations
             return null;
         }
 
-        public async Task<string?> UploadToServer(IFormFile file, string path)
+        public async Task<string> UploadToServer(IFormFile file, string path)
         {
             if (file != null && file.Length > 0)
             {
@@ -56,7 +56,7 @@ namespace HospitalWeb.Services.Implementations
             return null;
         }
 
-        public void DeleteFile(string? path)
+        public void DeleteFile(string path)
         {
             if (path != null && File.Exists(path))
             {

@@ -6,9 +6,9 @@ namespace HospitalWeb.Filters.Models.ViewModels
 {
     public class AdminsViewModel
     {
-        public IEnumerable<Admin>? Admins { get; set; }
-        public PageModel? PageModel { get; set; }
-        public AdminFilterModel? FilterModel { get; set; }
-        public AdminSortModel? SortModel { get; set; } 
+        public IEnumerable<Admin> Admins { get; set; }
+        public PageModel PageModel { get; set; }
+        public AdminFilterModel FilterModel { get; set; }
+        public AdminSortModel SortModel { get; set; } 
     }
 }

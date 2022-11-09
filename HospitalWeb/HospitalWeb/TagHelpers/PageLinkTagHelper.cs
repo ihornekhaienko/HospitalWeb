@@ -18,9 +18,9 @@ namespace HospitalWeb.TagHelpers
 
         [ViewContext]
         [HtmlAttributeNotBound]
-        public ViewContext? ViewContext { get; set; }
-        public PageModel? PageModel { get; set; }
-        public string? PageAction { get; set; }
+        public ViewContext ViewContext { get; set; }
+        public PageModel PageModel { get; set; }
+        public string PageAction { get; set; }
 
         [HtmlAttributeName(DictionaryAttributePrefix = "page-url-")]
         public Dictionary<string, object> PageUrlValues { get; set; } = new Dictionary<string, object>();

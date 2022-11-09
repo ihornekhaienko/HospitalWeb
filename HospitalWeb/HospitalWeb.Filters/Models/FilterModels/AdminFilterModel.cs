@@ -2,9 +2,9 @@
 {
     public class AdminFilterModel
     {
-        public string? SearchString { get; private set; }
+        public string SearchString { get; private set; }
 
-        public AdminFilterModel(string? searchString)
+        public AdminFilterModel(string searchString)
         {
             SearchString = searchString;
         }

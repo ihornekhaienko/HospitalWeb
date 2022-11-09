@@ -40,7 +40,7 @@ namespace HospitalWeb.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Admins(
-            string? searchString,
+            string searchString,
             int page = 1, 
             AdminSortState sortOrder = AdminSortState.Id)
         {
@@ -115,7 +115,7 @@ namespace HospitalWeb.Controllers
             return View(viewModel);
         }
 
-        public async Task<IActionResult> DeleteAdmin(string? id)
+        public async Task<IActionResult> DeleteAdmin(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -179,7 +179,7 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditAdmin(string id)
+        public IActionResult EditAdmin(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -243,7 +243,7 @@ namespace HospitalWeb.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Doctors(
-            string? searchString,
+            string searchString,
             int? specialty,
             int page = 1,
             DoctorSortState sortOrder = DoctorSortState.Id)
@@ -321,7 +321,7 @@ namespace HospitalWeb.Controllers
             return View(viewModel);
         }
 
-        public async Task<IActionResult> DeleteDoctor(string? id)
+        public async Task<IActionResult> DeleteDoctor(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -387,7 +387,7 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditDoctor(string id)
+        public IActionResult EditDoctor(string id)
         {
             ViewBag.Specialties = _uow.Specialties.GetAll().Select(s => s.SpecialtyName);
             if (string.IsNullOrWhiteSpace(id))
@@ -458,7 +458,7 @@ namespace HospitalWeb.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Patients(
-            string? searchString,
+            string searchString,
             int? locality,
             int page = 1,
             PatientSortState sortOrder = PatientSortState.Id)
@@ -541,7 +541,7 @@ namespace HospitalWeb.Controllers
             return View(viewModel);
         }
 
-        public async Task<IActionResult> DeletePatient(string? id)
+        public async Task<IActionResult> DeletePatient(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
