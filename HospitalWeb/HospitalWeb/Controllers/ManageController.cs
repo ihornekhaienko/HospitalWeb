@@ -1,4 +1,4 @@
-﻿using HospitalWeb.BLL.Services.Interfaces;
+﻿using HospitalWeb.Services.Interfaces;
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Entities.Identity;
@@ -16,7 +16,7 @@ namespace HospitalWeb.Controllers
 {
     public class ManageController : Controller
     {
-        int _pageSize = 10;
+        private readonly int _pageSize = 10;
         private readonly ILogger<ManageController> _logger;
         private readonly AppDbContext _db;
         private readonly UserManager<AppUser> _userManager;
@@ -44,9 +44,12 @@ namespace HospitalWeb.Controllers
             int page = 1, 
             AdminSortState sortOrder = AdminSortState.Id)
         {
-            ViewBag.CurrentAdmin = _db.Admins.Where(a => a.UserName == User.Identity.Name).FirstOrDefault();
+            ViewBag.CurrentAdmin = _uow.Admins
+                .GetAll()
+                .Where(a => a.UserName == User.Identity.Name)
+                .FirstOrDefault();
 
-            IQueryable<Admin> admins = _db.Admins;
+            IQueryable<Admin> admins = _uow.Admins.GetAll().AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchString))
             {
@@ -119,9 +122,9 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            var admin = await _db.Admins
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var admin =  _uow.Admins
+                .GetAll()
+                .FirstOrDefault(m => m.Id == id);
 
             if (admin == null)
             {
@@ -183,8 +186,9 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            var admin = await _db.Admins
-                .FirstOrDefaultAsync(a => a.Id == id);
+            var admin = _uow.Admins
+                .GetAll()
+                .FirstOrDefault(a => a.Id == id);
 
             if (admin == null)
             {
@@ -208,8 +212,9 @@ namespace HospitalWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var admin = await _db.Admins
-                    .FirstOrDefaultAsync(a => a.Email == model.Email);
+                var admin = _uow.Admins
+                    .GetAll()
+                    .FirstOrDefault(a => a.Email == model.Email);
 
                 admin.UserName = model.Email;
                 admin.Email = model.Email;
@@ -243,7 +248,9 @@ namespace HospitalWeb.Controllers
             int page = 1,
             DoctorSortState sortOrder = DoctorSortState.Id)
         {
-            IQueryable<Doctor> doctors = _db.Doctors.Include(d => d.Specialty);
+            IQueryable<Doctor> doctors = _uow.Doctors
+                .GetAll()
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchString))
             {
@@ -388,9 +395,9 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            var doctor = await _db.Doctors
-                .Include(d => d.Specialty)
-                .FirstOrDefaultAsync(d => d.Id == id);
+            var doctor = _uow.Doctors
+                .GetAll()
+                .FirstOrDefault(d => d.Id == id);
 
             if (doctor == null)
             {
@@ -415,9 +422,9 @@ namespace HospitalWeb.Controllers
             if (ModelState.IsValid)
             {
                 var specialty = _uow.Specialties.GetOrCreate(model.Specialty);
-                var doctor = await _db.Doctors
-                    .Include(d => d.Specialty)
-                    .FirstOrDefaultAsync(a => a.Email == model.Email);
+                var doctor = _uow.Doctors
+                    .GetAll()
+                    .FirstOrDefault(a => a.Email == model.Email);
 
                 if (doctor == null || specialty == null)
                 {
@@ -456,9 +463,9 @@ namespace HospitalWeb.Controllers
             int page = 1,
             PatientSortState sortOrder = PatientSortState.Id)
         {
-            IQueryable<Patient> patients = _db.Patients
-                .Include(p => p.Address)
-                .ThenInclude(a => a.Locality);
+            IQueryable<Patient> patients = _uow.Patients
+                .GetAll()
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchString))
             {

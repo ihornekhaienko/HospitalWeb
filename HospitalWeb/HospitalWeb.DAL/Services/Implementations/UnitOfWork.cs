@@ -6,7 +6,10 @@ namespace HospitalWeb.DAL.Services.Implementations
     {
         private readonly AppDbContext _db;
         private AddressRepository _addressRepository;
+        private AdminRepository _adminRepository;
+        private DoctorRepository _doctorRepository;
         private LocalityRepository _localityRepository;
+        private PatientRepository _patientRepository;
         private RecordRepository _recordRepository;
         private ScheduleRepository _scheduleRepository;
         private SpecialtyRepository _specialtyRepository;
@@ -26,6 +29,26 @@ namespace HospitalWeb.DAL.Services.Implementations
             }
         }
 
+        public AdminRepository Admins
+        {
+            get
+            {
+                if (_adminRepository == null)
+                    _adminRepository = new AdminRepository(_db);
+                return _adminRepository;
+            }
+        }
+
+        public DoctorRepository Doctors
+        {
+            get
+            {
+                if (_doctorRepository == null)
+                    _doctorRepository = new DoctorRepository(_db);
+                return _doctorRepository;
+            }
+        }
+
         public LocalityRepository Localities
         {
             get
@@ -33,6 +56,16 @@ namespace HospitalWeb.DAL.Services.Implementations
                 if (_localityRepository == null)
                     _localityRepository = new LocalityRepository(_db);
                 return _localityRepository;
+            }
+        }
+
+        public PatientRepository Patients
+        {
+            get
+            {
+                if (_patientRepository == null)
+                    _patientRepository = new PatientRepository(_db);
+                return _patientRepository;
             }
         }
 

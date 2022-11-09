@@ -149,5 +149,114 @@ namespace HospitalWeb.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+
+            byte[]? image;
+
+            if (user.Image != null)
+            {
+                image = user.Image;
+            }
+            else
+            {
+                image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+            }
+
+            var model = new ProfileViewModel
+            {
+                Name = user.Name,
+                Surname = user.Surname,
+                Email = user.Email,
+                Phone = user.PhoneNumber,
+                Image = image
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadPhoto(IFormFile file)
+        {
+            if (file != null)
+            {
+                var bytes = await _fileManager.GetBytes(file);
+
+                if (bytes != null && bytes.IsImage())
+                {
+                    var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+
+                    user.Image = bytes;
+                    var result = await _userManager.UpdateAsync(user);
+
+                    return RedirectToAction("Profile", "Account");
+                }
+            }
+
+            throw new NotImplementedException();
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+                var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Profile", "Account");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Wrong password");
+                    return View(model);
+                }
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            //if (ModelState.IsValid)
+            //{
+            //    var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+            //    var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+
+            //    if (result.Succeeded)
+            //    {
+            //        return RedirectToAction("Profile", "Account");
+            //    }
+            //    else
+            //    {
+            //        ModelState.AddModelError(string.Empty, "Wrong password");
+            //        return View(model);
+            //    }
+            //}
+
+            //return View(model);
+            throw new NotImplementedException();
+        }
     }
 }
