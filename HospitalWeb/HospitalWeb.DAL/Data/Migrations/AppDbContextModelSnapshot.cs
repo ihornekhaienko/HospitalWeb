@@ -182,11 +182,11 @@ namespace HospitalWeb.DAL.Data.Migrations
                     b.Property<string>("DoctorId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("ScheduleId");
 

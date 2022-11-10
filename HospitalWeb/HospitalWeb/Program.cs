@@ -1,4 +1,4 @@
-using HospitalWeb.BLL.Services.Extensions;
+using HospitalWeb.Services.Extensions;
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;
@@ -17,6 +17,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<A
 builder.Services.AddUnitOfWork();
 builder.Services.AddEmailNotifier();
 builder.Services.AddPasswordGenerator();
+builder.Services.AddFileManager();
 
 builder.Services.AddControllersWithViews();
 

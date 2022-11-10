@@ -15,48 +15,92 @@ namespace HospitalWeb.DAL.Services.Implementations
             _db = db;
         }
 
+        public Schedule Get(Func<Schedule, bool> filter)
+        {
+            return _db.Schedules
+                .Include(d => d.Doctor)
+                .FirstOrDefault(filter);
+        }
+
+        public IEnumerable<Schedule> GetAll(
+            Func<Schedule, bool> filter = null,
+            Func<IQueryable<Schedule>, IOrderedQueryable<Schedule>> orderBy = null,
+            int first = 0,
+            int offset = 0)
+        {
+            IQueryable<Schedule> schedules = _db.Schedules
+                .Include(d => d.Doctor);
+
+            if (filter != null)
+            {
+                schedules = schedules.Where(filter).AsQueryable();
+            }
+
+            if (orderBy != null)
+            {
+                schedules = orderBy(schedules);
+            }
+
+            if (offset > 0)
+            {
+                schedules = schedules.Skip(offset);
+            }
+
+            if (first > 0)
+            {
+                schedules = schedules.Take(first);
+            }
+
+            return schedules
+                .ToList();
+        }
+
+        public bool Contains(Func<Schedule, bool> query)
+        {
+            return _db.Schedules
+                .Include(d => d.Doctor)
+                .Any(query);
+        }
+
         public void Create(Schedule item)
         {
-            _db.Schedules.Add(item);
+            _db.Add(item);
             _db.SaveChanges();
         }
 
         public void Delete(Schedule item)
         {
-            _db.Schedules.Remove(item);
+            _db.Remove(item);
             _db.SaveChanges();
         }
 
-        public Schedule Get(int id)
+        public void Update(Schedule item)
         {
-            return _db.Schedules.Find(id);
+            _db.Entry(item).State = EntityState.Modified;
+            _db.SaveChanges();
         }
 
-        public IEnumerable<Schedule>? GetDoctorSchedules(Doctor? doctor)
+        public IEnumerable<Schedule> GetDoctorSchedules(Doctor doctor)
         {
             if (doctor == null)
             {
                 return null;
-            }    
+            }
 
-            return GetAll()
-                .Where(d => d.Doctor == doctor)
-                .ToList();
+            return GetAll(d => d.Doctor == doctor);
         }
 
-        public IEnumerable<Schedule>? GetDoctorSchedules(string doctorId)
+        public IEnumerable<Schedule> GetDoctorSchedules(string doctorId)
         {
             if (string.IsNullOrWhiteSpace(doctorId))
             {
                 return null;
             }
 
-            return GetAll()
-                .Where(d => d.Doctor.Id == doctorId)
-                .ToList();
+            return GetAll(d => d.Doctor.Id == doctorId);
         }
 
-        public Schedule? GetDoctorScheduleByDay(string doctorId, string day)
+        public Schedule GetDoctorScheduleByDay(string doctorId, string day)
         {
             DayOfWeek dayOfWeek;
             var result = Enum.TryParse(day, out dayOfWeek);
@@ -65,27 +109,12 @@ namespace HospitalWeb.DAL.Services.Implementations
             {
                 var doctorSchedules = GetDoctorSchedules(doctorId);
 
-                return doctorSchedules
-                    .Where(s => s.DayOfWeek == dayOfWeek)
-                    .FirstOrDefault();
+                return Get(d => d.Doctor.Id == doctorId && d.DayOfWeek == dayOfWeek);
             }
             else
             {
                 return null;
             }
-        }
-
-        public IEnumerable<Schedule> GetAll()
-        {
-            return _db.Schedules
-                .Include(s => s.Doctor)
-                .ToList();
-        }
-
-        public void Update(Schedule item)
-        {
-            _db.Schedules.Update(item);
-            _db.SaveChanges();
         }
     }
 }

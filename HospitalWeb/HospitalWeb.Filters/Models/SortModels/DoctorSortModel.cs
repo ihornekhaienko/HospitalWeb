@@ -1,20 +1,7 @@
-﻿namespace HospitalWeb.Filters.Models.SortModels
-{
-    public enum DoctorSortState
-    {
-        Id,
-        NameAsc,
-        NameDesc,
-        SurnameAsc,
-        SurnameDesc,
-        EmailAsc,
-        EmailDesc,
-        PhoneAsc,
-        PhoneDesc,
-        SpecialtyAsc,
-        SpecialtyDesc,
-    }
+﻿using HospitalWeb.Filters.Models.SortStates;
 
+namespace HospitalWeb.Filters.Models.SortModels
+{
     public class DoctorSortModel
     {
         public DoctorSortState IdSort { get; private set; }

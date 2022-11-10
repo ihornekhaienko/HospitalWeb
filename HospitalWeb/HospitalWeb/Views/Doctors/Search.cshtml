@@ -38,12 +38,16 @@
         }
         <div class="col-sm-4 mx-auto">
             <div class="card" style="width:400px;">
+<<<<<<< HEAD
                 @{
                     byte[] image = doctor.Image ?? ViewBag.Image;
                     var base64 = Convert.ToBase64String(image);
                     var Image = String.Format("data:image/gif;base64,{0}", base64);
                 }
                 <img src="@Image" class="card-img-top photo-profile" alt="Doctor @counter">
+=======
+                <img class="card-img-top" alt="Doctor @counter">
+>>>>>>> Developer
                 <div class="card-body text-center">
                     <h4 class="card-title">@doctor.ToString()</h4>
                     <p class="card-text">@doctor.Specialty</p>

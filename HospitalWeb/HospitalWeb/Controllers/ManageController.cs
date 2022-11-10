@@ -1,408 +1,131 @@
-﻿using HospitalWeb.BLL.Services.Interfaces;
-using HospitalWeb.DAL.Data;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Entities.Identity;
+﻿using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
-using HospitalWeb.Filters.Models;
-using HospitalWeb.Filters.Models.FilterModels;
-using HospitalWeb.Filters.Models.SortModels;
-using HospitalWeb.Filters.Models.ViewModels;
+using HospitalWeb.Services.Extensions;
+using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Manage;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.Controllers
 {
+    [Authorize]
+    [Route("[controller]/[action]")]
     public class ManageController : Controller
     {
-        int _pageSize = 10;
         private readonly ILogger<ManageController> _logger;
-        private readonly AppDbContext _db;
+        private readonly IWebHostEnvironment _environment;
         private readonly UserManager<AppUser> _userManager;
         private readonly UnitOfWork _uow;
-        private readonly IPasswordGenerator _passwordGenerator;
+        private readonly IFileManager _fileManager;
 
         public ManageController(
-            ILogger<ManageController> logger,
-            AppDbContext db,
+            ILogger<ManageController> logger, 
+            IWebHostEnvironment environment,
             UserManager<AppUser> userManager,
             UnitOfWork uow,
-            IPasswordGenerator passwordGenerator
-            )
+            IFileManager fileManager)
         {
             _logger = logger;
-            _db = db;
+            _environment = environment;
             _userManager = userManager;
             _uow = uow;
-            _passwordGenerator = passwordGenerator;
+            _fileManager = fileManager;
         }
 
+        [Authorize]
+        public IActionResult Profile()
+        {
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction("AdminProfile", "Manage");
+            }
+            else if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction("DoctorProfile", "Manage");
+            }
+            else if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction("PatientProfile", "Manage");
+            }
+
+            return NotFound();
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<IActionResult> Admins(
-            string? searchString,
-            int page = 1, 
-            AdminSortState sortOrder = AdminSortState.Id)
+        public async Task<IActionResult> AdminProfile()
         {
-            ViewBag.CurrentAdmin = _db.Admins.Where(a => a.UserName == User.Identity.Name).FirstOrDefault();
+            var admin = _uow.Admins.Get(a => a.Email == User.Identity.Name);
 
-            IQueryable<Admin> admins = _db.Admins;
+            byte[] image;
 
-            if (!string.IsNullOrWhiteSpace(searchString))
+            if (admin.Image != null)
             {
-                admins = admins.Where(a =>
-                    a.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
-                    a.Surname.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
-                    a.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-                );
+                image = admin.Image;
+            }
+            else
+            {
+                image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
             }
 
-            switch (sortOrder)
-            {
-                case AdminSortState.NameAsc:
-                    admins = admins.OrderBy(a => a.Name);
-                    break;
-                case AdminSortState.NameDesc:
-                    admins = admins.OrderByDescending(a => a.Name);
-                    break;
-                case AdminSortState.SurnameAsc:
-                    admins = admins.OrderBy(a => a.Surname);
-                    break;
-                case AdminSortState.SurnameDesc:
-                    admins = admins.OrderByDescending(a => a.Surname);
-                    break;
-                case AdminSortState.EmailAsc:
-                    admins = admins.OrderBy(a => a.Email);
-                    break;
-                case AdminSortState.EmailDesc:
-                    admins = admins.OrderByDescending(a => a.Email);
-                    break;
-                case AdminSortState.PhoneAsc:
-                    admins = admins.OrderBy(a => a.PhoneNumber);
-                    break;
-                case AdminSortState.PhoneDesc:
-                    admins = admins.OrderByDescending(a => a.PhoneNumber);
-                    break;
-                case AdminSortState.LevelAsc:
-                    admins = admins.OrderBy(a => a.IsSuperAdmin);
-                    break;
-                case AdminSortState.LevelDesc:
-                    admins = admins.OrderByDescending(a => a.IsSuperAdmin);
-                    break;
-                default:
-                    admins = admins.OrderBy(a => a.Id);
-                    break;
-            }
-
-            var count = await admins.CountAsync();
-            var items = await admins
-                .Skip((page - 1) * _pageSize)
-                .Take(_pageSize)
-                .ToListAsync();
-
-            var pageModel = new PageModel(count, page, _pageSize);
-            var viewModel = new AdminsViewModel
-            {
-                PageModel = pageModel,
-                SortModel = new AdminSortModel(sortOrder),
-                FilterModel = new AdminFilterModel(searchString),
-                Admins = items
-            };
-            
-            return View(viewModel);
-        }
-
-        public async Task<IActionResult> DeleteAdmin(string? id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return NotFound();
-            }
-
-            var admin = await _db.Admins
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (admin == null)
-            {
-                return NotFound();
-            }
-
-            await _userManager.DeleteAsync(admin);
-
-            return RedirectToAction("Admins", "Manage");
-        }
-
-        [HttpGet]
-        public IActionResult CreateAdmin()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateAdmin(AdminViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var admin = new Admin
-                {
-                    Name = model.Name,
-                    Surname = model.Surname,
-                    Email = model.Email,
-                    UserName = model.Email,
-                    PhoneNumber = model.Phone,
-                    IsSuperAdmin = model.IsSuperAdmin
-                };
-                var password = _passwordGenerator.GeneratePassword(null);
-                
-                var result = await _userManager.CreateAsync(admin, password);
-
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(admin, "Admin");
-
-                    return RedirectToAction("Admins", "Manage");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
-            }
-
-            return View(model);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> EditAdmin(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return NotFound();
-            }
-
-            var admin = await _db.Admins
-                .FirstOrDefaultAsync(a => a.Id == id);
-
-            if (admin == null)
-            {
-                return NotFound();
-            }
-
-            var model = new AdminViewModel
+            var model = new AdminProfileViewModel
             {
                 Name = admin.Name,
                 Surname = admin.Surname,
                 Email = admin.Email,
                 Phone = admin.PhoneNumber,
-                IsSuperAdmin = admin.IsSuperAdmin,
+                Image = image,
+                IsSuperAdmin = admin.IsSuperAdmin
             };
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditAdmin(AdminViewModel model)
+        public IActionResult AdminProfile(AdminProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var admin = await _db.Admins
-                    .FirstOrDefaultAsync(a => a.Email == model.Email);
+                var admin = _uow.Admins.Get(a => a.Email == User.Identity.Name);
 
-                admin.UserName = model.Email;
                 admin.Email = model.Email;
-                admin.Name = model.Name;
                 admin.Surname = model.Surname;
+                admin.Name = model.Name;
                 admin.PhoneNumber = model.Phone;
-                admin.IsSuperAdmin = model.IsSuperAdmin;
 
-                var result = await _userManager.UpdateAsync(admin);
+                _uow.Admins.Update(admin);
 
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Admins", "Manage");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
+                return RedirectToAction("Profile", "Manage");
             }
 
             return View(model);
         }
 
+        [Authorize(Roles = "Doctor")]
         [HttpGet]
-        public async Task<IActionResult> Doctors(
-            string? searchString,
-            int? specialty,
-            int page = 1,
-            DoctorSortState sortOrder = DoctorSortState.Id)
+        public async Task<IActionResult> DoctorProfile()
         {
-            IQueryable<Doctor> doctors = _db.Doctors.Include(d => d.Specialty);
+            var doctor = _uow.Doctors.Get(d => d.Email == User.Identity.Name);
 
-            if (!string.IsNullOrWhiteSpace(searchString))
+            byte[] image;
+
+            if (doctor.Image != null)
             {
-                doctors = doctors.Where(d =>
-                    d.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
-                    d.Surname.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
-                    d.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-                );
+                image = doctor.Image;
+            }
+            else
+            {
+                image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
             }
 
-            if (specialty != null && specialty != 0)
-            {
-                doctors = doctors.Where(p => p.Specialty.SpecialtyId == specialty);
-            }
-
-            switch (sortOrder)
-            {
-                case DoctorSortState.NameAsc:
-                    doctors = doctors.OrderBy(d => d.Name);
-                    break;
-                case DoctorSortState.NameDesc:
-                    doctors = doctors.OrderByDescending(d => d.Name);
-                    break;
-                case DoctorSortState.SurnameAsc:
-                    doctors = doctors.OrderBy(d => d.Surname);
-                    break;
-                case DoctorSortState.SurnameDesc:
-                    doctors = doctors.OrderByDescending(d => d.Surname);
-                    break;
-                case DoctorSortState.EmailAsc:
-                    doctors = doctors.OrderBy(d => d.Email);
-                    break;
-                case DoctorSortState.EmailDesc:
-                    doctors = doctors.OrderByDescending(d => d.Email);
-                    break;
-                case DoctorSortState.PhoneAsc:
-                    doctors = doctors.OrderBy(d => d.PhoneNumber);
-                    break;
-                case DoctorSortState.PhoneDesc:
-                    doctors = doctors.OrderByDescending(d => d.PhoneNumber);
-                    break;
-                case DoctorSortState.SpecialtyAsc:
-                    doctors = doctors.OrderBy(d => d.Specialty.SpecialtyName);
-                    break;
-                case DoctorSortState.SpecialtyDesc:
-                    doctors = doctors.OrderByDescending(d => d.Specialty.SpecialtyName);
-                    break;
-                default:
-                    doctors = doctors.OrderBy(d => d.Id);
-                    break;
-            }
-
-            var count = await doctors.CountAsync();
-            var items = await doctors
-                .Skip((page - 1) * _pageSize)
-                .Take(_pageSize)
-                .ToListAsync();
-
-            var pageModel = new PageModel(count, page, _pageSize);
-            var viewModel = new DoctorsViewModel
-            {
-                PageModel = pageModel,
-                SortModel = new DoctorSortModel(sortOrder),
-                FilterModel = new DoctorFilterModel(searchString, _uow.Specialties.GetAll().ToList(), specialty),
-                Doctors = items
-            };
-
-            return View(viewModel);
-        }
-
-        public async Task<IActionResult> DeleteDoctor(string? id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return NotFound();
-            }
-
-            var doctor = await _db.Doctors
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (doctor == null)
-            {
-                return NotFound();
-            }
-
-            await _userManager.DeleteAsync(doctor);
-
-            return RedirectToAction("Doctors", "Manage");
-        }
-
-        [HttpGet]
-        public IActionResult CreateDoctor()
-        {
-            ViewBag.Specialties = _uow.Specialties.GetAll().Select(s => s.SpecialtyName);
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateDoctor(DoctorViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var specialty = _uow.Specialties.GetOrCreate(model.Specialty);
-                var doctor = new Doctor
-                {
-                    Name = model.Name,
-                    Surname = model.Surname,
-                    Email = model.Email,
-                    UserName = model.Email,
-                    PhoneNumber = model.Phone,
-                    Specialty = specialty
-                };
-                var password = _passwordGenerator.GeneratePassword(null);
-
-                var result = await _userManager.CreateAsync(doctor, password);
-
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(doctor, "Doctor");
-
-                    return RedirectToAction("Doctors", "Manage");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
-            }
-
-            return View(model);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> EditDoctor(string id)
-        {
-            ViewBag.Specialties = _uow.Specialties.GetAll().Select(s => s.SpecialtyName);
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return NotFound();
-            }
-
-            var doctor = await _db.Doctors
-                .Include(d => d.Specialty)
-                .FirstOrDefaultAsync(d => d.Id == id);
-
-            if (doctor == null)
-            {
-                return NotFound();
-            }
-
-            var model = new DoctorViewModel
+            var model = new DoctorProfileViewModel
             {
                 Name = doctor.Name,
                 Surname = doctor.Surname,
                 Email = doctor.Email,
                 Phone = doctor.PhoneNumber,
+                Image = image,
                 Specialty = doctor.Specialty.SpecialtyName
             };
 
@@ -410,258 +133,166 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditDoctor(DoctorViewModel model)
+        public IActionResult DoctorProfile(DoctorProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var specialty = _uow.Specialties.GetOrCreate(model.Specialty);
-                var doctor = await _db.Doctors
-                    .Include(d => d.Specialty)
-                    .FirstOrDefaultAsync(a => a.Email == model.Email);
+                var doctor = _uow.Doctors.Get(d => d.Email == User.Identity.Name);
 
-                if (doctor == null || specialty == null)
-                {
-                    return NotFound();
-                }
-
-                doctor.UserName = model.Email;
                 doctor.Email = model.Email;
-                doctor.Name = model.Name;
                 doctor.Surname = model.Surname;
+                doctor.Name = model.Name;
                 doctor.PhoneNumber = model.Phone;
-                doctor.Specialty = specialty;
 
-                var result = await _userManager.UpdateAsync(doctor);
+                _uow.Doctors.Update(doctor);
 
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Doctors", "Manage");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
+                return RedirectToAction("Profile", "Manage");
             }
 
             return View(model);
         }
 
+        [Authorize(Roles = "Patient")]
         [HttpGet]
-        public async Task<IActionResult> Patients(
-            string? searchString,
-            int? locality,
-            int page = 1,
-            PatientSortState sortOrder = PatientSortState.Id)
+        public async Task<IActionResult> PatientProfile()
         {
-            IQueryable<Patient> patients = _db.Patients
-                .Include(p => p.Address)
-                .ThenInclude(a => a.Locality);
+            var patient = _uow.Patients.Get(p => p.Email == User.Identity.Name);
 
-            if (!string.IsNullOrWhiteSpace(searchString))
+            byte[] image;
+
+            if (patient.Image != null)
             {
-                patients = patients.Where(p =>
-                    p.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
-                    p.Surname.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
-                    p.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-                );
-            }
-
-            if (locality != null && locality != 0)
-            {
-                patients = patients
-                    .Where(p => p.Address.Locality.LocalityId == locality);
-            }
-
-            switch (sortOrder)
-            {
-                case PatientSortState.NameAsc:
-                    patients = patients.OrderBy(p => p.Name);
-                    break;
-                case PatientSortState.NameDesc:
-                    patients = patients.OrderByDescending(p => p.Name);
-                    break;
-                case PatientSortState.SurnameAsc:
-                    patients = patients.OrderBy(p => p.Surname);
-                    break;
-                case PatientSortState.SurnameDesc:
-                    patients = patients.OrderByDescending(p => p.Surname);
-                    break;
-                case PatientSortState.EmailAsc:
-                    patients = patients.OrderBy(p => p.Email);
-                    break;
-                case PatientSortState.EmailDesc:
-                    patients = patients.OrderByDescending(p => p.Email);
-                    break;
-                case PatientSortState.PhoneAsc:
-                    patients = patients.OrderBy(p => p.PhoneNumber);
-                    break;
-                case PatientSortState.PhoneDesc:
-                    patients = patients.OrderByDescending(p => p.PhoneNumber);
-                    break;
-                case PatientSortState.AddressAsc:
-                    patients = patients
-                        .OrderBy(p => p.Address.FullAddress)
-                        .ThenBy(a => a.Address.Locality.LocalityName);
-                    break;
-                case PatientSortState.AddressDesc:
-                    patients = patients
-                        .OrderByDescending(p => p.Address.FullAddress)
-                        .ThenByDescending(a => a.Address.Locality.LocalityName);
-                    break;
-                default:
-                    patients = patients.OrderBy(d => d.Id);
-                    break;
-            }
-
-            var count = await patients.CountAsync();
-            var items = await patients
-                .Skip((page - 1) * _pageSize)
-                .Take(_pageSize)
-                .ToListAsync();
-
-            var pageModel = new PageModel(count, page, _pageSize);
-            var viewModel = new PatientsViewModel
-            {
-                PageModel = pageModel,
-                SortModel = new PatientSortModel(sortOrder),
-                FilterModel = new PatientFilterModel(searchString, _uow.Localities.GetAll().ToList(), locality),
-                Patients = items
-            };
-
-            return View(viewModel);
-        }
-
-        public async Task<IActionResult> DeletePatient(string? id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return NotFound();
-            }
-
-            var patient = await _db.Patients
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (patient == null)
-            {
-                return NotFound();
-            }
-
-            await _userManager.DeleteAsync(patient);
-
-            return RedirectToAction("Patients", "Manage");
-        }
-        
-        public IActionResult DoctorSchedule(string id, string day)
-        {
-            if (_uow.Schedules.GetAll().Any(s => s.Doctor.Id == id && s.DayOfWeek.ToString() == day))
-            {
-                return RedirectToAction("EditDoctorSchedule", "Manage", new { id = id, day = day });
+                image = patient.Image;
             }
             else
             {
-                return RedirectToAction("AddDoctorSchedule", "Manage", new { id = id, day = day });
+                image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
             }
-        }
 
-        [HttpGet]
-        public async Task<IActionResult> AddDoctorSchedule(string id, string day)
-        {
-            DoctorSlotViewModel model;
-
-            RedirectToAction("AddDoctorSchedule", "Manage", new { id = id, day = day });
-            var doctor = await _userManager.FindByIdAsync(id);
-
-            model = new DoctorSlotViewModel
+            var model = new PatientProfileViewModel
             {
-                DoctorId = id,
-                DoctorFullName = doctor.ToString(),
-                DayOfWeek = day
+                Name = patient.Name,
+                Surname = patient.Surname,
+                Email = patient.Email,
+                Phone = patient.PhoneNumber,
+                Image = image,
+                Address = patient.Address.FullAddress,
+                Locality = patient.Address.Locality.LocalityName
             };
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddDoctorSchedule(DoctorSlotViewModel model)
+        public IActionResult PatientProfile(PatientProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var doctor = await _userManager.FindByIdAsync(model.DoctorId) as Doctor;
-                DayOfWeek dayOfWeek;
-                Enum.TryParse(model.DayOfWeek, out dayOfWeek);
+                var locality = _uow.Localities.GetOrCreate(model.Locality);
+                var address = _uow.Addresses.GetOrCreate(model.Address, locality);
+                var patient = _uow.Patients.Get(d => d.Email == User.Identity.Name);
 
-                var schedule = new Schedule
-                {
-                    Doctor = doctor,
-                    DayOfWeek = dayOfWeek,
-                    StartTime = model.StartTime,
-                    EndTime = model.EndTime
-                };
+                patient.Email = model.Email;
+                patient.Surname = model.Surname;
+                patient.Name = model.Name;
+                patient.PhoneNumber = model.Phone;
+                patient.Address = address;
 
-                _uow.Schedules.Create(schedule);
+                _uow.Patients.Update(patient);
 
-                return RedirectToAction("Doctors", "Manage");
+                return RedirectToAction("Profile", "Manage");
             }
-            return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult EditDoctorSchedule(string id, string day)
-        {
-            var schedule = _uow.Schedules.GetDoctorScheduleByDay(id, day);
-
-            DoctorSlotViewModel model;
-
-            model = new DoctorSlotViewModel
-            {
-                ScheduleId = schedule.ScheduleId,
-                DoctorId = id,
-                DoctorFullName = schedule.Doctor.ToString(),
-                DayOfWeek = schedule.DayOfWeek.ToString(),
-                StartTime = schedule.StartTime,
-                EndTime = schedule.EndTime
-            };
 
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult EditDoctorSchedule(DoctorSlotViewModel model)
+        public async Task<IActionResult> UploadPhoto(IFormFile file)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (model.ScheduleId == null)
+                if (file != null)
                 {
-                    return NotFound();
+                    var bytes = await _fileManager.GetBytes(file);
+
+                    if (bytes != null && bytes.IsImage())
+                    {
+                        var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+
+                        user.Image = bytes;
+                        var result = await _userManager.UpdateAsync(user);
+
+                        return RedirectToAction("Profile", "Manage");
+                    }
                 }
 
-                var schedule = _uow.Schedules.Get((int)model.ScheduleId);
-
-                schedule.StartTime = model.StartTime;
-                schedule.EndTime = model.EndTime;
-
-                _uow.Schedules.Update(schedule);
-
-                return RedirectToAction("Doctors", "Manage");
+                return NotFound();
             }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.Message);
+                return Ok();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+                var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Profile", "Manage");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Wrong password");
+                    return View(model);
+                }
+            }
+
             return View(model);
         }
 
-        public IActionResult DeleteDoctorSchedule(DoctorSlotViewModel model)
+        [HttpGet]
+        public IActionResult ForgotPassword()
         {
-            if (model.ScheduleId == null)
-            {
-                return NotFound();
-            }
+            return View();
+        }
 
-            var schedule = _uow.Schedules.Get((int)model.ScheduleId);
-            _uow.Schedules.Delete(schedule);
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            //if (ModelState.IsValid)
+            //{
+            //    var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+            //    var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 
-            return RedirectToAction("Doctors", "Manage");
+            //    if (result.Succeeded)
+            //    {
+            //        return RedirectToAction("Profile", "Account");
+            //    }
+            //    else
+            //    {
+            //        ModelState.AddModelError(string.Empty, "Wrong password");
+            //        return View(model);
+            //    }
+            //}
+
+            //return View(model);
+            throw new NotImplementedException();
         }
     }
 }

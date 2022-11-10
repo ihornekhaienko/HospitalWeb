@@ -14,34 +14,74 @@ namespace HospitalWeb.DAL.Services.Implementations
             _db = db;
         }
 
+        public Record Get(Func<Record, bool> filter)
+        {
+            return _db.Records.FirstOrDefault(filter);
+        }
+
+        public IEnumerable<Record> GetAll(
+            Func<Record, bool> filter = null,
+            Func<IQueryable<Record>, IOrderedQueryable<Record>> orderBy = null,
+            int first = 0,
+            int offset = 0)
+        {
+            IQueryable<Record> records = _db.Records
+                .Include(r => r.Doctor)
+                    .ThenInclude(d => d.Specialty)
+                .Include(r => r.Patient)
+                    .ThenInclude(p => p.Address)
+                        .ThenInclude(a => a.Locality);
+
+            if (filter != null)
+            {
+                records = records.Where(filter).AsQueryable();
+            }
+
+            if (orderBy != null)
+            {
+                records = orderBy(records);
+            }
+
+            if (offset > 0)
+            {
+                records = records.Skip(offset);
+            }
+
+            if (first > 0)
+            {
+                records = records.Take(first);
+            }
+
+            return records
+                .ToList();
+        }
+
+        public bool Contains(Func<Record, bool> query)
+        {
+            return _db.Records
+                .Include(r => r.Doctor)
+                    .ThenInclude(d => d.Specialty)
+                .Include(r => r.Patient)
+                    .ThenInclude(p => p.Address)
+                        .ThenInclude(a => a.Locality)
+                .Any(query);
+        }
+
         public void Create(Record item)
         {
-            _db.Records.Add(item);
+            _db.Add(item);
             _db.SaveChanges();
         }
 
         public void Delete(Record item)
         {
-            _db.Records.Remove(item);
+            _db.Remove(item);
             _db.SaveChanges();
-        }
-
-        public Record Get(int id)
-        {
-            return _db.Records.Find(id);
-        }
-
-        public IEnumerable<Record> GetAll()
-        {
-            return _db.Records
-                .Include(r => r.Doctor)
-                .Include(r => r.Patient)
-                .ToList();
         }
 
         public void Update(Record item)
         {
-            _db.Records.Update(item);
+            _db.Entry(item).State = EntityState.Modified;
             _db.SaveChanges();
         }
     }

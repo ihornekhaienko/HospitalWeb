@@ -2,14 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\icons\" />
-    <Folder Include="wwwroot\images\profile\" />
+    <Folder Include="wwwroot\files\images\icons\" />
+    <Folder Include="wwwroot\files\images\profile\" />
     <Folder Include="wwwroot\lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HospitalWeb.BLL\HospitalWeb.BLL.csproj" />
+    <ProjectReference Include="..\HospitalWeb.BLL\HospitalWeb.Services.csproj" />
     <ProjectReference Include="..\HospitalWeb.DAL\HospitalWeb.DAL.csproj" />
     <ProjectReference Include="..\HospitalWeb.Filters\HospitalWeb.Filters.csproj" />
   </ItemGroup>

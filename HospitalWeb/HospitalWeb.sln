@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HospitalWeb", "HospitalWeb\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HospitalWeb.DAL", "HospitalWeb.DAL\HospitalWeb.DAL.csproj", "{40113CEA-AFF1-43DB-B179-D29CB0F26661}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HospitalWeb.BLL", "HospitalWeb.BLL\HospitalWeb.BLL.csproj", "{2E864BD4-F2C2-45A0-95C4-C94D10E75C83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HospitalWeb.Services", "HospitalWeb.BLL\HospitalWeb.Services.csproj", "{2E864BD4-F2C2-45A0-95C4-C94D10E75C83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalWeb.Filters", "HospitalWeb.Filters\HospitalWeb.Filters.csproj", "{F77AED7D-0DA5-4716-89DA-87DCFE265F5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HospitalWeb.Filters", "HospitalWeb.Filters\HospitalWeb.Filters.csproj", "{F77AED7D-0DA5-4716-89DA-87DCFE265F5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
