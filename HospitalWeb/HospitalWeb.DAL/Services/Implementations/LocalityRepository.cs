@@ -14,49 +14,87 @@ namespace HospitalWeb.DAL.Services.Implementations
             _db = db;
         }
 
-        public void Create(Locality item)
+        public Locality Get(Func<Locality, bool> filter)
         {
-            _db.Localities.Add(item);
-            _db.SaveChanges();
+            return _db.Localities
+                .Include(l => l.Addresses)
+                    .ThenInclude(a => a.Patients)
+                .FirstOrDefault(filter);
         }
 
-        public Locality GetOrCreate(string? locality)
+        public IEnumerable<Locality> GetAll(
+            Func<Locality, bool> filter = null,
+            Func<IQueryable<Locality>, IOrderedQueryable<Locality>> orderBy = null,
+            int first = 0,
+            int offset = 0)
         {
-            if (GetAll().Any(l => l.LocalityName == locality))
-            {
-                return GetAll()?.FirstOrDefault(l => l.LocalityName == locality);
-            }
-            else
-            {
-                var obj = new Locality { LocalityName = locality };
-                _db.Localities.Add(obj);
-                _db.SaveChanges();
+            IQueryable<Locality> localities = _db.Localities
+                .Include(l => l.Addresses)
+                    .ThenInclude(a => a.Patients);
 
-                return obj;
+            if (filter != null)
+            {
+                localities = localities.Where(filter).AsQueryable();
             }
+
+            if (orderBy != null)
+            {
+                localities = orderBy(localities);
+            }
+
+            if (offset > 0)
+            {
+                localities = localities.Skip(offset);
+            }
+
+            if (first > 0)
+            {
+                localities = localities.Take(first);
+            }
+
+            return localities
+                .ToList();
+        }
+
+        public bool Contains(Func<Locality, bool> query)
+        {
+            return _db.Localities
+                .Include(l => l.Addresses)
+                    .ThenInclude(a => a.Patients)
+                .Any(query);
+        }
+
+        public void Create(Locality item)
+        {
+            _db.Add(item);
+            _db.SaveChanges();
         }
 
         public void Delete(Locality item)
         {
-            _db.Localities.Remove(item);
+            _db.Remove(item);
             _db.SaveChanges();
-        }
-
-        public Locality Get(int id)
-        {
-            return _db.Localities.Find(id);
-        }
-
-        public IEnumerable<Locality> GetAll()
-        {
-            return _db.Localities
-                .Include(a => a.Addresses);
         }
 
         public void Update(Locality item)
         {
-            _db.Localities.Update(item);
+            _db.Entry(item).State = EntityState.Modified;
             _db.SaveChanges();
+        }
+
+        public Locality GetOrCreate(string locality)
+        {
+            if (Contains(l => l.LocalityName == locality))
+            {
+                return Get(l => l.LocalityName == locality);
+            }
+            else
+            {
+                var obj = new Locality { LocalityName = locality };
+                Create(obj);
+
+                return obj;
+            }
         }
     }
 }

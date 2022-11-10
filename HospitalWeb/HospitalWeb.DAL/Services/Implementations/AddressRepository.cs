@@ -14,51 +14,87 @@ namespace HospitalWeb.DAL.Services.Implementations
             _db = db;
         }
 
+        public Address Get(Func<Address, bool> filter)
+        {
+            return _db.Addresses
+                .Include(a => a.Locality)
+                .Include(a => a.Patients)
+                .FirstOrDefault(filter);
+        }
+
+        public IEnumerable<Address> GetAll(
+            Func<Address, bool> filter = null,
+            Func<IQueryable<Address>, IOrderedQueryable<Address>> orderBy = null,
+            int first = 0,
+            int offset = 0)
+        {
+            IQueryable<Address> addresses = _db.Addresses
+                .Include(a => a.Locality)
+                .Include(a => a.Patients);
+
+            if (filter != null)
+            {
+                addresses = addresses.Where(filter).AsQueryable();
+            }
+
+            if (orderBy != null)
+            {
+                addresses = orderBy(addresses);
+            }
+
+            if (offset > 0)
+            {
+                addresses = addresses.Skip(offset);
+            }
+
+            if (first > 0)
+            {
+                addresses = addresses.Take(first);
+            }
+
+            return addresses
+                .ToList();
+        }
+
+        public bool Contains(Func<Address, bool> query)
+        {
+            return _db.Addresses
+                .Include(a => a.Locality)
+                .Include(a => a.Patients)
+                .Any(query);
+        }
+
         public void Create(Address item)
         {
-            _db.Addresses.Add(item);
+            _db.Add(item);
+            _db.SaveChanges();
+        }
+
+        public void Delete(Address item)
+        {
+            _db.Remove(item);
+            _db.SaveChanges();
+        }
+
+        public void Update(Address item)
+        {
+            _db.Entry(item).State = EntityState.Modified;
             _db.SaveChanges();
         }
 
         public Address GetOrCreate(string address, Locality locality)
         {
-            if (GetAll().Any(a => a.FullAddress == address && a.Locality == locality))
+            if (Contains(a => a.FullAddress == address && a.Locality == locality))
             {
-                return GetAll()?.FirstOrDefault(a => a.FullAddress == address && a.Locality == locality);
+                return Get(a => a.FullAddress == address && a.Locality == locality);
             }
             else
             {
                 var obj = new Address { FullAddress = address, Locality = locality };
-                _db.Addresses.Add(obj);
-                _db.SaveChanges();
+                Create(obj);
 
                 return obj;
             }
-        }
-
-        public void Delete(Address item)
-        {
-            _db.Addresses.Remove(item);
-            _db.SaveChanges();
-        }
-
-        public Address Get(int id)
-        {
-            return _db.Addresses.Find(id);
-        }
-
-        public IEnumerable<Address> GetAll()
-        {
-            return _db.Addresses
-                .Include(a => a.Locality)
-                .Include(a => a.Patients)
-                .ToList();
-        }
-
-        public void Update(Address item)
-        {
-            _db.Addresses.Update(item);
-            _db.SaveChanges();
         }
     }
 }
