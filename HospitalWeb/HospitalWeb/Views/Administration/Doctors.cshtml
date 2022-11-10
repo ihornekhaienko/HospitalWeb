@@ -1,18 +1,28 @@
-﻿@model AdminsViewModel
+﻿@model DoctorsViewModel
 @{
-    ViewBag.Title = "Administrators";
+    ViewBag.Title = "Doctors";
 }
 
-<h1>Administrators list</h1>
+<h1>Doctors list</h1>
 <p>
-    <a asp-controller="Manage" asp-action="CreateAdmin">Create New</a>
+    <a asp-controller="Administration" asp-action="CreateDoctor">Create New</a>
 </p>
 <form method="get">
     <div class="mb-3">
         <label>Search: </label>
         <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
+        <span class="input-group-btn input-space"><label>Specialty</label></span>
+        <span class="input-group-btn input-space">
+            <select name="specialty" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Specialties, 
+                            "SpecialtyId", 
+                            "SpecialtyName", 
+                            Model.FilterModel.SelectedSpecialty))">
+            </select>
+        </span>
         <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">Search</button></span>
-        <span class="input-group-btn input-space"><a asp-action="Admins"> Back to Full List</a></span>
+        <span class="input-group-btn input-space"><a asp-action="Doctors"> Back to Full List</a></span>
     </div>
 </form>
 
@@ -20,83 +30,75 @@
     <thead>
         <tr>
             <th>
-                <a asp-action="Admins"
+                <a asp-action="Doctors"
                    asp-route-sortOrder="@(Model.SortModel.NameSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
                    Name
                 </a>
             </th>
             <th>
-                <a asp-action="Admins"
+                <a asp-action="Doctors"
                    asp-route-sortOrder="@(Model.SortModel.SurnameSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
                    Surname
                 </a>
             </th>
             <th>
-                <a asp-action="Admins"
+                <a asp-action="Doctors"
                    asp-route-sortOrder="@(Model.SortModel.EmailSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
                    Email
                 </a>
             </th>
             <th>
-                <a asp-action="Admins"
+                <a asp-action="Doctors"
                    asp-route-sortOrder="@(Model.SortModel.PhoneSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
                    Phone
                 </a>
             </th>
             <th>
-                <a asp-action="Admins"
-                   asp-route-sortOrder="@(Model.SortModel.LevelSort)"
+                <a asp-action="Doctors"
+                   asp-route-sortOrder="@(Model.SortModel.SpecialtySort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
-                   Level
+                   Specialty
                 </a>
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody> 
-        @foreach(var admin in Model.Admins)
+        @foreach(var doctor in Model.Doctors)
         {
             <tr>
                 <td>
-                    @admin.Name
+                    @doctor.Name
                 </td>
                 <td>
-                    @admin.Surname
+                    @doctor.Surname
                 </td>
                 <td>
-                    @admin.Email
+                    @doctor.Email
                 </td>
                 <td>
-                    @admin.PhoneNumber
+                    @doctor.PhoneNumber
                 </td>
                 <td>
-                    @if (admin.IsSuperAdmin)
-                    {
-                        <span>Super</span>
-                    }
-                    else
-                    {
-                        <span>Admin</span>
-                    }
+                    @doctor.Specialty
                 </td>
                 <td>
-                    @if(ViewBag.CurrentAdmin.Id != admin.Id && !admin.IsSuperAdmin)
-                    {
-                        <span>
-                            <a asp-action="EditAdmin" asp-route-id="@admin.Id">Edit</a> |
-                            <a asp-action="DeleteAdmin" asp-route-id="@admin.Id">Delete</a>
-                        </span>
-                    }
+                    <span>
+                        <a asp-controller="Administration" asp-action="EditDoctor" asp-route-id="@doctor.Id">Edit</a> |
+                        <a asp-controller="Administration" asp-action="DoctorSchedule" asp-route-id="@doctor.Id" asp-route-day="Monday">Schedule</a> |
+                        <a asp-controller="Administration" asp-action="DeleteDoctor" asp-route-id="@doctor.Id">Delete</a>
+                    </span>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<page-link page-model="@(Model.PageModel)" page-action="Admins"
+<page-link page-model="@(Model.PageModel)" page-action="Doctors"
+page-url-specialty="@(Model.FilterModel.SelectedSpecialty)"
 page-url-searchString="@(Model.FilterModel.SearchString)"
 page-url-sortOrder="@(Model.SortModel.Current)"></page-link>

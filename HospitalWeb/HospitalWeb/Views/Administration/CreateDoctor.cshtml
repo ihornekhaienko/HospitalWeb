@@ -1,12 +1,12 @@
 ﻿@model DoctorViewModel
 @{
-    ViewBag.Title = "Edit doctor";
+    ViewBag.Title = "Create doctor";
 }
 
-<h2>Edit doctor</h2>
+<h2>Create new doctor</h2>
 <div class="row">
     <div class="col-md-4">
-        <form asp-controller="Manage" asp-action="EditDoctor">
+        <form asp-controller="Administration" asp-action="CreateDoctor">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="mb-3">
                 <label asp-for="Name" class="control-label"></label>
@@ -40,12 +40,12 @@
                 <span asp-validation-for="Specialty" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <button type="submit" class="btn btn-success">Save</button>
+                <button type="submit" class="btn btn-success">Create</button>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-controller="Manage" asp-action="Doctors">Back to List</a>
+    <a asp-controller="Administration" asp-action="Doctors">Back to List</a>
 </div>

@@ -1,28 +1,25 @@
-﻿@model DoctorsViewModel
+﻿@model PatientsViewModel
 @{
-    ViewBag.Title = "Doctors";
+    ViewBag.Title = "Patients";
 }
 
-<h1>Doctors list</h1>
-<p>
-    <a asp-controller="Manage" asp-action="CreateDoctor">Create New</a>
-</p>
+<h1>Patients list</h1>
 <form method="get">
     <div class="mb-3">
         <label>Search: </label>
         <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
-        <span class="input-group-btn input-space"><label>Specialty</label></span>
+        <span class="input-group-btn input-space"><label>Locality</label></span>
         <span class="input-group-btn input-space">
-            <select name="specialty" 
+            <select name="locality" 
                 asp-items="@(new SelectList(
-                            Model.FilterModel.Specialties, 
-                            "SpecialtyId", 
-                            "SpecialtyName", 
-                            Model.FilterModel.SelectedSpecialty))">
+                            Model.FilterModel.Localities, 
+                            "LocalityId", 
+                            "LocalityName", 
+                            Model.FilterModel.SelectedLocality))">
             </select>
         </span>
         <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">Search</button></span>
-        <span class="input-group-btn input-space"><a asp-action="Doctors"> Back to Full List</a></span>
+        <span class="input-group-btn input-space"><a asp-action="Patients"> Back to Full List</a></span>
     </div>
 </form>
 
@@ -30,75 +27,71 @@
     <thead>
         <tr>
             <th>
-                <a asp-action="Doctors"
+                <a asp-action="Patients"
                    asp-route-sortOrder="@(Model.SortModel.NameSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
                    Name
                 </a>
             </th>
             <th>
-                <a asp-action="Doctors"
+                <a asp-action="Patients"
                    asp-route-sortOrder="@(Model.SortModel.SurnameSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
                    Surname
                 </a>
             </th>
             <th>
-                <a asp-action="Doctors"
+                <a asp-action="Patients"
                    asp-route-sortOrder="@(Model.SortModel.EmailSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
                    Email
                 </a>
             </th>
             <th>
-                <a asp-action="Doctors"
+                <a asp-action="Patients"
                    asp-route-sortOrder="@(Model.SortModel.PhoneSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
                    Phone
                 </a>
             </th>
             <th>
-                <a asp-action="Doctors"
-                   asp-route-sortOrder="@(Model.SortModel.SpecialtySort)"
+                <a asp-action="Patients"
+                   asp-route-sortOrder="@(Model.SortModel.AddressSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
-                   Specialty
+                   Address
                 </a>
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody> 
-        @foreach(var doctor in Model.Doctors)
+        @foreach(var patient in Model.Patients)
         {
             <tr>
                 <td>
-                    @doctor.Name
+                    @patient.Name
                 </td>
                 <td>
-                    @doctor.Surname
+                    @patient.Surname
                 </td>
                 <td>
-                    @doctor.Email
+                    @patient.Email
                 </td>
                 <td>
-                    @doctor.PhoneNumber
+                    @patient.PhoneNumber
                 </td>
                 <td>
-                    @doctor.Specialty.SpecialtyName
+                    @(patient.Address)
                 </td>
                 <td>
-                    <span>
-                        <a asp-controller="Manage" asp-action="EditDoctor" asp-route-id="@doctor.Id">Edit</a> |
-                        <a asp-controller="Manage" asp-action="DoctorSchedule" asp-route-id="@doctor.Id" asp-route-day="Monday">Schedule</a> |
-                        <a asp-controller="Manage" asp-action="DeleteDoctor" asp-route-id="@doctor.Id">Delete</a>
-                    </span>
+                    <a asp-action="DeletePatient" asp-route-id="@patient.Id">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<page-link page-model="@(Model.PageModel)" page-action="Doctors"
-page-url-specialty="@(Model.FilterModel.SelectedSpecialty)"
+<page-link page-model="@(Model.PageModel)" page-action="Patients"
+page-url-locality="@(Model.FilterModel.SelectedLocality)"
 page-url-searchString="@(Model.FilterModel.SearchString)"
 page-url-sortOrder="@(Model.SortModel.Current)"></page-link>
