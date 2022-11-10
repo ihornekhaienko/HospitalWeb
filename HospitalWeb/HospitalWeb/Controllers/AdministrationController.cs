@@ -7,9 +7,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Filters.Models.SortStates;
+<<<<<<< Updated upstream
 
 namespace HospitalWeb.Controllers
 {
+=======
+using Microsoft.AspNetCore.Authorization;
+
+namespace HospitalWeb.Controllers
+{
+    [Authorize(Roles = "Admin")]
+>>>>>>> Stashed changes
     public class AdministrationController : Controller
     {
         private readonly int _pageSize = 10;
