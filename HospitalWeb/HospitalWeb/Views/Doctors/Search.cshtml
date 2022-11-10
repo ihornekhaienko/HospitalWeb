@@ -1,0 +1,66 @@
+﻿@model DoctorsViewModel
+@{
+    ViewBag.Title = "Doctors";
+    int cols = 3;
+    int total = Model.Doctors.Count();
+    int counter = 1;
+}
+
+<form method="get" asp-controller="Doctors" asp-action="Search">
+    <div class="mb-5 mt-3">
+        <label>Search: </label>
+        <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
+        <span class="input-group-btn input-space"><label>Specialty</label></span>
+        <span class="input-group-btn input-space">
+            <select name="specialty" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Specialties, 
+                            "SpecialtyId", 
+                            "SpecialtyName", 
+                            Model.FilterModel.SelectedSpecialty))">
+            </select>
+        </span>
+        <span class="input-group-btn input-space">
+            <button type="submit" class="btn btn-success btn-sm">Search</button>
+        </span>
+        <span class="input-group-btn input-space">
+            <button type="submit" formaction="Search" class="btn btn-info btn-sm">Clear filters</button>
+        </span>
+    </div>
+</form>
+
+<div class="container">
+    @foreach (var doctor in Model.Doctors)
+    {
+        if (counter % cols == 1)
+        {
+            @:<div class="row mb-3" >
+        }
+        <div class="col-sm-4 mx-auto">
+            <div class="card" style="width:400px;">
+                @{
+                    byte[] image = doctor.Image ?? ViewBag.Image;
+                    var base64 = Convert.ToBase64String(image);
+                    var Image = String.Format("data:image/gif;base64,{0}", base64);
+                }
+                <img src="@Image" class="card-img-top photo-profile" alt="Doctor @counter">
+                <div class="card-body text-center">
+                    <h4 class="card-title">@doctor.ToString()</h4>
+                    <p class="card-text">@doctor.Specialty</p>
+                    <a href="#" class="btn btn-primary">Make an appointment</a>
+                </div>
+            </div>
+        </div>    
+
+        if ((counter % cols == 0) || ((counter) == total))
+        {
+            @:</div>
+        }
+        counter++;
+    }
+</div>
+
+<page-link page-model="@(Model.PageModel)" page-action="Search"
+page-url-specialty="@(Model.FilterModel.SelectedSpecialty)"
+page-url-searchString="@(Model.FilterModel.SearchString)"
+page-url-sortOrder="@(Model.SortModel.Current)"></page-link>
