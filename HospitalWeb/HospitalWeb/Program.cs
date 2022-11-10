@@ -1,4 +1,4 @@
-using HospitalWeb.BLL.Services.Extensions;
+using HospitalWeb.Services.Extensions;
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;

@@ -17,7 +17,6 @@ namespace HospitalWeb.Controllers
     {
         private readonly ILogger<AccountController> _logger;
         private readonly IWebHostEnvironment _environment;
-        private readonly AppDbContext _db;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UnitOfWork _uow;
@@ -26,7 +25,6 @@ namespace HospitalWeb.Controllers
         public AccountController(
             ILogger<AccountController> logger,
             IWebHostEnvironment environment,
-            AppDbContext db,
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             UnitOfWork uow,
@@ -35,7 +33,6 @@ namespace HospitalWeb.Controllers
         {
             _logger = logger;
             _environment = environment;
-            _db = db;
             _userManager = userManager;
             _signInManager = signInManager;
             _uow = uow;
