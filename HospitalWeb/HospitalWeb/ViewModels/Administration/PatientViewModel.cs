@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HospitalWeb.ViewModels.Manage
+namespace HospitalWeb.ViewModels.Administration
 {
     public class PatientViewModel
     {

@@ -1,7 +1,7 @@
 ﻿using HospitalWeb.Attributes.Validation;
 using System.ComponentModel.DataAnnotations;
 
-namespace HospitalWeb.ViewModels.Manage
+namespace HospitalWeb.ViewModels.Administration
 {
     public class DoctorSlotViewModel
     {
