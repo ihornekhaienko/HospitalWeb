@@ -10,4 +10,8 @@
     <ProjectReference Include="..\HospitalWeb.DAL\HospitalWeb.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Builders\Extensions\" />
+  </ItemGroup>
+
 </Project>
