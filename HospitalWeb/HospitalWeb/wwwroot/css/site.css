@@ -6,6 +6,11 @@
     line-height: 60px;
 }
 
+main {
+    position: relative;
+    top: 60px;
+}
+
 /*input.input-validation-error {
     border: 1px solid #b94a48;
 }
@@ -84,4 +89,16 @@ body {
 
 .border-right {
     border-right: 1px solid rgb(169, 169, 169);
+}
+
+.photo {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+}
+
+.photo-sm {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
 }
