@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\files\images\icons\" />
-    <Folder Include="wwwroot\files\images\profile\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
