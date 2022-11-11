@@ -5,8 +5,11 @@
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
+    var user = await UserManager.FindByEmailAsync(User.Identity.Name);
+    var name = user.Name;
+
     <li class="nav-item">
-        <a class="nav-link" asp-controller="Manage" asp-action="Profile" title="Manage">Hello, @User.Identity?.Name!</a>
+        <a class="nav-link" asp-controller="Manage" asp-action="Profile" title="Manage">Hello, @name</a>
     </li>
     <li class="nav-item"> 
         <form  class="form-inline" asp-controller="Account" asp-action="Logout" asp-route-returnUrl="@Url.Action("Index", "Home")">
