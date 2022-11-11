@@ -16,9 +16,16 @@ namespace HospitalWeb.Controllers
             _notifier = notifier;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Index(string searchString)
+        {
+            return RedirectToAction("Search", "Doctors", new { searchString = searchString });
         }
 
         public IActionResult Test()
