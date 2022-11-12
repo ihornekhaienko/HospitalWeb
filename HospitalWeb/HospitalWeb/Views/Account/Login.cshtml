@@ -1,15 +1,17 @@
 ﻿@model LoginViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 @{
-    ViewBag.Title = "Sign In";
+    ViewBag.Title = Localizer["Title"];
     Layout = "_AccountLayout";
 }
 
 <div class="row mt-5">
     <div class="col-lg-4 bg-white m-auto">
-        <h2 class="text-center pt-3">Sign In</h2>
+        <h2 class="text-center pt-3">@Localizer["Title"]</h2>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div> 
         <div class="text-center mb-3">
-            <a asp-controller="Account" asp-action="Register">Don't have an account? Register</a>
+            <a asp-controller="Account" asp-action="Register">@Localizer["Register"]</a>
         </div>
 
         <form method="post" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-antiforgery="true">
@@ -18,7 +20,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-envelope"></i>
                     </span>
-                    <input type="text" asp-for="Email" class="form-control input-validation-error" placeholder="Email"/>                
+                    <input type="text" asp-for="Email" class="form-control input-validation-error" placeholder="@SharedLocalizer["Email"]"/>                
                 </div>
                 <span asp-validation-for="Email" class="validator text-danger"></span>
             </div>
@@ -28,7 +30,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-lock"></i>
                     </span>
-                    <input type="password" asp-for="Password" class="form-control input-validation-error" placeholder="Password"/>
+                    <input type="password" asp-for="Password" class="form-control input-validation-error" placeholder="@SharedLocalizer["Password"]"/>
                 </div>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
@@ -36,12 +38,12 @@
             <div class="mb-3">
                 <div class="input-group">
                     <input type="checkbox" asp-for="RememberMe"/>
-                    <label asp-for="RememberMe">Remember Me?</label>
+                    <label asp-for="RememberMe">@SharedLocalizer["RememberMe"]</label>
                 </div>
             </div>
 
             <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-success">Sign In</button>
+                <button type="submit" class="btn btn-success">@Localizer["Title"]</button>
             </div>
         </form>
     </div>
