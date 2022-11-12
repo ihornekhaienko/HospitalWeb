@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using HospitalWeb.ViewModels.Error;
 
 namespace HospitalWeb.Controllers
 {
@@ -19,6 +20,7 @@ namespace HospitalWeb.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UnitOfWork _uow;
         private readonly IFileManager _fileManager;
+        private readonly INotifier _notifier;
 
         public AccountController(
             ILogger<AccountController> logger,
@@ -26,7 +28,8 @@ namespace HospitalWeb.Controllers
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             UnitOfWork uow,
-            IFileManager fileManager
+            IFileManager fileManager,
+            INotifier notifier
             )
         {
             _logger = logger;
@@ -35,19 +38,22 @@ namespace HospitalWeb.Controllers
             _signInManager = signInManager;
             _uow = uow;
             _fileManager = fileManager;
+            _notifier = notifier;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Register()
+        public IActionResult Register(string returnUrl = null)
         {
+            ViewBag.ReturnUrl = returnUrl;
+
             return View();
         }
 
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             if (ModelState.IsValid)
             {
@@ -72,10 +78,19 @@ namespace HospitalWeb.Controllers
 
                 if (result.Succeeded)
                 {
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(patient);
+                    var callbackUrl = Url.Action(
+                        "ConfirmEmail",
+                        "Account",
+                        new { userId = patient.Id, code = code },
+                        protocol: HttpContext.Request.Scheme
+                        );
+                    await _notifier.SendConfirmationLink(model.Email, callbackUrl);
+
                     await _userManager.AddToRoleAsync(patient, "Patient");
                     await _signInManager.SignInAsync(patient, false);
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToLocal(returnUrl);
                 }
                 else
                 {
@@ -102,7 +117,7 @@ namespace HospitalWeb.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
             if (ModelState.IsValid)
             {
@@ -110,14 +125,7 @@ namespace HospitalWeb.Controllers
 
                 if (result.Succeeded)
                 {
-                    if (!string.IsNullOrEmpty(ViewBag.ReturnUrl) && Url.IsLocalUrl(ViewBag.ReturnUrl))
-                    {
-                        return Redirect(ViewBag.ReturnUrl);
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+                    return RedirectToLocal(returnUrl);
                 }
                 else
                 {
@@ -136,6 +144,49 @@ namespace HospitalWeb.Controllers
             await _signInManager.SignOutAsync();
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            try
+            {
+                if (userId == null || code == null)
+                {
+                    return RedirectToAction(nameof(HomeController.Index), "Home");
+                }
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    throw new ApplicationException($"Unable to load user with ID '{userId}'.");
+                }
+                var result = await _userManager.ConfirmEmailAsync(user, code);
+
+                if (!result.Succeeded)
+                {
+                    throw new ApplicationException($"Failed email confirmation");
+                }
+
+                return View("ConfirmEmail", "Account");
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
+        }
+
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }

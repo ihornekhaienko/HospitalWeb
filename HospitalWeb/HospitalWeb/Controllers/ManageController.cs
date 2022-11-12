@@ -2,6 +2,7 @@
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.Services.Extensions;
 using HospitalWeb.Services.Interfaces;
+using HospitalWeb.ViewModels.Error;
 using HospitalWeb.ViewModels.Manage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,19 +19,22 @@ namespace HospitalWeb.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly UnitOfWork _uow;
         private readonly IFileManager _fileManager;
+        private readonly INotifier _notifier;
 
         public ManageController(
             ILogger<ManageController> logger, 
             IWebHostEnvironment environment,
             UserManager<AppUser> userManager,
             UnitOfWork uow,
-            IFileManager fileManager)
+            IFileManager fileManager,
+            INotifier notifier)
         {
             _logger = logger;
             _environment = environment;
             _userManager = userManager;
             _uow = uow;
             _fileManager = fileManager;
+            _notifier = notifier;
         }
 
         [Authorize]
@@ -40,11 +44,11 @@ namespace HospitalWeb.Controllers
             {
                 return RedirectToAction("AdminProfile", "Manage");
             }
-            else if (User.IsInRole("Admin"))
+            else if (User.IsInRole("Doctor"))
             {
                 return RedirectToAction("DoctorProfile", "Manage");
             }
-            else if (User.IsInRole("Admin"))
+            else if (User.IsInRole("Patient"))
             {
                 return RedirectToAction("PatientProfile", "Manage");
             }
@@ -56,18 +60,8 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> AdminProfile()
         {
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
             var admin = _uow.Admins.Get(a => a.Email == User.Identity.Name);
-
-            byte[] image;
-
-            if (admin.Image != null)
-            {
-                image = admin.Image;
-            }
-            else
-            {
-                image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            }
 
             var model = new AdminProfileViewModel
             {
@@ -75,7 +69,7 @@ namespace HospitalWeb.Controllers
                 Surname = admin.Surname,
                 Email = admin.Email,
                 Phone = admin.PhoneNumber,
-                Image = image,
+                Image = admin.Image,
                 IsSuperAdmin = admin.IsSuperAdmin
             };
 
@@ -83,20 +77,31 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult AdminProfile(AdminProfileViewModel model)
+        public async Task<IActionResult> AdminProfile(AdminProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var admin = _uow.Admins.Get(a => a.Email == User.Identity.Name);
 
+                admin.UserName = model.Email;
                 admin.Email = model.Email;
                 admin.Surname = model.Surname;
                 admin.Name = model.Name;
                 admin.PhoneNumber = model.Phone;
 
-                _uow.Admins.Update(admin);
+                var result = await _userManager.UpdateAsync(admin);
 
-                return RedirectToAction("Profile", "Manage");
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Profile", "Manage");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
 
             return View(model);
@@ -106,18 +111,8 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> DoctorProfile()
         {
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
             var doctor = _uow.Doctors.Get(d => d.Email == User.Identity.Name);
-
-            byte[] image;
-
-            if (doctor.Image != null)
-            {
-                image = doctor.Image;
-            }
-            else
-            {
-                image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            }
 
             var model = new DoctorProfileViewModel
             {
@@ -125,7 +120,7 @@ namespace HospitalWeb.Controllers
                 Surname = doctor.Surname,
                 Email = doctor.Email,
                 Phone = doctor.PhoneNumber,
-                Image = image,
+                Image = doctor.Image,
                 Specialty = doctor.Specialty.SpecialtyName
             };
 
@@ -133,20 +128,31 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult DoctorProfile(DoctorProfileViewModel model)
+        public async Task<IActionResult> DoctorProfile(DoctorProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var doctor = _uow.Doctors.Get(d => d.Email == User.Identity.Name);
 
+                doctor.UserName = model.Email;
                 doctor.Email = model.Email;
                 doctor.Surname = model.Surname;
                 doctor.Name = model.Name;
                 doctor.PhoneNumber = model.Phone;
 
-                _uow.Doctors.Update(doctor);
+                var result = await _userManager.UpdateAsync(doctor);
 
-                return RedirectToAction("Profile", "Manage");
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Profile", "Manage");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
 
             return View(model);
@@ -156,18 +162,8 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> PatientProfile()
         {
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
             var patient = _uow.Patients.Get(p => p.Email == User.Identity.Name);
-
-            byte[] image;
-
-            if (patient.Image != null)
-            {
-                image = patient.Image;
-            }
-            else
-            {
-                image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            }
 
             var model = new PatientProfileViewModel
             {
@@ -175,7 +171,7 @@ namespace HospitalWeb.Controllers
                 Surname = patient.Surname,
                 Email = patient.Email,
                 Phone = patient.PhoneNumber,
-                Image = image,
+                Image = patient.Image,
                 Address = patient.Address.FullAddress,
                 Locality = patient.Address.Locality.LocalityName
             };
@@ -184,7 +180,7 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult PatientProfile(PatientProfileViewModel model)
+        public async Task<IActionResult> PatientProfile(PatientProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -192,15 +188,26 @@ namespace HospitalWeb.Controllers
                 var address = _uow.Addresses.GetOrCreate(model.Address, locality);
                 var patient = _uow.Patients.Get(d => d.Email == User.Identity.Name);
 
+                patient.UserName = model.Email;
                 patient.Email = model.Email;
                 patient.Surname = model.Surname;
                 patient.Name = model.Name;
                 patient.PhoneNumber = model.Phone;
                 patient.Address = address;
 
-                _uow.Patients.Update(patient);
+                var result = await _userManager.UpdateAsync(patient);
 
-                return RedirectToAction("Profile", "Manage");
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Profile", "Manage");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
 
             return View(model);
@@ -224,14 +231,20 @@ namespace HospitalWeb.Controllers
 
                         return RedirectToAction("Profile", "Manage");
                     }
+                    else
+                    {
+                        throw new Exception("Your file is not an image");
+                    }
                 }
-
-                return NotFound();
+                else
+                {
+                    throw new Exception("Failed loading file");
+                }
             }
             catch (Exception err)
             {
-                _logger.LogCritical(err.Message);
-                return Ok();
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
 
@@ -245,23 +258,34 @@ namespace HospitalWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-                var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (ModelState.IsValid)
+                {
+                    var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+                    var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Profile", "Manage");
+                    if (result.Succeeded)
+                    {
+                        await _notifier.NotifyUpdate(user.Email, user.Email);
+                        return RedirectToAction("Profile", "Manage");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                    }
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Wrong password");
-                    return View(model);
-                }
+
+                return View(model);
             }
-
-            return View(model);
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [HttpGet]
