@@ -1,15 +1,17 @@
 ﻿@model RegisterViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 @{
-    ViewBag.Title = "Register";
+    ViewBag.Title = Localizer["Title"];
     Layout = "_AccountLayout";
 }
 
 <div class="row mt-5 mb-5">
     <div class="col-lg-4 bg-white m-auto">
-        <h2 class="text-center pt-3">Signup Now</h2>
+        <h2 class="text-center pt-3">@Localizer["Title"]</h2>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="text-center mb-3">
-            <a asp-controller="Account" asp-action="Login">Have an account? Login</a>
+            <a asp-controller="Account" asp-action="Login">@Localizer["Login"]</a>
         </div>
                         
         <form method="post" asp-controller="Account" asp-action="Register" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-antiforgery="true">
@@ -18,7 +20,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-user"></i>
                     </span>
-                    <input type="text" asp-for="Name" class="form-control input-validation-error" placeholder="Name"/>
+                    <input type="text" asp-for="Name" class="form-control input-validation-error" placeholder="@SharedLocalizer["Name"]"/>
                 </div>
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
@@ -28,7 +30,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-user"></i>
                     </span>
-                    <input type="text" asp-for="Surname" class="form-control input-validation-error" placeholder="Surname"/>
+                    <input type="text" asp-for="Surname" class="form-control input-validation-error" placeholder="@SharedLocalizer["Surname"]"/>
                 </div>
                 <span asp-validation-for="Surname" class="text-danger"></span>
             </div>
@@ -38,7 +40,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-envelope"></i>
                     </span>
-                    <input type="text" asp-for="Email" class="form-control input-validation-error" placeholder="Email"/>                
+                    <input type="text" asp-for="Email" class="form-control input-validation-error" placeholder="@SharedLocalizer["Email"]"/>                
                 </div>
                 <span asp-validation-for="Email" class="validator text-danger"></span>
             </div>
@@ -48,7 +50,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-lock"></i>
                     </span>
-                    <input type="password" asp-for="Password" class="form-control input-validation-error" placeholder="Password"/>
+                    <input type="password" asp-for="Password" class="form-control input-validation-error" placeholder="@SharedLocalizer["Password"]"/>
                 </div>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
@@ -58,7 +60,7 @@
                      <span class="input-group-text">
                         <i class="fa fa-lock"></i>
                     </span>
-                    <input type="password" asp-for="ConfirmPassword" class="form-control input-validation-error" placeholder="Confirm password"/>
+                    <input type="password" asp-for="ConfirmPassword" class="form-control input-validation-error" placeholder="@SharedLocalizer["ConfirmPassword"]"/>
                 </div>
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
@@ -67,7 +69,7 @@
                 <div class="input-group ">
                     <span class="input-group-text">
                         <i class="fa fa-phone"></i>
-                        <label style="margin-left:5px; width: 100px;">Phone number</label>
+                        <label style="margin-left:5px; width: 100px;">@SharedLocalizer["Phone"]</label>
                     </span>
                     <input type="tel" asp-for="Phone" class="form-control input-validation-error"/>
                 </div>
@@ -78,7 +80,7 @@
                 <div class="input-group">
                      <span class="input-group-text">
                         <i class="fa fa-calendar-days"></i>
-                        <label style="margin-left:5px; width: 100px;">Date of birth</label>
+                        <label style="margin-left:5px; width: 100px;">@SharedLocalizer["BirthDate"]</label>
                     </span>
                     <input type="date" asp-for="BirthDate" class="form-control input-validation-error"/>
                 </div>
@@ -90,7 +92,7 @@
                     <span class="input-group-text">
                         <i class="fa fa-location-dot"></i>
                     </span>
-                    <input type="text" asp-for="Locality" class="form-control input-validation-error" placeholder="Locality"/>
+                    <input type="text" asp-for="Locality" class="form-control input-validation-error" placeholder="@SharedLocalizer["Locality"]"/>
                 </div>
                 <span asp-validation-for="Locality" class="text-danger"></span>
             </div>
@@ -100,29 +102,29 @@
                     <span class="input-group-text">
                         <i class="fa fa-city"></i>
                     </span>
-                    <input type="text" asp-for="Address" class="form-control input-validation-error" placeholder="Address"/>
+                    <input type="text" asp-for="Address" class="form-control input-validation-error" placeholder="@SharedLocalizer["Address"]"/>
                 </div>
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
 
             <div class="input-group mb-3">
                 <div class="form-check form-check-inline">
-                    <h6 class="mb-2 pb-1">Sex: </h6>
+                    <h6 class="mb-2 pb-1">@SharedLocalizer["Sex"]: </h6>
                 </div>
 
                 <div class="form-check form-check-inline">
                         <input asp-for="Sex" class="form-check-input" type="radio" value="male" name="sex" checked />
-                        <label class="form-check-label">Male</label>
+                        <label class="form-check-label">@Localizer["Male"]</label>
                 </div>
 
                 <div class="form-check form-check-inline">
                     <input asp-for="Sex" class="form-check-input" type="radio" name="sex" value="female" />
-                    <label class="form-check-label">Female</label>
+                    <label class="form-check-label">@Localizer["Female"]</label>
                 </div>
             </div>
 
             <div class="d-grid">
-                <button type="submit" class="btn btn-success">Sign Up</button>
+                <button type="submit" class="btn btn-success">@Localizer["Title"]</button>
             </div>
         </form>
 
