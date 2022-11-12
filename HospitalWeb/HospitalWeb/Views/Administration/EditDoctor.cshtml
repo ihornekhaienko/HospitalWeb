@@ -1,9 +1,11 @@
 ﻿@model DoctorViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 @{
-    ViewBag.Title = "Edit doctor";
+    ViewBag.Title = Localizer["Title"];
 }
 
-<h2>Edit doctor</h2>
+<h2>@Localizer["Title"]</h2>
 <div class="row">
     <div class="col-md-4">
         <form asp-controller="Administration" asp-action="EditDoctor">
@@ -40,12 +42,12 @@
                 <span asp-validation-for="Specialty" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <button type="submit" class="btn btn-success">Save</button>
+                <button type="submit" class="btn btn-success">@SharedLocalizer["Update"]</button>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-controller="Administration" asp-action="Doctors">Back to List</a>
+    <a asp-controller="Administration" asp-action="Doctors">@SharedLocalizer["BackToFullList"]</a>
 </div>

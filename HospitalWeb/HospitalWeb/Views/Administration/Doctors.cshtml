@@ -1,17 +1,19 @@
 ﻿@model DoctorsViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 @{
-    ViewBag.Title = "Doctors";
+    ViewBag.Title = Localizer["Title"];
 }
 
-<h1>Doctors list</h1>
+<h1>@Localizer["Header"]</h1>
 <p>
-    <a asp-controller="Administration" asp-action="CreateDoctor">Create New</a>
+    <a asp-controller="Administration" asp-action="CreateDoctor">@SharedLocalizer["CreateNew"]</a>
 </p>
 <form method="get">
     <div class="mb-3">
-        <label>Search: </label>
+        <label>@SharedLocalizer["Search"]: </label>
         <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
-        <span class="input-group-btn input-space"><label>Specialty</label></span>
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["Specialty"]</label></span>
         <span class="input-group-btn input-space">
             <select name="specialty" 
                 asp-items="@(new SelectList(
@@ -21,8 +23,8 @@
                             Model.FilterModel.SelectedSpecialty))">
             </select>
         </span>
-        <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">Search</button></span>
-        <span class="input-group-btn input-space"><a asp-action="Doctors"> Back to Full List</a></span>
+        <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button></span>
+        <span class="input-group-btn input-space"><a asp-action="Doctors"> @SharedLocalizer["BackToFullList"]</a></span>
     </div>
 </form>
 
@@ -33,35 +35,35 @@
                 <a asp-action="Doctors"
                    asp-route-sortOrder="@(Model.SortModel.NameSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
-                   Name
+                   @SharedLocalizer["Name"]
                 </a>
             </th>
             <th>
                 <a asp-action="Doctors"
                    asp-route-sortOrder="@(Model.SortModel.SurnameSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
-                   Surname
+                   @SharedLocalizer["Surname"]
                 </a>
             </th>
             <th>
                 <a asp-action="Doctors"
                    asp-route-sortOrder="@(Model.SortModel.EmailSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
-                   Email
+                   @SharedLocalizer["Email"]
                 </a>
             </th>
             <th>
                 <a asp-action="Doctors"
                    asp-route-sortOrder="@(Model.SortModel.PhoneSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
-                   Phone
+                   @SharedLocalizer["Phone"]
                 </a>
             </th>
             <th>
                 <a asp-action="Doctors"
                    asp-route-sortOrder="@(Model.SortModel.SpecialtySort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
-                   Specialty
+                   @SharedLocalizer["Specialty"]
                 </a>
             </th>
             <th></th>
@@ -88,9 +90,15 @@
                 </td>
                 <td>
                     <span>
-                        <a asp-controller="Administration" asp-action="EditDoctor" asp-route-id="@doctor.Id">Edit</a> |
-                        <a asp-controller="Administration" asp-action="DoctorSchedule" asp-route-id="@doctor.Id" asp-route-day="Monday">Schedule</a> |
-                        <a asp-controller="Administration" asp-action="DeleteDoctor" asp-route-id="@doctor.Id">Delete</a>
+                        <a asp-controller="Administration" asp-action="EditDoctor" asp-route-id="@doctor.Id">
+                            @SharedLocalizer["Edit"]
+                        </a> |
+                        <a asp-controller="Administration" asp-action="DoctorSchedule" asp-route-id="@doctor.Id" asp-route-day="Monday">
+                            @SharedLocalizer["Schedule"]
+                        </a> |
+                        <a asp-controller="Administration" asp-action="DeleteDoctor" asp-route-id="@doctor.Id">
+                            @SharedLocalizer["Delete"]
+                        </a>
                     </span>
                 </td>
             </tr>
