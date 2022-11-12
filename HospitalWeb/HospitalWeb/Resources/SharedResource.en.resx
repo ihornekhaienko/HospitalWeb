@@ -180,6 +180,9 @@
   <data name="EndTimeSelect" xml:space="preserve">
     <value>Select ending time</value>
   </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
   <data name="Level" xml:space="preserve">
     <value>Access level</value>
   </data>
@@ -254,6 +257,9 @@
   </data>
   <data name="SurnameRequired" xml:space="preserve">
     <value>The surname is required</value>
+  </data>
+  <data name="UnexpectedErrorMessage" xml:space="preserve">
+    <value>An unexpected error has occurred</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>

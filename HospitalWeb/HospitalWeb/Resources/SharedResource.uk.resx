@@ -180,6 +180,9 @@
   <data name="EndTimeSelect" xml:space="preserve">
     <value>Введіть час закінчення</value>
   </data>
+  <data name="Error" xml:space="preserve">
+    <value>Помилка</value>
+  </data>
   <data name="Level" xml:space="preserve">
     <value>Рівень доступу</value>
   </data>
@@ -257,6 +260,9 @@
   </data>
   <data name="SurnameRequired" xml:space="preserve">
     <value>Необхідно вказати прізвище</value>
+  </data>
+  <data name="UnexpectedErrorMessage" xml:space="preserve">
+    <value>Сталася неочікувана помилка</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Оновити</value>
