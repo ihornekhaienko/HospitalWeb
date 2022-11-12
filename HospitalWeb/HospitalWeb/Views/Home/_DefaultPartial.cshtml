@@ -1,21 +1,20 @@
-﻿@inject IViewLocalizer Localizer
-@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+﻿@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 
 <div class="container">
     <div class="row mt-5">
     <div class="col-sm-6 mx-auto text-center">
-        <h4>@Localizer["SearchDoctorsAd"]</h4>
+        <h4>@SharedLocalizer["SearchDoctorsAd"]</h4>
     </div>
     </div>
     <div class="row mt-2">
          <div class="col-sm-6 mx-auto text-center">
-            <h6>@Localizer["MakeAppointment"]</h6>
+            <h6>@SharedLocalizer["MakeAppointment"]</h6>
         </div>
     </div>
     <div class="row mt-2">
         <div class="col-sm-6 mx-auto text-center">
              <form method="post">
-                <input class="search-input" name="searchString" placeholder="@Localizer["EnterDoctor"]" style="min-width:300px;"/>
+                <input class="search-input" name="searchString" placeholder="@SharedLocalizer["EnterDoctor"]" style="min-width:300px;"/>
                 <span class="input-group-btn input-space">
                     <button type="submit" class="btn btn-success btn-sm">
                         @SharedLocalizer["Search"]
@@ -29,7 +28,7 @@
             <div class="card" style="width:300px;">
                     <img src="./files/images/doctor.png" class="card-img-top photo mt-1" alt="Find doctor">
                     <div class="card-body text-center">
-                        <h4 class="card-title">@Localizer["FindDoctor"]</h4>
+                        <h4 class="card-title">@SharedLocalizer["FindDoctor"]</h4>
                         <a asp-controller="Doctors" asp-action="Search" class="btn btn-primary">@SharedLocalizer["Find"]</a>
                     </div>
             </div>
@@ -38,7 +37,7 @@
             <div class="card" style="width:300px;">
                     <img src="./files/images/hospital.png" class="card-img-top photo mt-1" alt="Find hospital">
                     <div class="card-body text-center">
-                        <h4 class="card-title">@Localizer["FindHospital"]</h4>
+                        <h4 class="card-title">@SharedLocalizer["FindHospital"]</h4>
                         <a asp-controller="Hospitals" asp-action="Search" class="btn btn-primary">@SharedLocalizer["Find"]</a>
                     </div>
             </div>
@@ -47,7 +46,7 @@
             <div class="card" style="width:300px;">
                     <img src="./files/images/stats.jpg" class="card-img-top photo mt-1" alt="Show stats">
                     <div class="card-body text-center">
-                        <h4 class="card-title">@Localizer["LookForStatistics"]</h4>
+                        <h4 class="card-title">@SharedLocalizer["LookForStatistics"]</h4>
                         <a asp-controller="Stat" asp-action="Index" class="btn btn-primary">@SharedLocalizer["Show"]</a>
                     </div>
             </div>

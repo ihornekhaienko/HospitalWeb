@@ -330,4 +330,70 @@
   <data name="UploadPhoto" xml:space="preserve">
     <value>Завантажити фото</value>
   </data>
+  <data name="Admins" xml:space="preserve">
+    <value>Адміни</value>
+  </data>
+  <data name="Appointments" xml:space="preserve">
+    <value>Прийом</value>
+  </data>
+  <data name="Doctors" xml:space="preserve">
+    <value>Лікарі</value>
+  </data>
+  <data name="EnterDoctor" xml:space="preserve">
+    <value>Введіть ім'я лікаря або спеціальність</value>
+  </data>
+  <data name="FindDoctor" xml:space="preserve">
+    <value>Знайти лікаря</value>
+  </data>
+  <data name="FindHospital" xml:space="preserve">
+    <value>Знайти клініку</value>
+  </data>
+  <data name="FooterText" xml:space="preserve">
+    <value>Наша місія – надавати якісні медичні послуги всім у комфортній та затишній обстановці. Наші клініки надають переважно консультації та не обладнані для прийому невідкладних випадків.</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>Історія</value>
+  </data>
+  <data name="LookForStatistics" xml:space="preserve">
+    <value>Переглянути статистику</value>
+  </data>
+  <data name="MakeAppointment" xml:space="preserve">
+    <value>Записатися на прийом, не виходячи з дому</value>
+  </data>
+  <data name="ManageAdmins" xml:space="preserve">
+    <value>Керувати адміністраторами</value>
+  </data>
+  <data name="ManageAppointments" xml:space="preserve">
+    <value>Прийом</value>
+  </data>
+  <data name="ManageDoctors" xml:space="preserve">
+    <value>Керувати лікарями</value>
+  </data>
+  <data name="ManagePatients" xml:space="preserve">
+    <value>Керувати пацієнтами</value>
+  </data>
+  <data name="Patients" xml:space="preserve">
+    <value>Пацієнти</value>
+  </data>
+  <data name="SearchDoctors" xml:space="preserve">
+    <value>Знайти лікаря</value>
+  </data>
+  <data name="SearchDoctorsAd" xml:space="preserve">
+    <value>Шукайте лікарів та клініки онлайн</value>
+  </data>
+  <data name="SearchHospitals" xml:space="preserve">
+    <value>Знайти клініку</value>
+  </data>
+  <data name="ShowHistory" xml:space="preserve">
+    <value>Показати історію прийому</value>
+  </data>
+  <data name="Treatment" xml:space="preserve">
+    <value>Історія лікування</value>
+  </data>
+  <data name="Administration" xml:space="preserve">
+    <value>Адміністрування</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Контакти</value>
+  </data>
 </root>

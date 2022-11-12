@@ -1,6 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<AppUser> SignInManager
-@inject IViewLocalizer Localizer
 @inject IHtmlLocalizer<SharedResource> SharedLocalizer
 
 @if (SignInManager.IsSignedIn(User))
@@ -11,25 +10,25 @@
             <div class="dropdown">
                 <button class="btn btn-sea-green nav-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-users"></i>
-                    @Localizer["Administration"]
+                    @SharedLocalizer["Administration"]
                 </button>
                 <ul class="dropdown-menu bg-sea-green">
                     <li>
                         <a class="nav-link bg-sea-green" asp-controller="Administration" asp-action="Admins">
                             <i class="fa-solid fa-hammer"></i>
-                            @Localizer["Admins"]
+                            @SharedLocalizer["Admins"]
                         </a>
                     </li>
                     <li>
                         <a class="nav-link bg-sea-green" asp-controller="Administration" asp-action="Doctors">
                             <i class="fa-solid fa-stethoscope"></i>
-                            @Localizer["Doctors"]
+                            @SharedLocalizer["Doctors"]
                         </a>
                     </li>
                     <li>
                         <a class="nav-link bg-sea-green" asp-controller="Administration" asp-action="Patients">
                             <i class="fa-solid fa-hospital-user"></i>
-                            @Localizer["Patients"]
+                            @SharedLocalizer["Patients"]
                         </a>
                     </li>
                 </ul>
@@ -41,13 +40,13 @@
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Appointments" asp-action="Planned" asp-route-date="@DateTime.Today">
                 <i class="fa-solid fa-calendar-check"></i>
-                @Localizer["Appointments"]
+                @SharedLocalizer["Appointments"]
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Appointments" asp-action="History" asp-route-date="@DateTime.Today">
                 <i class="fa-solid fa-clock-rotate-left"></i>
-                @Localizer["History"]
+                @SharedLocalizer["History"]
             </a>
         </li>
     }
@@ -56,19 +55,19 @@
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Hospitals" asp-action="Search">
                 <i class="fa-solid fa-hospital"></i>
-                @Localizer["SearchHospitals"]
+                @SharedLocalizer["SearchHospitals"]
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Doctors" asp-action="Search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                @Localizer["SearchDoctors"]
+                @SharedLocalizer["SearchDoctors"]
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Treatments" asp-action="History">
                 <i class="fa-solid fa-file-medical"></i>
-                @Localizer["Treatment"]
+                @SharedLocalizer["Treatment"]
             </a>
         </li>
     }
@@ -90,13 +89,13 @@ else
     <li class="nav-item">
         <a class="nav-link bg-sea-green" asp-controller="Hospitals" asp-action="Search">
             <i class="fa-solid fa-hospital"></i>
-            @Localizer["SearchHospitals"]
+            @SharedLocalizer["SearchHospitals"]
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link bg-sea-green" asp-controller="Doctors" asp-action="Search">
             <i class="fa-solid fa-magnifying-glass"></i>
-            @Localizer["SearchDoctors"]
+            @SharedLocalizer["SearchDoctors"]
         </a>
     </li>
     <li class="nav-item">

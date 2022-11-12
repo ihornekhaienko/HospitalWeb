@@ -117,6 +117,27 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Administration" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="Admins" xml:space="preserve">
+    <value>Admins</value>
+  </data>
+  <data name="Appointments" xml:space="preserve">
+    <value>Appointments</value>
+  </data>
+  <data name="Doctors" xml:space="preserve">
+    <value>Doctors</value>
+  </data>
+  <data name="EnterDoctor" xml:space="preserve">
+    <value>Enter doctor's name or specialty</value>
+  </data>
+  <data name="FindDoctor" xml:space="preserve">
+    <value>Find a doctor</value>
+  </data>
+  <data name="FindHospital" xml:space="preserve">
+    <value>Find a clinic</value>
+  </data>
   <data name="About" xml:space="preserve">
     <value>About</value>
   </data>
@@ -326,5 +347,53 @@
   </data>
   <data name="UploadPhoto" xml:space="preserve">
     <value>Upload photo</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="LookForStatistics" xml:space="preserve">
+    <value>Look for statistics</value>
+  </data>
+  <data name="MakeAppointment" xml:space="preserve">
+    <value>Make an appointment without leaving your home</value>
+  </data>
+  <data name="ManageAdmins" xml:space="preserve">
+    <value>Manage admins</value>
+  </data>
+  <data name="ManageAppointments" xml:space="preserve">
+    <value>Manage appointments</value>
+  </data>
+  <data name="ManageDoctors" xml:space="preserve">
+    <value>Manage doctors</value>
+  </data>
+  <data name="ManagePatients" xml:space="preserve">
+    <value>Manage patients</value>
+  </data>
+  <data name="Patients" xml:space="preserve">
+    <value>Patients</value>
+  </data>
+  <data name="SearchDoctors" xml:space="preserve">
+    <value>Search doctors</value>
+  </data>
+  <data name="SearchDoctorsAd" xml:space="preserve">
+    <value>Search for doctors and clinics online</value>
+  </data>
+  <data name="SearchHospitals" xml:space="preserve">
+    <value>Search hospitals</value>
+  </data>
+  <data name="ShowHistory" xml:space="preserve">
+    <value>Show appointments history</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value>Find a doctor</value>
+  </data>
+  <data name="Treatment" xml:space="preserve">
+    <value>Treatment history</value>
+  </data>
+  <data name="FooterText" xml:space="preserve">
+    <value>Our mission is to provide quality health services to all in a comfortable and cozy environment. Our clinics primarily offer consultations and is not equipped to take emergencies.</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Contact</value>
   </data>
 </root>

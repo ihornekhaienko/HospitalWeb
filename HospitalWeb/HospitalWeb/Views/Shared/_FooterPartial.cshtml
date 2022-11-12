@@ -1,5 +1,4 @@
-﻿@inject IViewLocalizer Localizer
-@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+﻿@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 
 <section class="border-top mt-5">
     <div class="container text-center text-md-start mt-5">
@@ -9,7 +8,7 @@
                     <i class="fa-solid fa-truck-medical me-3 text-secondary"></i>Hospital
                 </h6>
                 <p>
-                    @Localizer["FooterText"]
+                    @SharedLocalizer["FooterText"]
                 </p>
             </div>
             <div class="col-sm-4 mx-auto">
@@ -27,7 +26,7 @@
                 </p>
             </div>
             <div class="col-sm-4 mx-auto">
-                <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
+                <h6 class="text-uppercase fw-bold mb-4">@SharedLocalizer["Contact"]</h6>
                 <p>
                     <a href="https://github.com/ihornekhaienko" class="text-reset">
                         <i class="fa-brands fa-github"></i>
