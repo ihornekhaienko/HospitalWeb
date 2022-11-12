@@ -186,6 +186,9 @@
   <data name="Error" xml:space="preserve">
     <value>Помилка</value>
   </data>
+  <data name="ForgotPassword" xml:space="preserve">
+    <value>Забули пароль?</value>
+  </data>
   <data name="Level" xml:space="preserve">
     <value>Рівень доступу</value>
   </data>
@@ -209,6 +212,9 @@
   </data>
   <data name="Notifications" xml:space="preserve">
     <value>Сповіщення</value>
+  </data>
+  <data name="OldPassword" xml:space="preserve">
+    <value>Старий пароль</value>
   </data>
   <data name="Password" xml:space="preserve">
     <value>Пароль</value>
@@ -260,6 +266,9 @@
   </data>
   <data name="StartTimeSelectError" xml:space="preserve">
     <value>Час початку має бути меншим за час закінчення</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>Підтвердити</value>
   </data>
   <data name="Super" xml:space="preserve">
     <value>Суперадмін</value>
