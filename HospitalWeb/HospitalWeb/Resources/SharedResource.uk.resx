@@ -138,6 +138,9 @@
   <data name="BirthDateRequired" xml:space="preserve">
     <value>Необхідно вказати дату народження</value>
   </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Змінити пароль</value>
+  </data>
   <data name="ClearFilters" xml:space="preserve">
     <value>Очистити фільтри</value>
   </data>
@@ -204,6 +207,9 @@
   <data name="NewPasswordRequired" xml:space="preserve">
     <value>Необхідно вказати новий пароль</value>
   </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Сповіщення</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Пароль</value>
   </data>
@@ -222,6 +228,9 @@
   <data name="PhoneRequired" xml:space="preserve">
     <value>Необхідно вказати номер телефону</value>
   </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Профіль</value>
+  </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Запам'ятати мене?</value>
   </data>
@@ -230,6 +239,9 @@
   </data>
   <data name="Search" xml:space="preserve">
     <value>Пошук</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Налаштування</value>
   </data>
   <data name="Sex" xml:space="preserve">
     <value>Стать</value>
@@ -266,5 +278,8 @@
   </data>
   <data name="Update" xml:space="preserve">
     <value>Оновити</value>
+  </data>
+  <data name="UploadPhoto" xml:space="preserve">
+    <value>Завантажити фото</value>
   </data>
 </root>

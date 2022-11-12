@@ -1,6 +1,7 @@
 ﻿@model AdminProfileViewModel
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 @{
-    ViewBag.Title = "Profile";
+    ViewBag.Title = SharedLocalizer["Profile"];
 }
 
 <div class="container rounded bg-white">
@@ -18,14 +19,14 @@
                 @if (Model.IsSuperAdmin)
                 {
                     <span class="text-black-50">
-                        Super Admin
+                        @SharedLocalizer["Super"]
                     </span>
                 }
-                <span><a asp-controller="Manage" asp-action="ChangePassword">Change Password</a></span>
+                <span><a asp-controller="Manage" asp-action="ChangePassword">@SharedLocalizer["ChangePassword"]</a></span>
                 <div class="mt-2">
                     <form method="post" asp-controller="Manage" asp-action="UploadPhoto" enctype="multipart/form-data"> 
                         <input type="file" name="file" id="uploader" style="display: none;" />
-                        <input type="button" value="Upload Photo" id="activator" class="btn btn-info btn-sm"/>
+                        <input type="button" value="@SharedLocalizer["UploadPhoto"]" id="activator" class="btn btn-info btn-sm"/>
                     </form>              
                 </div>
             </div>
@@ -33,7 +34,7 @@
         <div class="col-md-5 border-right">
             <div class="p-3 py-5 d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="text-right">Profile Settings</h4>
+                    <h4 class="text-right">@SharedLocalizer["Settings"]</h4>
                 </div>
                 <form method="post" asp-controller="Manage" asp-action="AdminProfile">
                     <div asp-validation-summary="All" class="text-danger"></div>
@@ -59,7 +60,7 @@
                         </div>
                     </div>
                     <div class="mt-5 text-center">
-                        <button class="btn btn-primary profile-button align-self-end" type="submit">Save Profile</button>
+                        <button class="btn btn-primary profile-button align-self-end" type="submit">@SharedLocalizer["Update"]</button>
                     </div>
                 </form>        
             </div>
@@ -68,7 +69,7 @@
         <div class="col-md-4">
             <div class="p-3 py-5">
                 <div class="d-flex justify-content-between align-items-center experience">
-                    <h5>Notifications</h5>
+                    <h5>@SharedLocalizer["Notifications"]</h5>
                 </div><br>
             </div>
         </div>

@@ -138,6 +138,9 @@
   <data name="BirthDateRequired" xml:space="preserve">
     <value>The date of birth is required</value>
   </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Change password</value>
+  </data>
   <data name="ClearFilters" xml:space="preserve">
     <value>Clear filters</value>
   </data>
@@ -204,6 +207,9 @@
   <data name="NewPasswordRequired" xml:space="preserve">
     <value>The new password is required</value>
   </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
   </data>
@@ -222,6 +228,9 @@
   <data name="PhoneRequired" xml:space="preserve">
     <value>The phone is required</value>
   </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Remember me?</value>
   </data>
@@ -230,6 +239,9 @@
   </data>
   <data name="Search" xml:space="preserve">
     <value>Search</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
   </data>
   <data name="Sex" xml:space="preserve">
     <value>Sex</value>
@@ -263,5 +275,8 @@
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>
+  </data>
+  <data name="UploadPhoto" xml:space="preserve">
+    <value>Upload photo</value>
   </data>
 </root>
