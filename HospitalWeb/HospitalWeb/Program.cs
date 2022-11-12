@@ -5,7 +5,7 @@ using HospitalWeb.DAL.Services.Extensions;
 using HospitalWeb.Middlewares.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using HospitalWeb;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +21,12 @@ builder.Services.AddEmailNotifier();
 builder.Services.AddPasswordGenerator();
 builder.Services.AddFileManager();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddControllersWithViews()
+    .AddDataAnnotationsLocalization(options => 
+        options.DataAnnotationLocalizerProvider = (type, factory) =>
+            factory.Create(typeof(SharedResource)))
+    .AddViewLocalization();
 
 var app = builder.Build();
 
