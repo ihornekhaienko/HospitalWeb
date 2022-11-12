@@ -1,0 +1,31 @@
+﻿<div class="container">
+    <div class="row mt-4">
+        <div class="col-sm-4 mx-auto">
+            <div class="card" style="width:300px;">
+                    <img src="./files/images/appointment.png" class="card-img-top photo mt-1" alt="Appointments">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">Manage appointments</h4>
+                        <a asp-controller="Appointments" asp-action="Index" class="btn btn-primary">Manage</a>
+                    </div>
+            </div>
+        </div>
+        <div class="col-sm-4 mx-auto">
+            <div class="card" style="width:300px;">
+                    <img src="./files/images/history.png" class="card-img-top photo mt-1 ml-1 mr-1" alt="History">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">Show history</h4>
+                        <a asp-controller="Appointments" asp-action="History" class="btn btn-primary">Show</a>
+                    </div>
+            </div>
+        </div>
+        <div class="col-sm-4 mx-auto">
+            <div class="card" style="width:300px;">
+                    <img src="./files/images/stats.jpg" class="card-img-top photo mt-1" alt="Show stats">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">Look for statistics</h4>
+                        <a asp-controller="Stat" asp-action="Index" class="btn btn-primary">View</a>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
