@@ -6,6 +6,8 @@ using HospitalWeb.Middlewares.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HospitalWeb;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,10 +25,22 @@ builder.Services.AddFileManager();
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddControllersWithViews()
-    .AddDataAnnotationsLocalization(options => 
+    .AddDataAnnotationsLocalization(options =>
         options.DataAnnotationLocalizerProvider = (type, factory) =>
             factory.Create(typeof(SharedResource)))
     .AddViewLocalization();
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        new CultureInfo("en"),
+        new CultureInfo("uk")
+    };
+
+    options.DefaultRequestCulture = new RequestCulture("en");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
 
 var app = builder.Build();
 
@@ -36,7 +50,10 @@ if (builder.Environment.IsDevelopment())
     app.UseDbInitializer();
 }
 
+app.UseRequestLocalization();
+
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();

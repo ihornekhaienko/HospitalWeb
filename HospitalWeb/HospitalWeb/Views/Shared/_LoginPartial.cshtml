@@ -2,7 +2,6 @@
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
 
-<ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
     var user = await UserManager.FindByEmailAsync(User.Identity.Name);
@@ -35,4 +34,3 @@ else
         </a>
     </li>
 }
-</ul>
