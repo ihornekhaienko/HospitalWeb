@@ -13,5 +13,7 @@
         PhoneDesc,
         AddressAsc,
         AddressDesc,
+        BirthDateAsc,
+        BirthDateDesc
     }
 }

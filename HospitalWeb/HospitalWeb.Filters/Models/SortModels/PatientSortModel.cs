@@ -10,6 +10,7 @@ namespace HospitalWeb.Filters.Models.SortModels
         public PatientSortState EmailSort { get; private set; }
         public PatientSortState PhoneSort { get; protected set; }
         public PatientSortState AddressSort { get; private set; }
+        public PatientSortState BirthDateSort { get; private set; }
 
         public PatientSortState Current { get; private set; }
 
@@ -21,6 +22,7 @@ namespace HospitalWeb.Filters.Models.SortModels
             EmailSort = sortOrder == PatientSortState.EmailAsc ? PatientSortState.EmailDesc : PatientSortState.EmailAsc;
             PhoneSort = sortOrder == PatientSortState.PhoneAsc ? PatientSortState.PhoneDesc : PatientSortState.PhoneAsc;
             AddressSort = sortOrder == PatientSortState.AddressAsc ? PatientSortState.AddressDesc : PatientSortState.AddressAsc;
+            BirthDateSort = sortOrder == PatientSortState.BirthDateAsc ? PatientSortState.BirthDateDesc : PatientSortState.BirthDateAsc;
             Current = sortOrder;
         }
     }
