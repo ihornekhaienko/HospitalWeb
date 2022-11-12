@@ -1,4 +1,7 @@
-﻿<section class="border-top mt-5">
+﻿@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+<section class="border-top mt-5">
     <div class="container text-center text-md-start mt-5">
         <div class="row mt-3">
             <div class="col-sm-4 mx-auto">
@@ -6,24 +9,21 @@
                     <i class="fa-solid fa-truck-medical me-3 text-secondary"></i>Hospital
                 </h6>
                 <p>
-                    Our mission is to provide quality health services
-                    to all in a comfortable and cozy environment.
-                    Our clinics primarily offer consultations and
-                    is not equipped to take emergencies.
+                    @Localizer["FooterText"]
                 </p>
             </div>
             <div class="col-sm-4 mx-auto">
                 <h6 class="text-uppercase fw-bold mb-4">
-                    Info
+                    @SharedLocalizer["Info"]
                 </h6>
                 <p>
-                    <a asp-controller="Home" asp-action="Index" class="text-reset">Home</a>
+                    <a asp-controller="Home" asp-action="Index" class="text-reset">@SharedLocalizer["Home"]</a>
                 </p>
                 <p>
-                    <a asp-controller="Home" asp-action="About" class="text-reset">About</a>
+                    <a asp-controller="Home" asp-action="About" class="text-reset">@SharedLocalizer["About"]</a>
                 </p>
                 <p>
-                    <a asp-controller="Home" asp-action="Privacy" class="text-reset">Privacy</a>
+                    <a asp-controller="Home" asp-action="Privacy" class="text-reset">@SharedLocalizer["Privacy"]</a>
                 </p>
             </div>
             <div class="col-sm-4 mx-auto">

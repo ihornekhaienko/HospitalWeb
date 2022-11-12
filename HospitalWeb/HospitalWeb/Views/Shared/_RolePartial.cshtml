@@ -1,5 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<AppUser> SignInManager
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 
 @if (SignInManager.IsSignedIn(User))
 {
@@ -9,25 +11,25 @@
             <div class="dropdown">
                 <button class="btn btn-sea-green nav-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-users"></i>
-                    Administration
+                    @Localizer["Administration"]
                 </button>
                 <ul class="dropdown-menu bg-sea-green">
                     <li>
                         <a class="nav-link bg-sea-green" asp-controller="Administration" asp-action="Admins">
                             <i class="fa-solid fa-hammer"></i>
-                            Admins
+                            @Localizer["Admins"]
                         </a>
                     </li>
                     <li>
                         <a class="nav-link bg-sea-green" asp-controller="Administration" asp-action="Doctors">
                             <i class="fa-solid fa-stethoscope"></i>
-                            Doctors
+                            @Localizer["Doctors"]
                         </a>
                     </li>
                     <li>
                         <a class="nav-link bg-sea-green" asp-controller="Administration" asp-action="Patients">
                             <i class="fa-solid fa-hospital-user"></i>
-                            Patients
+                            @Localizer["Patients"]
                         </a>
                     </li>
                 </ul>
@@ -39,13 +41,13 @@
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Appointments" asp-action="Planned" asp-route-date="@DateTime.Today">
                 <i class="fa-solid fa-calendar-check"></i>
-                Appointments
+                @Localizer["Appointments"]
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Appointments" asp-action="History" asp-route-date="@DateTime.Today">
                 <i class="fa-solid fa-clock-rotate-left"></i>
-                History
+                @Localizer["History"]
             </a>
         </li>
     }
@@ -54,32 +56,32 @@
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Hospitals" asp-action="Search">
                 <i class="fa-solid fa-hospital"></i>
-                Search hospitals
+                @Localizer["SearchHospitals"]
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Doctors" asp-action="Search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                Search doctors
+                @Localizer["SearchDoctors"]
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link bg-sea-green" asp-controller="Treatments" asp-action="History">
                 <i class="fa-solid fa-file-medical"></i>
-                Treatment history
+                @Localizer["Treatment"]
             </a>
         </li>
     }
     <li class="nav-item">
         <a class="nav-link" asp-controller="Stats" asp-action="Index">
             <i class="fa-solid fa-chart-simple"></i>
-            Statistics
+           @SharedLocalizer["Statistics"]
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" asp-controller="Manage" asp-action="Profile">
             <i class="fa-solid fa-user"></i>
-            My Profile
+           @SharedLocalizer["Profile"]
         </a>
     </li>
 }
@@ -88,19 +90,19 @@ else
     <li class="nav-item">
         <a class="nav-link bg-sea-green" asp-controller="Hospitals" asp-action="Search">
             <i class="fa-solid fa-hospital"></i>
-            Search hospitals
+            @Localizer["SearchHospitals"]
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link bg-sea-green" asp-controller="Doctors" asp-action="Search">
             <i class="fa-solid fa-magnifying-glass"></i>
-            Search doctors
+            @Localizer["SearchDoctors"]
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" asp-controller="Stats" asp-action="Index">
             <i class="fa-solid fa-chart-simple"></i>
-            Statistics
+            @SharedLocalizer["Statistics"]
         </a>
     </li>
 }

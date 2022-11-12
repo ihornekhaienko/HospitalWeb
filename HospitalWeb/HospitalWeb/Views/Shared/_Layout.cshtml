@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -21,7 +23,7 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Home" asp-action="Index">
                                     <i class="fa-solid fa-house"></i>
-                                    Home
+                                    @SharedLocalizer["Home"]
                                 </a>
                             </li>
                             <partial name="_RolePartial" />

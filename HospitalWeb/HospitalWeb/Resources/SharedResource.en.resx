@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
   <data name="Add" xml:space="preserve">
     <value>Add</value>
   </data>
@@ -186,8 +189,23 @@
   <data name="Error" xml:space="preserve">
     <value>Error</value>
   </data>
+  <data name="Find" xml:space="preserve">
+    <value>Find</value>
+  </data>
   <data name="ForgotPassword" xml:space="preserve">
     <value>Forgot password?</value>
+  </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Hello</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Hospital" xml:space="preserve">
+    <value>Hospital</value>
+  </data>
+  <data name="Info" xml:space="preserve">
+    <value>Information</value>
   </data>
   <data name="Level" xml:space="preserve">
     <value>Access level</value>
@@ -197,6 +215,15 @@
   </data>
   <data name="LocalityRequired" xml:space="preserve">
     <value>The locality is required</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="Manage" xml:space="preserve">
+    <value>Manage</value>
   </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
@@ -234,8 +261,14 @@
   <data name="PhoneRequired" xml:space="preserve">
     <value>The phone is required</value>
   </data>
+  <data name="Privacy" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
   <data name="Profile" xml:space="preserve">
     <value>Profile</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Register</value>
   </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Remember me?</value>
@@ -252,6 +285,9 @@
   <data name="Sex" xml:space="preserve">
     <value>Sex</value>
   </data>
+  <data name="Show" xml:space="preserve">
+    <value>Show</value>
+  </data>
   <data name="Specialty" xml:space="preserve">
     <value>Specialty</value>
   </data>
@@ -266,6 +302,9 @@
   </data>
   <data name="StartTimeSelectError" xml:space="preserve">
     <value>The start time must lower than the end time</value>
+  </data>
+  <data name="Statistics" xml:space="preserve">
+    <value>Statistics</value>
   </data>
   <data name="Submit" xml:space="preserve">
     <value>Submit</value>
