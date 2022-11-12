@@ -1,9 +1,10 @@
-﻿@{
-    ViewBag.Title = "Confirm email";
+﻿@inject IViewLocalizer Localizer
+@{
+    ViewBag.Title = Localizer["Title"];
 }
 
 <div>
     <p>
-        Thank you for confirming your email.
+        Localizer["Message"]
     </p>
 </div>
