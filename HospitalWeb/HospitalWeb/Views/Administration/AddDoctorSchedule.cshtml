@@ -1,13 +1,15 @@
 ﻿@model DoctorSlotViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 @{
-    ViewBag.Title = "Add doctor's schedule";
+    ViewBag.Title = Localizer["Title"];
     ViewBag.RouteId = Model.DoctorId;
 }
 
 <form method="post">
-    <h2>Add doctor's schedule</h2>
+    <h2>@Localizer["Title"]</h2>
     @Html.HiddenFor(m => m.DoctorId)
-    <h5>Doctor @Model.DoctorFullName</h5>
+    <h5>@Localizer["Doctor"] @Model.DoctorFullName</h5>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <br/>
 
@@ -46,7 +48,7 @@
         <span asp-validation-for="EndTime" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-success">Add</button>
+    <button type="submit" class="btn btn-success">@SharedLocalizer["Add"]</button>
 </form>
 
 @section scripts {
