@@ -1,0 +1,14 @@
+﻿@model ErrorViewModel
+@{
+    ViewBag.Title = "Error";
+}
+<div class="list-header clearfix text-danger">
+    <h2>Error</h2>
+    <p>An unexpected error has occurred.</p>
+    @if (Model != null )
+    {
+        <p>
+            @Model.Message
+        </p>
+    }
+</div>
