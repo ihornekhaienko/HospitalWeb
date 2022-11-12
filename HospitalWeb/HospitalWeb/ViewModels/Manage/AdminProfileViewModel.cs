@@ -4,21 +4,21 @@ namespace HospitalWeb.ViewModels.Manage
 {
     public class AdminProfileViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "NameRequired")]
         [Display(Name = "Name")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "SurnameRequired")]
         [Display(Name = "Surname")]
         public string Surname { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "EmailRequired")]
+        [EmailAddress(ErrorMessage = "EmailValidation")]
         [Display(Name = "Email")]
-        [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
-        [Display(Name = "Phone number")]
+        [Required(ErrorMessage = "PhoneRequired")]
+        [Display(Name = "Phone")]
         [RegularExpression("^\\+?[1-9][0-9]{7,14}$")]
         public string Phone { get; set; }
 

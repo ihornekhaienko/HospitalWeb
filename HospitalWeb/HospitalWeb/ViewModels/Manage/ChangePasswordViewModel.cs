@@ -4,19 +4,19 @@ namespace HospitalWeb.ViewModels.Manage
 {
     public class ChangePasswordViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "PasswordRequired")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string OldPassword { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "NewPasswordRequired")]
         [DataType(DataType.Password)]
-        [Display(Name = "New password")]
+        [Display(Name = "NewPassword")]
         public string NewPassword { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        [Display(Name = "ConfirmPassword")]
+        [Compare("NewPassword", ErrorMessage = "PasswordMatch")]
         public string ConfirmPassword { get; set; }
     }
 }

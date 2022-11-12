@@ -11,17 +11,17 @@ namespace HospitalWeb.ViewModels.Administration
 
         public int? ScheduleId { get; set; }
 
-        [Required]
-        [Display(Name = "Select day")]
+        [Required(ErrorMessage = "DayOfWeekRequired")]
+        [Display(Name = "DaySelect")]
         public string DayOfWeek { get; set; }
 
-        [Required]
-        [TimeLessThan("EndTime", ErrorMessage = "The start time must lower than the end time")]
-        [Display(Name = "Select starting time")]
+        [Required(ErrorMessage = "StartTimeRequired")]
+        [TimeLessThan("EndTime", ErrorMessage = "StartTimeSelectError")]
+        [Display(Name = "StartTimeSelect")]
         public DateTime StartTime { get; set; }
 
-        [Required]
-        [Display(Name = "Select ending time")]
+        [Required(ErrorMessage = "EndTimeRequired")]
+        [Display(Name = "EndTimeSelect")]
         public DateTime EndTime { get; set; }
     }
 }

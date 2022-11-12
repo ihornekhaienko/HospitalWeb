@@ -4,31 +4,31 @@ namespace HospitalWeb.ViewModels.Manage
 {
     public class PatientProfileViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "NameRequired")]
         [Display(Name = "Name")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "SurnameRequired")]
         [Display(Name = "Surname")]
         public string Surname { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "EmailRequired")]
+        [EmailAddress(ErrorMessage = "EmailValidation")]
         [Display(Name = "Email")]
-        [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
-        [Display(Name = "Phone number")]
+        [Required(ErrorMessage = "PhoneRequired")]
+        [Display(Name = "Phone")]
         [RegularExpression("^\\+?[1-9][0-9]{7,14}$")]
         public string Phone { get; set; }
 
         public byte[] Image { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "AddressRequired")]
         [Display(Name = "Address")]
         public string Address { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "LocalityRequired")]
         [Display(Name = "Locality")]
         public string Locality { get; set; }
     }
