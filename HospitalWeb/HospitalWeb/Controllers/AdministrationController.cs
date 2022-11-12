@@ -7,36 +7,32 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Filters.Models.SortStates;
-<<<<<<< Updated upstream
-
-namespace HospitalWeb.Controllers
-{
-=======
 using Microsoft.AspNetCore.Authorization;
 
 namespace HospitalWeb.Controllers
 {
     [Authorize(Roles = "Admin")]
->>>>>>> Stashed changes
     public class AdministrationController : Controller
     {
-        private readonly int _pageSize = 10;
         private readonly ILogger<AdministrationController> _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly UnitOfWork _uow;
         private readonly IPasswordGenerator _passwordGenerator;
+        private readonly INotifier _notifier;
 
         public AdministrationController(
             ILogger<AdministrationController> logger,
             UserManager<AppUser> userManager,
             UnitOfWork uow,
-            IPasswordGenerator passwordGenerator
+            IPasswordGenerator passwordGenerator,
+            INotifier notifier
             )
         {
             _logger = logger;
             _userManager = userManager;
             _uow = uow;
             _passwordGenerator = passwordGenerator;
+            _notifier = notifier;
         }
 
         [HttpGet]
@@ -58,22 +54,35 @@ namespace HospitalWeb.Controllers
 
         public async Task<IActionResult> DeleteAdmin(string id)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            try
             {
-                return NotFound();
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return NotFound();
+                }
+
+                var admin = _uow.Admins
+                    .Get(m => m.Id == id);
+
+                if (admin == null)
+                {
+                    return NotFound();
+                }
+
+                var result = await _userManager.DeleteAsync(admin);
+
+                if (result.Succeeded)
+                {
+                    await _notifier.NotifyDelete(admin.Email, admin.Email);
+                }
+
+                return RedirectToAction("Admins", "Administration");
             }
-
-            var admin =  _uow.Admins
-                .Get(m => m.Id == id);
-
-            if (admin == null)
+            catch (Exception err)
             {
-                return NotFound();
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
             }
-
-            await _userManager.DeleteAsync(admin);
-
-            return RedirectToAction("Admins", "Administration");
         }
 
         [HttpGet]
@@ -85,37 +94,48 @@ namespace HospitalWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAdmin(AdminViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var admin = new Admin
+                if (ModelState.IsValid)
                 {
-                    Name = model.Name,
-                    Surname = model.Surname,
-                    Email = model.Email,
-                    UserName = model.Email,
-                    PhoneNumber = model.Phone,
-                    IsSuperAdmin = model.IsSuperAdmin
-                };
-                var password = _passwordGenerator.GeneratePassword(null);
-                
-                var result = await _userManager.CreateAsync(admin, password);
-
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(admin, "Admin");
-
-                    return RedirectToAction("Admins", "Administration");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
+                    var admin = new Admin
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        Name = model.Name,
+                        Surname = model.Surname,
+                        Email = model.Email,
+                        UserName = model.Email,
+                        PhoneNumber = model.Phone,
+                        IsSuperAdmin = model.IsSuperAdmin,
+                        EmailConfirmed = true
+                    };
+
+                    var password = _passwordGenerator.GeneratePassword(null);
+
+                    var result = await _userManager.CreateAsync(admin, password);
+
+                    if (result.Succeeded)
+                    {
+                        await _userManager.AddToRoleAsync(admin, "Admin");
+                        await _notifier.NotifyAdd(admin.Email, admin.Email, password);
+
+                        return RedirectToAction("Admins", "Administration");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
                     }
                 }
-            }
 
-            return View(model);
+                return View(model);
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
+            }
         }
 
         [HttpGet]
@@ -149,34 +169,44 @@ namespace HospitalWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> EditAdmin(AdminViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var admin = _uow.Admins
-                    .Get(a => a.Email == model.Email);
-
-                admin.UserName = model.Email;
-                admin.Email = model.Email;
-                admin.Name = model.Name;
-                admin.Surname = model.Surname;
-                admin.PhoneNumber = model.Phone;
-                admin.IsSuperAdmin = model.IsSuperAdmin;
-
-                var result = await _userManager.UpdateAsync(admin);
-
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    return RedirectToAction("Admins", "Administration");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
+                    var admin = _uow.Admins
+                        .Get(a => a.Email == model.Email);
+
+                    admin.UserName = model.Email;
+                    admin.Email = model.Email;
+                    admin.Name = model.Name;
+                    admin.Surname = model.Surname;
+                    admin.PhoneNumber = model.Phone;
+                    admin.IsSuperAdmin = model.IsSuperAdmin;
+
+                    var result = await _userManager.UpdateAsync(admin);
+
+                    if (result.Succeeded)
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        await _notifier.NotifyUpdate(admin.Email, admin.Email);
+
+                        return RedirectToAction("Admins", "Administration");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
                     }
                 }
-            }
 
-            return View(model);
+                return View(model);
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
+            }
         }
 
         [HttpGet]
@@ -196,22 +226,35 @@ namespace HospitalWeb.Controllers
 
         public async Task<IActionResult> DeleteDoctor(string id)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            try
             {
-                return NotFound();
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return NotFound();
+                }
+
+                var doctor = _uow.Doctors
+                    .Get(m => m.Id == id);
+
+                if (doctor == null)
+                {
+                    return NotFound();
+                }
+
+                var result = await _userManager.DeleteAsync(doctor);
+
+                if (result.Succeeded)
+                {
+                    await _notifier.NotifyDelete(doctor.Email, doctor.Email);
+                }
+
+                return RedirectToAction("Doctors", "Administration");
             }
-
-            var doctor = _uow.Doctors
-                .Get(m => m.Id == id);
-
-            if (doctor == null)
+            catch (Exception err)
             {
-                return NotFound();
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
             }
-
-            await _userManager.DeleteAsync(doctor);
-
-            return RedirectToAction("Doctors", "Administration");
         }
 
         [HttpGet]
@@ -228,38 +271,48 @@ namespace HospitalWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateDoctor(DoctorViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var specialty = _uow.Specialties.GetOrCreate(model.Specialty);
-                var doctor = new Doctor
+                if (ModelState.IsValid)
                 {
-                    Name = model.Name,
-                    Surname = model.Surname,
-                    Email = model.Email,
-                    UserName = model.Email,
-                    PhoneNumber = model.Phone,
-                    Specialty = specialty
-                };
-                var password = _passwordGenerator.GeneratePassword(null);
-
-                var result = await _userManager.CreateAsync(doctor, password);
-
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(doctor, "Doctor");
-
-                    return RedirectToAction("Doctors", "Administration");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
+                    var specialty = _uow.Specialties.GetOrCreate(model.Specialty);
+                    var doctor = new Doctor
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        Name = model.Name,
+                        Surname = model.Surname,
+                        Email = model.Email,
+                        UserName = model.Email,
+                        PhoneNumber = model.Phone,
+                        Specialty = specialty,
+                        EmailConfirmed = true
+                    };
+                    var password = _passwordGenerator.GeneratePassword(null);
+
+                    var result = await _userManager.CreateAsync(doctor, password);
+
+                    if (result.Succeeded)
+                    {
+                        await _userManager.AddToRoleAsync(doctor, "Doctor");
+                        await _notifier.NotifyAdd(doctor.Email, doctor.Email, password);
+
+                        return RedirectToAction("Doctors", "Administration");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
                     }
                 }
-            }
 
-            return View(model);
+                return View(model);
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
+            }
         }
 
         [HttpGet]
@@ -294,41 +347,51 @@ namespace HospitalWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> EditDoctor(DoctorViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var specialty = _uow.Specialties
-                    .GetOrCreate(model.Specialty);
-                var doctor = _uow.Doctors
-                    .Get(a => a.Email == model.Email);
-
-                if (doctor == null || specialty == null)
+                if (ModelState.IsValid)
                 {
-                    return NotFound();
-                }
+                    var specialty = _uow.Specialties
+                        .GetOrCreate(model.Specialty);
+                    var doctor = _uow.Doctors
+                        .Get(a => a.Email == model.Email);
 
-                doctor.UserName = model.Email;
-                doctor.Email = model.Email;
-                doctor.Name = model.Name;
-                doctor.Surname = model.Surname;
-                doctor.PhoneNumber = model.Phone;
-                doctor.Specialty = specialty;
-
-                var result = await _userManager.UpdateAsync(doctor);
-
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Doctors", "Administration");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
+                    if (doctor == null || specialty == null)
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        return NotFound();
+                    }
+
+                    doctor.UserName = model.Email;
+                    doctor.Email = model.Email;
+                    doctor.Name = model.Name;
+                    doctor.Surname = model.Surname;
+                    doctor.PhoneNumber = model.Phone;
+                    doctor.Specialty = specialty;
+
+                    var result = await _userManager.UpdateAsync(doctor);
+
+                    if (result.Succeeded)
+                    {
+                        await _notifier.NotifyUpdate(doctor.Email, doctor.Email);
+
+                        return RedirectToAction("Doctors", "Administration");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
                     }
                 }
-            }
 
-            return View(model);
+                return View(model);
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
+            }
         }
 
         [HttpGet]
@@ -348,22 +411,35 @@ namespace HospitalWeb.Controllers
 
         public async Task<IActionResult> DeletePatient(string id)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            try
             {
-                return NotFound();
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return NotFound();
+                }
+
+                var patient = _uow.Patients
+                    .Get(m => m.Id == id);
+
+                if (patient == null)
+                {
+                    return NotFound();
+                }
+
+                var result = await _userManager.DeleteAsync(patient);
+
+                if (result.Succeeded)
+                {
+                    await _notifier.NotifyDelete(patient.Email, patient.Email);
+                }
+
+                return RedirectToAction("Patients", "Administration");
             }
-
-            var patient = _uow.Patients
-                .Get(m => m.Id == id);
-
-            if (patient == null)
+            catch (Exception err)
             {
-                return NotFound();
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
             }
-
-            await _userManager.DeleteAsync(patient);
-
-            return RedirectToAction("Patients", "Administration");
         }
         
         public IActionResult DoctorSchedule(string id, string day)
@@ -383,7 +459,6 @@ namespace HospitalWeb.Controllers
         {
             DoctorSlotViewModel model;
 
-            RedirectToAction("AddDoctorSchedule", "Administration", new { id = id, day = day });
             var doctor = await _userManager.FindByIdAsync(id);
 
             model = new DoctorSlotViewModel
@@ -462,6 +537,7 @@ namespace HospitalWeb.Controllers
             return View(model);
         }
 
+        [HttpPost]
         public IActionResult DeleteDoctorSchedule(DoctorSlotViewModel model)
         {
             if (model.ScheduleId == null)

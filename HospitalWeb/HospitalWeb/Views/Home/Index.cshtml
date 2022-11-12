@@ -1,5 +1,25 @@
-﻿@{
-    ViewBag.Title = "Welcome";
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<AppUser> SignInManager
+@{
+    ViewBag.Title = "HospitalWeb";
 }
 
-<p>Welcome...</p>
+@if (SignInManager.IsSignedIn(User))
+{
+    if (User.IsInRole("Admin"))
+    {
+        <partial name="_AdminPartial" />
+    }
+    else if (User.IsInRole("Doctor"))
+    {
+        <partial name="_DoctorPartial" />
+    }
+    else if (User.IsInRole("Patient"))
+    {
+        <partial name="_DefaultPartial" />
+    }
+}
+else
+{
+    <partial name="_DefaultPartial" />
+}

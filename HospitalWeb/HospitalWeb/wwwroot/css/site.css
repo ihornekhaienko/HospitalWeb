@@ -1,11 +1,43 @@
-﻿footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    white-space: nowrap;
-    line-height: 60px;
+﻿.main {
+    position: relative;
+    top: 60px;
 }
 
+.mb-10 {
+    margin-bottom: 100px;
+}
+
+.bg-sea-green {
+    background-color: rgb(46, 139, 87) !important;
+}
+
+.bg-cadet-blue {
+    background-color: rgb(95, 158, 160);
+}
+
+.navbar-brand {
+    color: rgb(255, 255, 255) !important;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, .75) !important;
+}
+
+.nav-link:hover {
+    color: rgb(255, 255, 255) !important;
+}
+
+.nav-btn {
+    color: rgba(255, 255, 255, .75) !important;
+}
+
+.nav-btn:hover {
+    color: rgb(255, 255, 255) !important;
+}
+
+a.text-reset {
+    text-decoration: none;
+}
 /*input.input-validation-error {
     border: 1px solid #b94a48;
 }
@@ -13,7 +45,6 @@
 input[type="checkbox"].input-validation-error {
     border: 0 none;
 }*/
-
 .gradient-custom-3 {
     /* fallback for old browsers */
     background: #84fab0;
@@ -84,4 +115,16 @@ body {
 
 .border-right {
     border-right: 1px solid rgb(169, 169, 169);
+}
+
+.photo {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+}
+
+.photo-sm {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
 }

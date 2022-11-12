@@ -4,6 +4,6 @@ namespace HospitalWeb.Services.Interfaces
 {
     public interface IPasswordGenerator
     {
-        string? GeneratePassword(PasswordOptions? opts);
+        string GeneratePassword(PasswordOptions opts);
     }
 }

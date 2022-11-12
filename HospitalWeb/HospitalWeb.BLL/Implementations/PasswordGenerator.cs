@@ -5,7 +5,7 @@ namespace HospitalWeb.Services.Implementations
 {
     internal class PasswordGenerator : IPasswordGenerator
     {
-        public string? GeneratePassword(PasswordOptions? opts = null)
+        public string GeneratePassword(PasswordOptions opts = null)
         {
             if (opts == null) opts = new PasswordOptions()
             {

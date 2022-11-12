@@ -3,39 +3,41 @@
     ViewBag.Title = "Profile";
 }
 
-<form method="post" asp-controller="Manage" asp-action="AdminProfile">
-    <div class="container rounded bg-white">
-        <div class="row">
-            <div class="col-md-3 border-right">
-                <div class="d-flex flex-column align-items-center text-center">
-                    @{
-                        var base64 = Convert.ToBase64String(Model.Image);
-                        var Image = String.Format("data:image/gif;base64,{0}", base64);
-                    }
-                    <img src="@Image" class="rounded-circle mt-5" alt="you" width="160" height="200">
-                    <span class="font-weight-bold">@Model.Name</span>
-                    <span class="text-black-50">@Model.Email</span>
-                    @if (Model.IsSuperAdmin)
-                    {
-                        <span class="text-black-50">
-                            Super Admin
-                        </span>
-                    }
-                    <span><a asp-controller="Manage" asp-action="ChangePassword">Change Password</a></span>
-                    <div class="mt-2">
-                        <form method="post" asp-controller="Manage" asp-action="UploadPhoto" enctype="multipart/form-data"> 
-                            <input type="file" name="file" id="uploader" style="display: none;" />
-                            <input type="button" value="Upload Photo" id="activator" class="btn btn-info btn-sm"/>
-                        </form>              
-                    </div>
+<div class="container rounded bg-white">
+    <div class="row">
+        <div class="col-md-3 border-right">
+            <div class="d-flex flex-column align-items-center text-center">
+                @{
+                    byte[] image = Model.Image ?? ViewBag.Image;
+                    var base64 = Convert.ToBase64String(image);
+                    var Image = String.Format("data:image/gif;base64,{0}", base64);
+                }
+                <img src="@Image" class="rounded-circle mt-5 photo" alt="you">
+                <span class="font-weight-bold">@Model.Name</span>
+                <span class="text-black-50">@Model.Email</span>
+                @if (Model.IsSuperAdmin)
+                {
+                    <span class="text-black-50">
+                        Super Admin
+                    </span>
+                }
+                <span><a asp-controller="Manage" asp-action="ChangePassword">Change Password</a></span>
+                <div class="mt-2">
+                    <form method="post" asp-controller="Manage" asp-action="UploadPhoto" enctype="multipart/form-data"> 
+                        <input type="file" name="file" id="uploader" style="display: none;" />
+                        <input type="button" value="Upload Photo" id="activator" class="btn btn-info btn-sm"/>
+                    </form>              
                 </div>
             </div>
-            <div class="col-md-5 border-right">
-                <div class="p-3 py-5 d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="text-right">Profile Settings</h4>
-                    </div>
-                    <div asp-validation-summary="All"></div>
+        </div>
+        <div class="col-md-5 border-right">
+            <div class="p-3 py-5 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="text-right">Profile Settings</h4>
+                </div>
+                <form method="post" asp-controller="Manage" asp-action="AdminProfile">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    @Html.HiddenFor(m => m.Image)
                     <div class="row mt-2">
                         <div class="col-md-6">
                             <label class="labels" asp-for="Name"></label>
@@ -59,18 +61,20 @@
                     <div class="mt-5 text-center">
                         <button class="btn btn-primary profile-button align-self-end" type="submit">Save Profile</button>
                     </div>
-                </div>
+                </form>        
             </div>
-            <div class="col-md-4">
-                <div class="p-3 py-5">
-                    <div class="d-flex justify-content-between align-items-center experience">
-                        <h5>Notifications</h5>
-                    </div><br>
-                </div>
+        </div>
+       
+        <div class="col-md-4">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center experience">
+                    <h5>Notifications</h5>
+                </div><br>
             </div>
         </div>
     </div>
-</form>
+</div>
+
 
 @section scripts {
     <script>

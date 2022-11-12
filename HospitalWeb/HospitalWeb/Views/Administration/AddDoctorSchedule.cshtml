@@ -54,7 +54,7 @@
         $('#daySelect').change(function(){
             var id = "@ViewBag.RouteId";
             var day = $(this).val();
-            var url = '@Url.Action("DoctorSchedule", "Manage")' + `/${id}?day=${day}`;
+            var url = '@Url.Action("DoctorSchedule", "Administration")' + `/${id}?day=${day}`;
             window.location.replace(url);
         });
     </script>

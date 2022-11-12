@@ -5,11 +5,14 @@
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
+    var user = await UserManager.FindByEmailAsync(User.Identity.Name);
+    var name = user.Name;
+
     <li class="nav-item">
-        <a class="nav-link" asp-controller="Manage" asp-action="Profile" title="Manage">Hello, @User.Identity?.Name!</a>
+        <a class="nav-link" asp-controller="Manage" asp-action="Profile" title="Manage">Hello, @name</a>
     </li>
     <li class="nav-item"> 
-        <form  class="form-inline" asp-controller="Account" asp-action="Logout" asp-route-returnUrl="@Url.Action("Index", "Home")">
+        <form  class="form-inline" asp-controller="Account" asp-action="Logout">
             <button  type="submit" class="nav-link btn btn-link">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 Logout
@@ -26,7 +29,7 @@ else
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Index", "Home")">
+        <a class="nav-link" asp-controller="Account" asp-action="Login">
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
             Login
         </a>

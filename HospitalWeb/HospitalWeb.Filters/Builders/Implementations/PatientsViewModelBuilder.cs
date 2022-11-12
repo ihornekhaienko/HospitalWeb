@@ -86,6 +86,12 @@ namespace HospitalWeb.Filters.Builders.Implementations
                     case PatientSortState.PhoneDesc:
                         patients = patients.OrderByDescending(p => p.PhoneNumber);
                         break;
+                    case PatientSortState.BirthDateAsc:
+                        patients = patients.OrderBy(p => p.BirthDate);
+                        break;
+                    case PatientSortState.BirthDateDesc:
+                        patients = patients.OrderByDescending(p => p.BirthDate);
+                        break;
                     case PatientSortState.AddressAsc:
                         patients = patients
                             .OrderBy(p => p.Address.FullAddress)
@@ -114,6 +120,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
                     Email = p.Email,
                     PhoneNumber = p.PhoneNumber,
                     Image = p.Image,
+                    BirthDate = p.BirthDate,
                     Address = p.Address.ToString()
                 });
         }

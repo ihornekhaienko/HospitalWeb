@@ -56,6 +56,13 @@
             </th>
             <th>
                 <a asp-action="Patients"
+                   asp-route-sortOrder="@(Model.SortModel.BirthDateSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   Date of Birth
+                </a>
+            </th>
+            <th>
+                <a asp-action="Patients"
                    asp-route-sortOrder="@(Model.SortModel.AddressSort)"
                    asp-route-searchString="@(Model.FilterModel.SearchString)">
                    Address
@@ -81,7 +88,10 @@
                     @patient.PhoneNumber
                 </td>
                 <td>
-                    @(patient.Address)
+                    @patient.BirthDate.ToString("dd MMMM, yyyy") 
+                </td>
+                <td>
+                    @patient.Address
                 </td>
                 <td>
                     <a asp-action="DeletePatient" asp-route-id="@patient.Id">Delete</a>

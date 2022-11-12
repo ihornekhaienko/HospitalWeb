@@ -8,47 +8,44 @@
         <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" /> 
         <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" /> 
     </head>
-    <body>
+    <body class="d-flex flex-column min-vh-100">
         <header>
-            <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Hospital</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <partial name="_RolePartial" />
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Account" asp-action="Profile">Profile</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
+            <nav class="navbar navbar-expand-md fixed-top bg-sea-green">
+                <div class="container-fluid">
+                    <a class="navbar-brand white" asp-controller="Home" asp-action="Index">Hospital</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                    <i class="fa-solid fa-house"></i>
+                                    Home
+                                </a>
+                            </li>
+                            <partial name="_RolePartial" />
+                        </ul>
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
         </header>
 
-        <div class="container">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
+        <main role="main" class="container main mb-10">
+            @RenderBody()
+        </main>
+        
 
-       <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2022 - Hospital - <a asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </div>
-       </footer>
-       
-       <script src="~/js/site.js"></script>
-           <script src="~/lib/jquery/jquery.min.js"></script>
-           <script src="~/lib/jQuery-Validation/jquery.validate.min.js"></script>
-           <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-           <script src="~/lib/bootstrap/js/bootstrap.bundle.js"></script>
-       @await RenderSectionAsync("Scripts", required: false)
+        <footer class="mt-auto text-center text-lg-start bg-white text-muted">
+            <partial name="_FooterPartial" />
+        </footer>
+
+        <script src="~/js/site.js"></script>
+        <script src="~/lib/jquery/jquery.min.js"></script>
+        <script src="~/lib/jQuery-Validation/jquery.validate.min.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+        <script src="~/lib/bootstrap/js/bootstrap.bundle.js"></script>
+        @await RenderSectionAsync("Scripts", required: false)
     </body>
 </html>

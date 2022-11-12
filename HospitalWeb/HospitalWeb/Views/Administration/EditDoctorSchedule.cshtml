@@ -4,7 +4,7 @@
     ViewBag.RouteId = Model.DoctorId;
 }
 
-<form>
+<form method="post" asp-controller="Administration" asp-action="EditDoctorSchedule">
     <h2>Manage doctor schedule</h2>
     @Html.HiddenFor(m => m.DoctorId)
     @Html.HiddenFor(m => m.ScheduleId)
@@ -47,8 +47,8 @@
         <span asp-validation-for="EndTime" class="text-danger"></span>
     </div>
 
-    <button type="submit" formaction="EditDoctorSchedule" formmethod="post" class="btn btn-primary">Update</button>
-    <button type="submit" formaction="DeleteDoctorSchedule" formmethod="post" class="btn btn-danger">Delete</button>
+    <button type="submit" class="btn btn-primary">Update</button>
+    <button type="submit" formaction="@Url.Action("DeleteDoctorSchedule")" formmethod="post" class="btn btn-danger">Delete</button>
 </form>
 
 @section scripts {

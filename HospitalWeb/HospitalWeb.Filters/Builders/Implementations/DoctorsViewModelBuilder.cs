@@ -45,7 +45,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
                 {
                     result = d.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
                     d.Surname.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
-                    d.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+                    d.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
+                    d.Specialty.SpecialtyName.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
                 }
 
                 if (_specialty != null && _specialty != 0)

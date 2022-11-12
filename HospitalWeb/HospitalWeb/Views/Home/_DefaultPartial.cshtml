@@ -1,0 +1,49 @@
+﻿<div class="container">
+    <div class="row mt-5">
+    <div class="col-sm-6 mx-auto text-center">
+        <h4>Search for doctors, clinics and medicines online</h4>
+    </div>
+    </div>
+    <div class="row mt-2">
+         <div class="col-sm-6 mx-auto text-center">
+            <h6>Make an appointment without leaving your home</h6>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-sm-6 mx-auto text-center">
+             <form method="post">
+                <input class="search-input" name="searchString" placeholder="Enter doctor's name or specialty" style="min-width:300px;"/>
+                <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">Search</button></span>
+             </form>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-sm-4 mx-auto">
+            <div class="card" style="width:300px;">
+                    <img src="./files/images/doctor.png" class="card-img-top photo mt-1" alt="Find doctor">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">Find a doctor</h4>
+                        <a asp-controller="Doctors" asp-action="Search" class="btn btn-primary">Find</a>
+                    </div>
+            </div>
+        </div>
+        <div class="col-sm-4 mx-auto">
+            <div class="card" style="width:300px;">
+                    <img src="./files/images/hospital.png" class="card-img-top photo mt-1" alt="Find hospital">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">Find a hospital</h4>
+                        <a asp-controller="Hospitals" asp-action="Search" class="btn btn-primary">Find</a>
+                    </div>
+            </div>
+        </div>
+        <div class="col-sm-4 mx-auto">
+            <div class="card" style="width:300px;">
+                    <img src="./files/images/stats.jpg" class="card-img-top photo mt-1" alt="Show stats">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">Look for statistics</h4>
+                        <a asp-controller="Stat" asp-action="Index" class="btn btn-primary">View</a>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
