@@ -1,6 +1,7 @@
 ﻿.main {
     position: relative;
     top: 60px;
+    width: 100%;
 }
 
 .mb-10 {
@@ -127,4 +128,56 @@ body {
     width: 100px;
     height: 100px;
     object-fit: contain;
+}
+
+@media (min-width: 768px) {
+    .seven-cols .col-md-1,
+    .seven-cols .col-sm-1,
+    .seven-cols .col-lg-1 {
+        width: 100%;
+        *width: 100%;
+    }
+}
+
+@media (min-width: 992px) {
+    .seven-cols .col-md-1,
+    .seven-cols .col-sm-1,
+    .seven-cols .col-lg-1 {
+        width: 14.285714285714285714285714285714%;
+        *width: 14.285714285714285714285714285714%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .seven-cols .col-md-1,
+    .seven-cols .col-sm-1,
+    .seven-cols .col-lg-1 {
+        width: 14.285714285714285714285714285714%;
+        *width: 14.285714285714285714285714285714%;
+    }
+}
+
+.carousel-control-next,
+.carousel-control-prev /*, .carousel-indicators */ {
+    filter: invert(100%);
+}
+
+.carousel-control-prev {
+    margin-left: -150px;
+}
+
+.carousel-control-next {
+    margin-right: -150px;
+}
+
+.hidden {
+    display: none;
+}
+
+.last {
+
+}
+
+.first {
+
 }
