@@ -1,4 +1,5 @@
 ﻿@model DoctorDetailsViewModel
+@inject IViewLocalizer Localizer
 @{
     ViewBag.Title = Model.FullName;
 }
@@ -45,3 +46,66 @@
         </button>
     </div>
 </section>
+
+@section scripts {
+    <script>
+        var date = new Date();
+
+        $('.date-free').click(function (e) {
+            return confirm('@Localizer["AppointmentConfirmation"]');
+        });
+
+        $('.date-taken').click(function () {
+            alert('@Localizer["DateTaken"]');
+        });
+
+        function loadWeek() {
+            $.ajax({
+                url: '@Url.Action("Schedule", "Doctors")',
+                dataType: "html",
+                data: { "id": "@Model.Id", "date": date.toISOString() },
+                type: "GET",
+                contentType: "application/json",
+                success: function (response) {
+                    $('.carousel-item').removeClass('active');
+                    $('.carousel-item').removeClass('last');
+                    $('#carouselInner').append(response);
+                },
+                error: function (err) {
+                    alert(err.responseText);
+                }
+            });
+        }
+
+        $('.carousel-control-next').click(function (e) {
+            if ($('.active').hasClass('last')) {
+                date.setHours(0, 0, 0, 0);
+                date.setDate(date.getDate() + 8);
+                loadWeek();
+            }
+            else
+            {
+                var next = $('.active').next();
+                $('.carousel-item').removeClass('active');
+                next.addClass('active');
+            }
+        });
+
+        $('.carousel-control-prev').click(function (e) {
+            var previous = $('.active').prev();
+
+            if (previous.hasClass('carousel-item')) {
+                $('.carousel-item').removeClass('active');
+                previous.addClass('active');
+            }
+        });
+
+        $('#schedule').on('slide.bs.carousel', function(e) {
+            e.preventDefault();
+        });
+
+        $(document).ready(function() {
+            loadWeek();
+        });
+    </script>
+}
