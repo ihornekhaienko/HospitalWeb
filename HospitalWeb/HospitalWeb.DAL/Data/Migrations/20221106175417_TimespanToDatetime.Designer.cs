@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HospitalWeb.DAL.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221113123925_Initial")]
-    partial class Initial
+    [Migration("20221106175417_TimespanToDatetime")]
+    partial class TimespanToDatetime
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

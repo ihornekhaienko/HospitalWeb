@@ -2,13 +2,13 @@
 
 namespace HospitalWeb.DAL.Entities
 {
-    public class Slot
+    public class Schedule
     {
-        public int SlotId { get; set; }
+        public int ScheduleId { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         
-        public Doctor Doctor { get; set; }
+        public Doctor? Doctor { get; set; }
     }
 }
