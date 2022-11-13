@@ -17,7 +17,7 @@ namespace HospitalWeb.DAL.Services.Implementations
         public Doctor Get(Func<Doctor, bool> filter)
         {
             return _db.Doctors
-                .Include(d => d.Records)
+                .Include(d => d.Appointments)
                 .Include(d => d.Schedules)
                 .Include(d => d.Specialty)
                 .FirstOrDefault(filter);
@@ -30,7 +30,7 @@ namespace HospitalWeb.DAL.Services.Implementations
             int offset = 0)
         {
             IQueryable<Doctor> doctors = _db.Doctors
-                .Include(d => d.Records)
+                .Include(d => d.Appointments)
                 .Include(d => d.Schedules)
                 .Include(d => d.Specialty);
 
@@ -61,7 +61,7 @@ namespace HospitalWeb.DAL.Services.Implementations
         public bool Contains(Func<Doctor, bool> query)
         {
             return _db.Doctors
-                .Include(d => d.Records)
+                .Include(d => d.Appointments)
                 .Include(d => d.Schedules)
                 .Include(d => d.Specialty)
                 .Any(query);

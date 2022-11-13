@@ -7,12 +7,12 @@ namespace HospitalWeb.DAL.Entities.Identity
     {
         public Doctor()
         {
-            Records = new List<Record>();
+            Appointments = new List<Appointment>();
             Schedules = new List<Schedule>();
         }
 
-        public Specialty? Specialty { get; set; }
-        public ICollection<Record>? Records { get; set; }
-        public ICollection<Schedule>? Schedules { get; set; }
+        public Specialty Specialty { get; set; }
+        public ICollection<Appointment> Appointments { get; set; }
+        public ICollection<Schedule> Schedules { get; set; }
     }
 }
