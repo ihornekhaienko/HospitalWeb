@@ -22,6 +22,7 @@ builder.Services.AddUnitOfWork();
 builder.Services.AddEmailNotifier();
 builder.Services.AddPasswordGenerator();
 builder.Services.AddFileManager();
+builder.Services.AddScheduleGenerator();
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddControllersWithViews()
