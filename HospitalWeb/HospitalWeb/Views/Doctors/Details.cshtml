@@ -1,6 +1,4 @@
 ﻿@model DoctorDetailsViewModel
-@inject IViewLocalizer Localizer
-@inject IHtmlLocalizer<SharedResource> SharedLocalizer
 @{
     ViewBag.Title = Model.FullName;
 }
@@ -31,5 +29,19 @@
                 </div>
             </div>
         </div>
+    </div>
+</section>
+
+<section>
+    <div id="schedule" class="carousel slide" data-bs-ride="carousel" data-interval="false" data-wrap="false" data-pause="true">
+        <div class="carousel-inner" id="carouselInner">
+        </div>      
+    
+        <button class="carousel-control-prev hidden" type="button" data-bs-target="#schedule" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#schedule" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
     </div>
 </section>
