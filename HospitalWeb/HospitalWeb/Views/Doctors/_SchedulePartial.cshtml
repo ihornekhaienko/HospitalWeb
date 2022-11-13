@@ -1,0 +1,32 @@
+﻿@model IEnumerable<ScheduleViewModel>
+@inject IViewLocalizer Localizer
+
+<div class="carousel-item active last">
+    <div class="row seven-cols">
+        @foreach (var day in Model)
+        {
+            <div class="col-md-1 p-2 text-center">
+                <h5>@day.Date.DayOfWeek</h5>
+                <p>@day.Date.ToShortDateString()</p>
+                @foreach (var slot in day.Slots)
+                {
+                    <p class="mb-1">
+                        @if (slot.IsFree)
+                        {
+                            <a asp-controller="Doctors" asp-action="SignUpForAppointment" 
+                                asp-route-doctorId="@day.DoctorId" asp-route-date="@slot.Time" class="btn btn-primary date-free">
+                                @slot.ToString()
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="#" class="btn btn-outline-primary date-taken">
+                                @slot.ToString()
+                            </a>
+                        }
+                    </p>
+                }
+            </div>
+        }
+    </div>
+</div>
