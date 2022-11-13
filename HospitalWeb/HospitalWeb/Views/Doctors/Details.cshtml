@@ -1,0 +1,35 @@
+﻿@model DoctorDetailsViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = Model.FullName;
+}
+
+<section>
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-md-9 col-lg-7 col-xl-5">
+                <div class="card" style="border-radius: 15px;">
+                    <div class="card-body p-4">
+                        <div class="d-flex text-black">
+                            <div class="flex-shrink-0">
+                                @{
+                                    byte[] image = Model.Image ?? ViewBag.Image;
+                                    var base64 = Convert.ToBase64String(image);
+                                    var Image = String.Format("data:image/gif;base64,{0}", base64);
+                                }
+                                <img src="@Image" alt="Doctor's image'" class="img-fluid photo" style="width: 180px; border-radius: 10px;">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="mb-2">@Model.FullName</h5>
+                                <p class="mb-1" style="color: #2b2a2a;">@Model.Specialty</p>
+                                <a class="mb-1" href="mailto:@Model.Email" style="text-decoration: none;">@Model.Email</a>
+                                <a class="mb-1" href="tel:@Model.Phone" style="text-decoration: none;">@Model.Phone</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

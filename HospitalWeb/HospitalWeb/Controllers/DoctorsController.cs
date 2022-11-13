@@ -2,6 +2,7 @@
 using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Filters.Models.SortStates;
 using HospitalWeb.Services.Interfaces;
+using HospitalWeb.ViewModels.Doctors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.Controllers
@@ -41,6 +42,26 @@ namespace HospitalWeb.Controllers
             var viewModel = builder.GetViewModel();
 
             return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(string id)
+        {
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+            var doctor = _uow.Doctors
+                .Get(d => d.Id == id);
+
+            var model = new DoctorDetailsViewModel
+            {
+                Id = doctor.Id,
+                FullName = doctor.ToString(),
+                Email = doctor.Email,
+                Phone = doctor.PhoneNumber,
+                Image = doctor.Image,
+                Specialty = doctor.Specialty.SpecialtyName
+            };
+
+            return View(model);
         }
     }
 }

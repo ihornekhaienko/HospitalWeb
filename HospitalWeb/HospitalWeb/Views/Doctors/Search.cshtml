@@ -49,7 +49,9 @@
                 <div class="card-body text-center">
                     <h4 class="card-title">@doctor.ToString()</h4>
                     <p class="card-text">@doctor.Specialty</p>
-                    <a href="#" class="btn btn-primary">@Localizer["MakeAppointment"]</a>
+                    <a asp-controller="Doctors" asp-action="Details" asp-route-id="@doctor.Id" class="btn btn-primary">
+                        @Localizer["MakeAppointment"]
+                    </a>
                 </div>
                 <input asp-for="@doctor.Id" type="hidden" />
             </div>
