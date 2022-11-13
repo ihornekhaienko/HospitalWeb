@@ -11,8 +11,8 @@ namespace HospitalWeb.DAL.Entities.Identity
             Schedules = new List<Schedule>();
         }
 
-        public Specialty? Specialty { get; set; }
-        public ICollection<Record>? Records { get; set; }
-        public ICollection<Schedule>? Schedules { get; set; }
+        public Specialty Specialty { get; set; }
+        public ICollection<Record> Records { get; set; }
+        public ICollection<Schedule> Schedules { get; set; }
     }
 }

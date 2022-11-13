@@ -272,8 +272,8 @@ namespace HospitalWeb.DAL.Data.Migrations
                     ScheduleId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DayOfWeek = table.Column<int>(type: "int", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DoctorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>

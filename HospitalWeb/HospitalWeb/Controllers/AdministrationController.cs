@@ -480,7 +480,7 @@ namespace HospitalWeb.Controllers
                 DayOfWeek dayOfWeek;
                 Enum.TryParse(model.DayOfWeek, out dayOfWeek);
 
-                var schedule = new Schedule
+                var schedule = new Slot
                 {
                     Doctor = doctor,
                     DayOfWeek = dayOfWeek,
