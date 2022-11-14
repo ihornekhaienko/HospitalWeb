@@ -420,4 +420,16 @@
   <data name="Visits" xml:space="preserve">
     <value>Visits</value>
   </data>
+  <data name="Diagnosis" xml:space="preserve">
+    <value>Diagnosis</value>
+  </data>
+  <data name="Patient" xml:space="preserve">
+    <value>Patient</value>
+  </data>
+  <data name="Prescription" xml:space="preserve">
+    <value>Prescription</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>Print</value>
+  </data>
 </root>

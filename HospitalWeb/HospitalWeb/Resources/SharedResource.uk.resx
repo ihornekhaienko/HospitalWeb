@@ -423,4 +423,16 @@
   <data name="Visits" xml:space="preserve">
     <value>Візити</value>
   </data>
+  <data name="Diagnosis" xml:space="preserve">
+    <value>Діагноз</value>
+  </data>
+  <data name="Patient" xml:space="preserve">
+    <value>Пацієнт</value>
+  </data>
+  <data name="Prescription" xml:space="preserve">
+    <value>Призначення</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>Друкувати</value>
+  </data>
 </root>

@@ -55,7 +55,7 @@
                                 @if (appointment.State == "Completed")
                                 {
                                     <div class="mb-1">
-                                        <a asp-controller="Treatment" asp-action="Appointment" asp-route-id="@appointment.AppointmentId" 
+                                        <a asp-controller="Appointments" asp-action="Details" asp-route-id="@appointment.AppointmentId" 
                                         class="btn btn-primary btn-230 flex-grow-1">@SharedLocalizer["Details"]</a>
                                     </div>
                                 }
