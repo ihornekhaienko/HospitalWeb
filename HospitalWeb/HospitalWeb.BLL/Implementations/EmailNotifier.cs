@@ -4,16 +4,19 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Configuration;
 using System.Collections.Specialized;
+using Microsoft.Extensions.Configuration;
 
 namespace HospitalWeb.Services.Implementations
 {
     internal class EmailNotifier : INotifier
     {
         private readonly ILogger<EmailNotifier> _logger;
+        private readonly IConfiguration _config;
 
-        public EmailNotifier(ILogger<EmailNotifier> logger)
+        public EmailNotifier(ILogger<EmailNotifier> logger, IConfiguration config)
         {
             _logger = logger;
+            _config = config;
         }
 
         public async Task<bool> NotifyAdd(string receiver, string username, string password)
@@ -46,9 +49,9 @@ namespace HospitalWeb.Services.Implementations
 
         public async Task<bool> SendMessage(string receiver, string subject, string message)
         {
-            var apiKey = "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";
+            var apiKey = _config["Sendgrid:Key"];
             var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("hospital0311@gmail.com");
+            var from = new EmailAddress(_config["Sendgrid:Email"]);
             var to = new EmailAddress(receiver);
             var plainTextContent = message;
             var htmlContent = $"<p>{message}</p>";
