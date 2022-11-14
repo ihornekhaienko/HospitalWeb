@@ -384,9 +384,6 @@
   <data name="ShowHistory" xml:space="preserve">
     <value>Show appointments history</value>
   </data>
-  <data name="String1" xml:space="preserve">
-    <value>Find a doctor</value>
-  </data>
   <data name="Treatment" xml:space="preserve">
     <value>Treatment history</value>
   </data>
@@ -395,5 +392,32 @@
   </data>
   <data name="Contact" xml:space="preserve">
     <value>Contact</value>
+  </data>
+  <data name="AppointmentDetails" xml:space="preserve">
+    <value>Appointment details</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="State" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="Visits" xml:space="preserve">
+    <value>Visits</value>
   </data>
 </root>

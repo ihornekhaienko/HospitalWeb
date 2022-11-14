@@ -396,4 +396,31 @@
   <data name="Contact" xml:space="preserve">
     <value>Контакти</value>
   </data>
+  <data name="AppointmentDetails" xml:space="preserve">
+    <value>Деталі візиту</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Відмінити</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Деталі</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>Від</value>
+  </data>
+  <data name="State" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Час</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>До</value>
+  </data>
+  <data name="Visits" xml:space="preserve">
+    <value>Візити</value>
+  </data>
 </root>
