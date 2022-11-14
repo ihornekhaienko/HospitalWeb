@@ -40,8 +40,10 @@ namespace HospitalWeb.Controllers
             AppointmentSortState sortOrder = AppointmentSortState.DateDesc)
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+            var userId = _uow.Patients.Get(p => p.Email == User.Identity.Name).Id;
 
-            var builder = new AppointmentsViewModelBuilder(_uow, page, searchString, sortOrder, state, fromDate, toDate);
+            var builder = new AppointmentsViewModelBuilder(_uow, 
+                page, searchString, sortOrder, state: state, fromTime: fromDate, toTime: toDate, patientId: userId);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();

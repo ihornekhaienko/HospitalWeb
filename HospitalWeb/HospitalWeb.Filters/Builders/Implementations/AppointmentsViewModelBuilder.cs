@@ -13,6 +13,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
     public class AppointmentsViewModelBuilder : ViewModelBuilder<AppointmentsViewModel>
     {
         private readonly UnitOfWork _uow;
+        private readonly string _patientId;
+        private readonly string _doctorId;
         private readonly int? _state;
         private readonly DateTime? _fromTime;
         private readonly DateTime? _toTime;
@@ -31,6 +33,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
            int? state = null,
            DateTime? fromTime = null,
            DateTime? toTime = null,
+           string doctorId = null,
+           string patientId = null,
            int pageSize = 10
            ) : base(pageNumber, pageSize, searchString)
         {
@@ -39,6 +43,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
             _state = state;
             _fromTime = fromTime;
             _toTime = toTime;
+            _doctorId = doctorId;
+            _patientId = patientId;
         }
 
         public override void BuildEntityModel()
@@ -51,6 +57,16 @@ namespace HospitalWeb.Filters.Builders.Implementations
                 {
                     result = a.Diagnosis.DiagnosisName.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
                     a.Doctor.Specialty.SpecialtyName.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+                }
+
+                if (!string.IsNullOrWhiteSpace(_doctorId))
+                {
+                    result = result && a.Doctor.Id == _doctorId;
+                }
+
+                if (!string.IsNullOrWhiteSpace(_patientId))
+                {
+                    result = result && a.Patient.Id == _patientId;
                 }
 
                 if (_state != null && _state != 0)
