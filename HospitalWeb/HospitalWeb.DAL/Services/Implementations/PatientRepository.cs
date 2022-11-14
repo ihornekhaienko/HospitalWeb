@@ -25,6 +25,7 @@ namespace HospitalWeb.DAL.Services.Implementations
                 .Include(p => p.Address)
                     .ThenInclude(a => a.Locality)
                 .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
                 .FirstOrDefault(filter);
         }
 
@@ -37,7 +38,8 @@ namespace HospitalWeb.DAL.Services.Implementations
             IQueryable<Patient> patients = _db.Patients
                 .Include(p => p.Address)
                     .ThenInclude(a => a.Locality)
-                .Include(p => p.Appointments);
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Diagnosis);
 
             if (filter != null)
             {
@@ -69,6 +71,7 @@ namespace HospitalWeb.DAL.Services.Implementations
                 .Include(p => p.Address)
                     .ThenInclude(a => a.Locality)
                 .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
                 .Any(query);
         }
 

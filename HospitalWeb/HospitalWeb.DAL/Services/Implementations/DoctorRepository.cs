@@ -18,6 +18,7 @@ namespace HospitalWeb.DAL.Services.Implementations
         {
             return _db.Doctors
                 .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
                 .Include(d => d.Schedules)
                 .Include(d => d.Specialty)
                 .FirstOrDefault(filter);
@@ -31,6 +32,7 @@ namespace HospitalWeb.DAL.Services.Implementations
         {
             IQueryable<Doctor> doctors = _db.Doctors
                 .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
                 .Include(d => d.Schedules)
                 .Include(d => d.Specialty);
 
@@ -62,6 +64,7 @@ namespace HospitalWeb.DAL.Services.Implementations
         {
             return _db.Doctors
                 .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
                 .Include(d => d.Schedules)
                 .Include(d => d.Specialty)
                 .Any(query);

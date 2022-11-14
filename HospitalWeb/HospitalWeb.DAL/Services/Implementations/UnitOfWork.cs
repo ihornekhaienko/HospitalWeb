@@ -8,6 +8,7 @@ namespace HospitalWeb.DAL.Services.Implementations
         private AddressRepository _addressRepository;
         private AdminRepository _adminRepository;
         private AppointmentRepository _appointmentRepository;
+        private DiagnosisRepository _diagnosisRepository;
         private DoctorRepository _doctorRepository;
         private LocalityRepository _localityRepository;
         private PatientRepository _patientRepository;
@@ -46,6 +47,16 @@ namespace HospitalWeb.DAL.Services.Implementations
                 if (_appointmentRepository == null)
                     _appointmentRepository = new AppointmentRepository(_db);
                 return _appointmentRepository;
+            }
+        }
+
+        public DiagnosisRepository Diagnoses
+        {
+            get
+            {
+                if (_diagnosisRepository == null)
+                    _diagnosisRepository = new DiagnosisRepository(_db);
+                return _diagnosisRepository;
             }
         }
 

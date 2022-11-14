@@ -17,7 +17,14 @@ namespace HospitalWeb.DAL.Services.Implementations
 
         public Appointment Get(Func<Appointment, bool> filter)
         {
-            return _db.Appointments.FirstOrDefault(filter);
+            return _db.Appointments
+                .Include(a => a.Diagnosis)
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Specialty)
+                .Include(a => a.Patient)
+                    .ThenInclude(p => p.Address)
+                        .ThenInclude(a => a.Locality)
+                .FirstOrDefault(filter);
         }
 
         public IEnumerable<Appointment> GetAll(
@@ -27,9 +34,10 @@ namespace HospitalWeb.DAL.Services.Implementations
             int offset = 0)
         {
             IQueryable<Appointment> appointments = _db.Appointments
-                .Include(r => r.Doctor)
+                .Include(a => a.Diagnosis)
+                .Include(a => a.Doctor)
                     .ThenInclude(d => d.Specialty)
-                .Include(r => r.Patient)
+                .Include(a => a.Patient)
                     .ThenInclude(p => p.Address)
                         .ThenInclude(a => a.Locality);
 
@@ -60,9 +68,10 @@ namespace HospitalWeb.DAL.Services.Implementations
         public bool Contains(Func<Appointment, bool> query)
         {
             return _db.Appointments
-                .Include(r => r.Doctor)
+                .Include(a => a.Diagnosis)
+                .Include(a => a.Doctor)
                     .ThenInclude(d => d.Specialty)
-                .Include(r => r.Patient)
+                .Include(a => a.Patient)
                     .ThenInclude(p => p.Address)
                         .ThenInclude(a => a.Locality)
                 .Any(query);
@@ -89,9 +98,9 @@ namespace HospitalWeb.DAL.Services.Implementations
         public bool IsDateFree(Doctor doctor, DateTime date)
         {
             return !_db.Appointments
-                .Any(r => DateTime.Compare(r.AppointmentDate, date) == 0 &&
-                     r.Doctor == doctor &&
-                     (r.State == State.Active || r.State == State.Planned || r.State == State.Completed)
+                .Any(a => DateTime.Compare(a.AppointmentDate, date) == 0 &&
+                     a.Doctor == doctor &&
+                     (a.State == State.Active || a.State == State.Planned || a.State == State.Completed)
                 );
         }
     }
