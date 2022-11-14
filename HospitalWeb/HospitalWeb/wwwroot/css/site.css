@@ -181,3 +181,7 @@ body {
 .first {
 
 }
+
+.btn-230 {
+    min-width: 230px;
+}
