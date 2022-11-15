@@ -426,6 +426,9 @@
   <data name="Diagnosis" xml:space="preserve">
     <value>Діагноз</value>
   </data>
+  <data name="Fill" xml:space="preserve">
+    <value>Заповнити дані прийому</value>
+  </data>
   <data name="Patient" xml:space="preserve">
     <value>Пацієнт</value>
   </data>
@@ -434,5 +437,8 @@
   </data>
   <data name="Print" xml:space="preserve">
     <value>Друкувати</value>
+  </data>
+  <data name="DiagnosisRequired" xml:space="preserve">
+    <value>Необхідно вказати діагноз</value>
   </data>
 </root>

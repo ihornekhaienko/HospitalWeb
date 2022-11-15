@@ -423,6 +423,9 @@
   <data name="Diagnosis" xml:space="preserve">
     <value>Diagnosis</value>
   </data>
+  <data name="Fill" xml:space="preserve">
+    <value>Fill in an appointment</value>
+  </data>
   <data name="Patient" xml:space="preserve">
     <value>Patient</value>
   </data>
@@ -431,5 +434,8 @@
   </data>
   <data name="Print" xml:space="preserve">
     <value>Print</value>
+  </data>
+  <data name="DiagnosisRequired" xml:space="preserve">
+    <value>The diagnosis is required</value>
   </data>
 </root>
