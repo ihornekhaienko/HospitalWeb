@@ -39,6 +39,7 @@ namespace HospitalWeb.Controllers
             int page = 1,
             AppointmentSortState sortOrder = AppointmentSortState.DateDesc)
         {
+            _uow.Appointments.UpdateStates();
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
             var userId = _uow.Patients.Get(p => p.Email == User.Identity.Name).Id;
 
@@ -56,6 +57,7 @@ namespace HospitalWeb.Controllers
         {
             try
             {
+                _uow.Appointments.UpdateStates();
                 var appointment = _uow.Appointments
                     .Get(a => a.AppointmentId == id);
 
