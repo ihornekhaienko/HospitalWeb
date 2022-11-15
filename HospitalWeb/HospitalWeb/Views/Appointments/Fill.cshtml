@@ -1,0 +1,59 @@
+﻿@model AppointmentViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = Localizer["Title"];
+}
+
+<div class="container">
+    <div class="row mt-2">
+        <div class="col-8 mx-auto">
+            <h2 class="mb-3">@Localizer["Title"]</h2>
+            <div class="row mb-3 border-bottom">
+                <div class="col-6">
+                    <p class="small text-muted mb-1">@SharedLocalizer["Doctor"]</p>
+                    <p class="mb-0">
+                        <a asp-controller="Doctors" asp-action="Details" asp-route-id="@Model.DoctorId">
+                            @Model.Doctor
+                        </a>
+                    </p>
+                    <p class="small text-muted mb-1">@SharedLocalizer["Specialty"]</p>
+                    <p class="mb-0">@Model.DoctorSpecialty</p>
+                </div>
+                <div class="col-6">
+                     <p class="small text-muted mb-1">@SharedLocalizer["Patient"]</p>
+                     <p class="mb-0">@Model.Patient</p>
+                     <p class="small text-muted mb-1">@SharedLocalizer["Date"]</p>
+                     <p class="mb-0">@Model.AppointmentDate.ToShortDateString()</p>
+                     <p class="small text-muted mb-1">@SharedLocalizer["Time"]</p>
+                     <p class="mb-0">@Model.AppointmentDate.ToString("HH:mm")</p>
+                </div>
+            </div>
+            <form method="post">
+                <div asp-validation-summary="ModelOnly"></div>
+                @Html.HiddenFor(m => m.AppointmentId)
+                @Html.HiddenFor(m => m.AppointmentDate)
+                @Html.HiddenFor(m => m.DoctorId)
+                @Html.HiddenFor(m => m.Doctor)
+                @Html.HiddenFor(m => m.DoctorSpecialty)
+                @Html.HiddenFor(m => m.Patient)
+                <h5>@SharedLocalizer["Diagnosis"]</h5>
+                <input type="text" class="mb-1" asp-for="Diagnosis" list="diagnoses"/>
+                <datalist id="diagnoses">
+                    @foreach (var diagnosis in ViewBag.Diagnoses)
+                    {
+                        <option value="@diagnosis"></option>
+                    }
+                </datalist>
+                <p><span asp-validation-for="Diagnosis" class="validator text-danger"></span></p>
+                <h5>@SharedLocalizer["Prescription"]</h5>
+                <p>
+                    <textarea asp-for="Prescription" cols="100" rows="20"></textarea>
+                </p>
+                <p>
+                    <button class="btn btn-primary">@SharedLocalizer["Submit"]</button>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
