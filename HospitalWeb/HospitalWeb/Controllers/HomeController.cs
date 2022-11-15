@@ -1,4 +1,5 @@
-﻿using HospitalWeb.Services.Interfaces;
+﻿using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -8,14 +9,15 @@ namespace HospitalWeb.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly INotifier _notifier;
+        private readonly UnitOfWork _uow;
 
         public HomeController(
             ILogger<HomeController> logger,
-            INotifier notifier)
+            INotifier notifier,
+            UnitOfWork uow)
         {
             _logger = logger;
-            _notifier = notifier;
+            _uow = uow;
         }
 
         [HttpGet]
@@ -43,10 +45,10 @@ namespace HospitalWeb.Controllers
             return LocalRedirect(returnUrl);
         }
 
-        public IActionResult Test()
+        public IActionResult UpdateAppointmentStates()
         {
-            _notifier.SendMessage("gordeybeatkiller@gmail.com", "Test", "test");
-            return Content("ok");
+            _uow.Appointments.UpdateStates();
+            return Ok();
         }
     }
 }
