@@ -42,8 +42,23 @@
                 </div>
             </div>
 
-            <div class="d-grid mb-3">
+            <div class="d-grid mb-2">
                 <button type="submit" class="btn btn-success">@Localizer["Title"]</button>
+            </div>
+        </form>
+        <form method="post" asp-controller="Account" asp-action="ExternalLogin" asp-route-returnUrl="@ViewBag.ReturnUrl">
+            <div class="text-center">
+                @Localizer["ExternalLogin"]         
+            </div>
+            <div class="text-center mb-3">
+                <span>
+                    @foreach (var provider in ViewBag.ExternalLogins)
+                    {   
+                        <button type="submit" name="provider" value="@provider.Name" class="btn-icon">
+                            <i class="fa-brands fa-@provider.Name.ToLower()"></i>
+                        </button>
+                    }
+                </span>    
             </div>
         </form>
     </div>
