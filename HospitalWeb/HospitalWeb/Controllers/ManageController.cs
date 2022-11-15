@@ -287,36 +287,5 @@ namespace HospitalWeb.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
-
-        [HttpGet]
-        public IActionResult ForgotPassword()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        {
-            //if (ModelState.IsValid)
-            //{
-            //    var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-            //    var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-
-            //    if (result.Succeeded)
-            //    {
-            //        return RedirectToAction("Profile", "Account");
-            //    }
-            //    else
-            //    {
-            //        ModelState.AddModelError(string.Empty, "Wrong password");
-            //        return View(model);
-            //    }
-            //}
-
-            //return View(model);
-            throw new NotImplementedException();
-        }
     }
 }
