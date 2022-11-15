@@ -1,9 +1,13 @@
-﻿namespace HospitalWeb.ViewModels.Appointments
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HospitalWeb.ViewModels.Appointments
 {
     public class AppointmentViewModel
     {
+        [Required]
         public int AppointmentId { get; set; }
 
+        [Required(ErrorMessage = "DiagnosisRequired")]
         public string Diagnosis { get; set; }
 
         public string Prescription { get; set; }
