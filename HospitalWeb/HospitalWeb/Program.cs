@@ -10,6 +10,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
@@ -41,6 +42,12 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.DefaultRequestCulture = new RequestCulture("en");
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
+});
+
+builder.Services.AddAuthentication().AddGoogle(options =>
+{
+    options.ClientId = configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
 });
 
 var app = builder.Build();
