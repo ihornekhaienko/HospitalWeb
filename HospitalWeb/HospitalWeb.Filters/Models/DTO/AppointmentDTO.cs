@@ -31,6 +31,10 @@ namespace HospitalWeb.Filters.Models.DTO
 
         public string Patient { get; set; }
 
+        public string PatientSex { get; set; }
+
+        public string PatientBirthDate { get; set; }
+
         public byte[] PatientImage { get; set; }
     }
 }

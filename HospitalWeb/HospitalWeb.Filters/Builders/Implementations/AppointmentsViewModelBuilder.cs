@@ -143,6 +143,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
                    DoctorImage = a.Doctor.Image,
                    PatientId = a.Patient.Id,
                    Patient = a.Patient.ToString(),
+                   PatientBirthDate = a.Patient.BirthDate.ToShortDateString(),
+                   PatientSex = a.Patient.Sex.ToString(),
                    PatientImage = a.Patient.Image
                });
         }

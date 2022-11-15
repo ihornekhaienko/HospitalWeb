@@ -103,5 +103,19 @@ namespace HospitalWeb.DAL.Services.Implementations
                      (a.State == State.Active || a.State == State.Planned || a.State == State.Completed)
                 );
         }
+
+        public void UpdateStates()
+        {
+            var date = DateTime.Today;
+            var missed = _db.Appointments.Where(a => a.AppointmentDate < date && a.State == State.Planned);
+
+            foreach (var a in missed)
+            {
+                a.State = State.Missed;
+            }
+
+            _db.Appointments.UpdateRange(missed);
+            _db.SaveChanges();
+        }
     }
 }
