@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HospitalWeb.ViewModels.Error;
+using System.Security.Claims;
 
 namespace HospitalWeb.Controllers
 {
@@ -40,6 +41,9 @@ namespace HospitalWeb.Controllers
             _fileManager = fileManager;
             _notifier = notifier;
         }
+
+        [TempData]
+        public string ErrorMessage { get; set; }
 
         [HttpGet]
         [AllowAnonymous]
@@ -110,6 +114,7 @@ namespace HospitalWeb.Controllers
         {
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
             ViewBag.ReturnUrl = returnUrl;
+            ViewBag.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             return View();
         }
@@ -176,6 +181,113 @@ namespace HospitalWeb.Controllers
                 }
 
                 return View("ConfirmEmail", "Account");
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account",
+                                    new { returnUrl });
+
+            var properties =
+                _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+            return new ChallengeResult(provider, properties);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            if (remoteError != null)
+            {
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = $"Error from external provider: {remoteError}" });
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var result = await _signInManager
+                .ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: false);
+
+            if (result.Succeeded)
+            {
+                return RedirectToLocal(returnUrl);
+            }
+            else
+            {
+                ViewBag.ReturnUrl = returnUrl;
+                ViewBag.LoginProvider = info.LoginProvider;
+                var model = new ExternalLoginViewModel
+                {
+                    Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                };
+
+                return View("ExternalLogin", model);
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExternalLoginConfirm(ExternalLoginViewModel model, string returnUrl = null)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var info = await _signInManager.GetExternalLoginInfoAsync();
+
+                    if (info == null)
+                    {
+                        throw new ApplicationException("Error loading external login information during confirmation.");
+                    }
+
+                    var locality = _uow.Localities.GetOrCreate(model.Locality);
+                    var address = _uow.Addresses.GetOrCreate(model.Address, locality);
+                    Sex sex;
+                    Enum.TryParse(model.Sex, out sex);
+
+                    var patient = new Patient
+                    {
+                        Name = model.Name,
+                        Surname = model.Surname,
+                        UserName = model.Email,
+                        Email = model.Email,
+                        PhoneNumber = model.Phone,
+                        Address = address,
+                        BirthDate = model.BirthDate,
+                        Sex = sex
+                    };
+                    var result = await _userManager.CreateAsync(patient);
+
+                    if (result.Succeeded)
+                    {
+                        result = await _userManager.AddLoginAsync(patient, info);
+
+                        if (result.Succeeded)
+                        {
+                            await _userManager.AddToRoleAsync(patient, "Patient");
+                            await _signInManager.SignInAsync(patient, false);
+
+                            return RedirectToLocal(returnUrl);
+                        }
+                    }
+                }
+
+                ViewBag.ReturnUrl = returnUrl;
+                return View("ExternalLogin", model);
             }
             catch (Exception err)
             {
