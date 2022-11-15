@@ -1,0 +1,106 @@
+﻿@model ExternalLoginViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = Localizer["Title"];
+    Layout = "_AccountLayout";
+}
+
+<div class="row mt-5 mb-5">
+    <div class="col-lg-4 bg-white m-auto" style="min-width: 500px;">
+        <h2 class="text-center pt-3">@Localizer["Title"]</h2>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="text-center mb-3">
+            <p>
+                @Localizer["SuccessConfirmation"] <strong>@ViewBag.LoginProvider</strong>.
+                @Localizer["EnterInfo"].
+            </p>
+        </div>
+                        
+        <form method="post" asp-controller="Account" asp-action="ExternalLoginConfirm" asp-route-returnUrl="@ViewBag.ReturnUrl">
+            @Html.HiddenFor(m => m.Email)
+            <div class="mb-3">
+                <div class="input-group ">
+                    <span class="input-group-text">
+                        <i class="fa fa-user"></i>
+                    </span>
+                    <input type="text" asp-for="Name" class="form-control input-validation-error" placeholder="@SharedLocalizer["Name"]"/>
+                </div>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fa fa-user"></i>
+                    </span>
+                    <input type="text" asp-for="Surname" class="form-control input-validation-error" placeholder="@SharedLocalizer["Surname"]"/>
+                </div>
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group ">
+                    <span class="input-group-text">
+                        <i class="fa fa-phone"></i>
+                        <label style="margin-left:5px; width: 100px;">@SharedLocalizer["Phone"]</label>
+                    </span>
+                    <input type="tel" asp-for="Phone" class="form-control input-validation-error"/>
+                </div>
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                     <span class="input-group-text">
+                        <i class="fa fa-calendar-days"></i>
+                        <label style="margin-left:5px; width: 100px;">@SharedLocalizer["BirthDate"]</label>
+                    </span>
+                    <input type="date" asp-for="BirthDate" class="form-control input-validation-error"/>
+                </div>
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fa fa-location-dot"></i>
+                    </span>
+                    <input type="text" asp-for="Locality" class="form-control input-validation-error" placeholder="@SharedLocalizer["Locality"]"/>
+                </div>
+                <span asp-validation-for="Locality" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fa fa-city"></i>
+                    </span>
+                    <input type="text" asp-for="Address" class="form-control input-validation-error" placeholder="@SharedLocalizer["Address"]"/>
+                </div>
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="form-check form-check-inline">
+                    <h6 class="mb-2 pb-1">@SharedLocalizer["Sex"]: </h6>
+                </div>
+
+                <div class="form-check form-check-inline">
+                        <input asp-for="Sex" class="form-check-input" type="radio" value="male" name="sex" checked />
+                        <label class="form-check-label">@Localizer["Male"]</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input asp-for="Sex" class="form-check-input" type="radio" name="sex" value="female" />
+                    <label class="form-check-label">@Localizer["Female"]</label>
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-success">@SharedLocalizer["Register"]</button>
+            </div>
+        </form>
+    </div>
+</div>
