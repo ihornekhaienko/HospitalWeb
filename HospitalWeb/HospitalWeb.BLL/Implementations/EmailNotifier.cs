@@ -47,6 +47,13 @@ namespace HospitalWeb.Services.Implementations
                 $"<a href={confirmationLink}>Confirmation link</a>");
         }
 
+        public async Task<bool> SendResetPasswordLink(string receiver, string resetPasswordLink)
+        {
+            return await SendMessage(receiver,
+                "Reset your password",
+                $"Please reset your password by clicking here: <a href='{resetPasswordLink}'>link</a>");
+        }
+
         public async Task<bool> SendMessage(string receiver, string subject, string message)
         {
             var apiKey = _config["Sendgrid:Key"];
