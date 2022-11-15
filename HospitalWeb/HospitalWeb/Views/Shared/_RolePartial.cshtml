@@ -38,13 +38,13 @@
     else if (User.IsInRole("Doctor"))
     {
         <li class="nav-item">
-            <a class="nav-link bg-sea-green" asp-controller="Appointments" asp-action="Planned" asp-route-date="@DateTime.Today">
+            <a class="nav-link bg-sea-green" asp-controller="Appointments" asp-action="Today">
                 <i class="fa-solid fa-calendar-check"></i>
                 @SharedLocalizer["Appointments"]
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link bg-sea-green" asp-controller="Appointments" asp-action="History" asp-route-date="@DateTime.Today">
+            <a class="nav-link bg-sea-green" asp-controller="Appointments" asp-action="History">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 @SharedLocalizer["History"]
             </a>

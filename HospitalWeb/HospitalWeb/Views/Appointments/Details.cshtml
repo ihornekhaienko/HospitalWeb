@@ -26,7 +26,7 @@
                      <p class="small text-muted mb-1">@SharedLocalizer["Date"]</p>
                      <p class="mb-0">@Model.AppointmentDate.ToShortDateString()</p>
                      <p class="small text-muted mb-1">@SharedLocalizer["Time"]</p>
-                     <p class="mb-0">@Model.AppointmentDate.ToString("hh:mm")</p>
+                     <p class="mb-0">@Model.AppointmentDate.ToString("HH:mm")</p>
                 </div>
                 <p>
                     <a asp-controller="Appointments" asp-action="Print" asp-route-id="@Model.AppointmentId" class="btn btn-primary">
