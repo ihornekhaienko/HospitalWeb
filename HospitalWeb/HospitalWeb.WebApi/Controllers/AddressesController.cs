@@ -60,7 +60,7 @@ namespace HospitalWeb.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Address>> Put(int id)
+        public async Task<ActionResult<Address>> Delete(int id)
         {
             var address = await _uow.Addresses.GetAsync(a => a.AddressId == id);
 
