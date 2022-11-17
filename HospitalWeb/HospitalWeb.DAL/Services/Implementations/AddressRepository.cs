@@ -66,9 +66,8 @@ namespace HospitalWeb.DAL.Services.Implementations
         }
 
         public async Task<IEnumerable<Address>> GetAllAsync(
-            Func<Address, bool> filter, 
-            Func<IQueryable<Address>, 
-            IOrderedQueryable<Address>> orderBy, 
+            Func<Address, bool> filter = null, 
+            Func<IQueryable<Address>, IOrderedQueryable<Address>> orderBy = null, 
             int first = 0, 
             int offset = 0)
         {
