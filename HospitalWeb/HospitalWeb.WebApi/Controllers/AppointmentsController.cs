@@ -122,7 +122,7 @@ namespace HospitalWeb.WebApi.Controllers
                 TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
             };
 
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Add("Pagination", JsonConvert.SerializeObject(metadata));
 
             return appointments;
         }
