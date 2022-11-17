@@ -2,6 +2,7 @@
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace HospitalWeb.DAL.Services.Implementations
 {
@@ -14,7 +15,7 @@ namespace HospitalWeb.DAL.Services.Implementations
             _db = db;
         }
 
-        public Diagnosis Get(Func<Diagnosis, bool> filter)
+        public Diagnosis Get(Expression<Func<Diagnosis, bool>> filter)
         {
             return _db.Diagnoses
                 .Include(d => d.Appointments)
@@ -22,6 +23,16 @@ namespace HospitalWeb.DAL.Services.Implementations
                 .Include(d => d.Appointments)
                     .ThenInclude(a => a.Patient)
                 .FirstOrDefault(filter);
+        }
+
+        public async Task<Diagnosis> GetAsync(Expression<Func<Diagnosis, bool>> filter)
+        {
+            return await _db.Diagnoses
+               .Include(d => d.Appointments)
+                   .ThenInclude(a => a.Doctor)
+               .Include(d => d.Appointments)
+                   .ThenInclude(a => a.Patient)
+               .FirstOrDefaultAsync(filter);
         }
 
         public IEnumerable<Diagnosis> GetAll(
@@ -60,7 +71,42 @@ namespace HospitalWeb.DAL.Services.Implementations
                 .ToList();
         }
 
-        public bool Contains(Func<Diagnosis, bool> query)
+        public async Task<IEnumerable<Diagnosis>> GetAllAsync(
+           Func<Diagnosis, bool> filter = null,
+           Func<IQueryable<Diagnosis>, IOrderedQueryable<Diagnosis>> orderBy = null,
+           int first = 0,
+           int offset = 0)
+        {
+            IQueryable<Diagnosis> diagnoses = _db.Diagnoses
+                .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Doctor)
+                .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Patient);
+
+            if (filter != null)
+            {
+                diagnoses = diagnoses.Where(filter).AsQueryable();
+            }
+
+            if (orderBy != null)
+            {
+                diagnoses = orderBy(diagnoses);
+            }
+
+            if (offset > 0)
+            {
+                diagnoses = diagnoses.Skip(offset);
+            }
+
+            if (first > 0)
+            {
+                diagnoses = diagnoses.Take(first);
+            }
+
+            return await diagnoses.ToListAsync();
+        }
+
+        public bool Contains(Expression<Func<Diagnosis, bool>> query)
         {
             return _db.Diagnoses
                 .Include(d => d.Appointments)
@@ -70,10 +116,26 @@ namespace HospitalWeb.DAL.Services.Implementations
                 .Any(query);
         }
 
+        public async Task<bool> ContainsAsync(Expression<Func<Diagnosis, bool>> query)
+        {
+            return await _db.Diagnoses
+                 .Include(d => d.Appointments)
+                     .ThenInclude(a => a.Doctor)
+                 .Include(d => d.Appointments)
+                     .ThenInclude(a => a.Patient)
+                 .AnyAsync(query);
+        }
+
         public void Create(Diagnosis item)
         {
             _db.Add(item);
             _db.SaveChanges();
+        }
+
+        public async Task CreateAsync(Diagnosis item)
+        {
+            _db.Add(item);
+            await _db.SaveChangesAsync();
         }
 
         public void Delete(Diagnosis item)
@@ -82,10 +144,22 @@ namespace HospitalWeb.DAL.Services.Implementations
             _db.SaveChanges();
         }
 
+        public async Task DeleteAsync(Diagnosis item)
+        {
+            _db.Remove(item);
+            await _db.SaveChangesAsync();
+        }
+
         public void Update(Diagnosis item)
         {
             _db.Entry(item).State = EntityState.Modified;
             _db.SaveChanges();
+        }
+
+        public async Task UpdateAsync(Diagnosis item)
+        {
+            _db.Entry(item).State = EntityState.Modified;
+            await _db.SaveChangesAsync();
         }
 
         public Diagnosis GetOrCreate(string diagnosis)
@@ -106,6 +180,29 @@ namespace HospitalWeb.DAL.Services.Implementations
                     DiagnosisName = diagnosis
                 };
                 Create(obj);
+
+                return obj;
+            }
+        }
+
+        public async Task<Diagnosis> GetOrCreateAsync(string diagnosis)
+        {
+            if (string.IsNullOrWhiteSpace(diagnosis))
+            {
+                return null;
+            }
+
+            if (await ContainsAsync(d => d.DiagnosisName == diagnosis))
+            {
+                return await GetAsync(d => d.DiagnosisName == diagnosis);
+            }
+            else
+            {
+                var obj = new Diagnosis
+                {
+                    DiagnosisName = diagnosis
+                };
+                await CreateAsync(obj);
 
                 return obj;
             }
