@@ -86,7 +86,7 @@ namespace HospitalWeb.DAL.Services.Implementations
                 admins = admins.Take(first);
             }
 
-            return await admins.ToListAsync();
+            return await Task.FromResult(admins.ToList());
         }
 
         public bool Contains(Expression<Func<Admin, bool>> query)

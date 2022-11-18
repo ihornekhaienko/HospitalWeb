@@ -112,7 +112,7 @@ namespace HospitalWeb.DAL.Services.Implementations
                 appointments = appointments.Take(first);
             }
 
-            return await appointments.ToListAsync();
+            return await Task.FromResult(appointments.ToList());
         }
 
         public bool Contains(Expression<Func<Appointment, bool>> query)

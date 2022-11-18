@@ -103,7 +103,7 @@ namespace HospitalWeb.DAL.Services.Implementations
                 doctors = doctors.Take(first);
             }
 
-            return await doctors.ToListAsync();
+            return await Task.FromResult(doctors.ToList());
         }
 
         public bool Contains(Expression<Func<Doctor, bool>> query)
