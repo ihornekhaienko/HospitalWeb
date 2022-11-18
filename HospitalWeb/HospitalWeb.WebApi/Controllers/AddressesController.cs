@@ -11,11 +11,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class AddressesController : ControllerBase
     {
         private readonly ILogger<AddressesController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _uow;
 
         public AddressesController(
             ILogger<AddressesController> logger,
-            UnitOfWork uow)
+            ApiUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
@@ -30,7 +30,14 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Address>> Get(int id)
         {
-            return await _uow.Addresses.GetAsync(a => a.AddressId == id);
+            var address = await _uow.Addresses.GetAsync(a => a.AddressId == id);
+
+            if (address == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(address);
         }
 
         [HttpPost]
@@ -64,6 +71,19 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var address = await _uow.Addresses.GetAsync(a => a.AddressId == id);
 
+            if (address == null)
+            {
+                return NotFound();
+            }
+
+            await _uow.Addresses.DeleteAsync(address);
+
+            return Ok(address);
+        }
+
+        [HttpDelete("{Address}")]
+        public async Task<ActionResult<Address>> Delete(Address address)
+        {
             if (address == null)
             {
                 return NotFound();
