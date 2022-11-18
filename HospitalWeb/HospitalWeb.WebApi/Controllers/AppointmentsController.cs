@@ -1,7 +1,5 @@
 ﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
-using HospitalWeb.Filters.Builders.Implementations;
-using HospitalWeb.Filters.Models.ViewModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -13,11 +11,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class AppointmentsController : ControllerBase
     {
         private readonly ILogger<AppointmentsController> _logger;
-        private readonly ApiUnitOfWork _uow;
+        private readonly UnitOfWork _uow;
 
         public AppointmentsController(
             ILogger<AppointmentsController> logger,
-            ApiUnitOfWork uow)
+            UnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;

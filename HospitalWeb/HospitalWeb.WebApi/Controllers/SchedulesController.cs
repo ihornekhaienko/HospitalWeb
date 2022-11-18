@@ -9,11 +9,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class SchedulesController : ControllerBase
     {
         private readonly ILogger<SchedulesController> _logger;
-        private readonly ApiUnitOfWork _uow;
+        private readonly UnitOfWork _uow;
 
         public SchedulesController(
             ILogger<SchedulesController> logger,
-            ApiUnitOfWork uow)
+            UnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;

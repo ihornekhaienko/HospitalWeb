@@ -1,8 +1,6 @@
-﻿using HospitalWeb.DAL.Data;
-using HospitalWeb.DAL.Entities;
+﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.WebApi.Controllers
 {
@@ -11,11 +9,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class AddressesController : ControllerBase
     {
         private readonly ILogger<AddressesController> _logger;
-        private readonly ApiUnitOfWork _uow;
+        private readonly UnitOfWork _uow;
 
         public AddressesController(
             ILogger<AddressesController> logger,
-            ApiUnitOfWork uow)
+            UnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;

@@ -9,11 +9,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class LocalitiesController : ControllerBase
     {
         private readonly ILogger<LocalitiesController> _logger;
-        private readonly ApiUnitOfWork _uow;
+        private readonly UnitOfWork _uow;
 
         public LocalitiesController(
             ILogger<LocalitiesController> logger,
-            ApiUnitOfWork uow)
+            UnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;

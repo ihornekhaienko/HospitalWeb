@@ -13,17 +13,15 @@ namespace HospitalWeb.WebApi.Controllers
     public class AdminsController : ControllerBase
     {
         private readonly ILogger<AdminsController> _logger;
-        private readonly ApiUnitOfWork _uow;
+        private readonly UnitOfWork _uow;
         private readonly AppDbContext _db;
 
         public AdminsController(
             ILogger<AdminsController> logger,
-            ApiUnitOfWork uow,
-            AppDbContext db)
+            UnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
-            _db = db;
         }
 
         [HttpGet]

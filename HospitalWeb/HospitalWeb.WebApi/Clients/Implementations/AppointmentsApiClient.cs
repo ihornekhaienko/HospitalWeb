@@ -1,6 +1,6 @@
 ﻿using HospitalWeb.DAL.Entities;
-using HospitalWeb.Filters.Models.SortStates;
 using HospitalWeb.WebApi.Clients.Interfaces;
+using HospitalWeb.WebApi.Models.SortStates;
 using System.Text;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
