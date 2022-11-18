@@ -13,23 +13,23 @@ namespace HospitalWeb.WebApi.Controllers
     public class AppointmentsController : ControllerBase
     {
         private readonly ILogger<AppointmentsController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _uow;
 
         public AppointmentsController(
             ILogger<AppointmentsController> logger,
-            UnitOfWork uow)
+            ApiUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
         }
 
         [HttpGet]
-        public IEnumerable<Appointment> Get(
-            string searchString,
-            string userId,
-            int? state,
-            DateTime? fromDate,
-            DateTime? toDate,
+        public async Task<IEnumerable<Appointment>> Get(
+            string searchString = null,
+            string userId = null,
+            int? state = null,
+            DateTime? fromDate = null,
+            DateTime? toDate = null,
             AppointmentSortState sortOrder = AppointmentSortState.DateAsc,
             int pageSize = 10,
             int pageNumber = 1)
@@ -110,8 +110,8 @@ namespace HospitalWeb.WebApi.Controllers
                 return (IOrderedQueryable<Appointment>)appointments;
             };
 
-            var appointments = _uow.Appointments
-                .GetAll(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
+            var appointments = await _uow.Appointments
+                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
 
             var metadata = new
             {
@@ -130,7 +130,14 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Appointment>> Get(int id)
         {
-            return await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
+            var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
+
+            if (appointment == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(appointment);
         }
 
         [HttpPost]
@@ -164,6 +171,19 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
 
+            if (appointment == null)
+            {
+                return NotFound();
+            }
+
+            await _uow.Appointments.DeleteAsync(appointment);
+
+            return Ok(appointment);
+        }
+
+        [HttpDelete("{Appointment}")]
+        public async Task<ActionResult<Appointment>> Delete(Appointment appointment)
+        {
             if (appointment == null)
             {
                 return NotFound();
