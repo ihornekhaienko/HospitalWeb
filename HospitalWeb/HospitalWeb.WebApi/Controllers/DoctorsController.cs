@@ -11,20 +11,20 @@ namespace HospitalWeb.WebApi.Controllers
     public class DoctorsController : ControllerBase
     {
         private readonly ILogger<DoctorsController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _uow;
 
         public DoctorsController(
             ILogger<DoctorsController> logger,
-            UnitOfWork uow)
+            ApiUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
         }
 
         [HttpGet]
-        public IEnumerable<Doctor> Get(
-            string searchString,
-            int? specialty,
+        public async Task<IEnumerable<Doctor>> Get(
+            string searchString = null,
+            int? specialty = null,
             DoctorSortState sortOrder = DoctorSortState.Id,
             int pageSize = 10,
             int pageNumber = 1)
@@ -95,8 +95,8 @@ namespace HospitalWeb.WebApi.Controllers
                 return (IOrderedQueryable<Doctor>)doctors;
             };
 
-            var doctors = _uow.Doctors
-                .GetAll(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
+            var doctors = await _uow.Doctors
+                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
 
             var metadata = new
             {
@@ -115,7 +115,14 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Doctor>> Get(string id)
         {
-            return await _uow.Doctors.GetAsync(d => d.Id == id);
+            var doctor = await _uow.Doctors.GetAsync(d => d.Id == id || d.Email == id);
+
+            if (doctor == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(doctor);
         }
 
         [HttpPost]
@@ -149,6 +156,19 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var doctor = await _uow.Doctors.GetAsync(d => d.Id == id);
 
+            if (doctor == null)
+            {
+                return NotFound();
+            }
+
+            await _uow.Doctors.DeleteAsync(doctor);
+
+            return Ok(doctor);
+        }
+
+        [HttpDelete("{Doctor}")]
+        public async Task<ActionResult<Doctor>> Delete(Doctor doctor)
+        {
             if (doctor == null)
             {
                 return NotFound();
