@@ -9,11 +9,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class LocalitiesController : ControllerBase
     {
         private readonly ILogger<LocalitiesController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _uow;
 
         public LocalitiesController(
             ILogger<LocalitiesController> logger,
-            UnitOfWork uow)
+            ApiUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
@@ -28,7 +28,14 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Locality>> Get(int id)
         {
-            return await _uow.Localities.GetAsync(l => l.LocalityId == id);
+            var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id);
+
+            if (locality == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(locality);
         }
 
         [HttpPost]
@@ -62,6 +69,19 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id);
 
+            if (locality == null)
+            {
+                return NotFound();
+            }
+
+            await _uow.Localities.DeleteAsync(locality);
+
+            return Ok(locality);
+        }
+
+        [HttpDelete("{Locality}")]
+        public async Task<ActionResult<Locality>> Delete(Locality locality)
+        {
             if (locality == null)
             {
                 return NotFound();
