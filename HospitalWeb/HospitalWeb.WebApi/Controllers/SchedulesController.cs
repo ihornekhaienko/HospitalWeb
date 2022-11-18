@@ -9,11 +9,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class SchedulesController : ControllerBase
     {
         private readonly ILogger<SchedulesController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _uow;
 
         public SchedulesController(
             ILogger<SchedulesController> logger,
-            UnitOfWork uow)
+            ApiUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
@@ -28,7 +28,14 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Schedule>> Get(int id)
         {
-            return await _uow.Schedules.GetAsync(s => s.ScheduleId == id);
+            var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id);
+
+            if (schedule == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(schedule);
         }
 
         [HttpPost]
@@ -62,6 +69,19 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id);
 
+            if (schedule == null)
+            {
+                return NotFound();
+            }
+
+            await _uow.Schedules.DeleteAsync(schedule);
+
+            return Ok(schedule);
+        }
+
+        [HttpDelete("{Schedule}")]
+        public async Task<ActionResult<Schedule>> Delete(Schedule schedule)
+        {
             if (schedule == null)
             {
                 return NotFound();
