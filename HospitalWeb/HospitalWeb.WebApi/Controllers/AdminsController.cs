@@ -1,7 +1,9 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
+﻿using HospitalWeb.DAL.Data;
+using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace HospitalWeb.WebApi.Controllers
@@ -11,19 +13,22 @@ namespace HospitalWeb.WebApi.Controllers
     public class AdminsController : ControllerBase
     {
         private readonly ILogger<AdminsController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _uow;
+        private readonly AppDbContext _db;
 
         public AdminsController(
             ILogger<AdminsController> logger,
-            UnitOfWork uow)
+            ApiUnitOfWork uow,
+            AppDbContext db)
         {
             _logger = logger;
             _uow = uow;
+            _db = db;
         }
 
         [HttpGet]
-        public IEnumerable<Admin> Get(
-            string searchString,
+        public async Task<IEnumerable<Admin>> Get(
+            string searchString = null,
             AdminSortState sortOrder = AdminSortState.Id,
             int pageSize = 10,
             int pageNumber = 1)
@@ -88,8 +93,8 @@ namespace HospitalWeb.WebApi.Controllers
                 return (IOrderedQueryable<Admin>)admins;
             };
 
-            var admins = _uow.Admins
-                .GetAll(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
+            var admins = await _uow.Admins
+                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
 
             var metadata = new
             {
@@ -105,10 +110,17 @@ namespace HospitalWeb.WebApi.Controllers
             return admins;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Admin>> Get(string id)
+        [HttpGet("{searchString}")]
+        public async Task<ActionResult<Admin>> Get(string searchString)
         {
-            return await _uow.Admins.GetAsync(a => a.Id == id);
+            var admin = await _db.Admins.FirstOrDefaultAsync(a => a.Id == searchString || a.Email == searchString);
+
+            if (admin == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(admin);
         }
 
         [HttpPost]
@@ -142,6 +154,19 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var admin = await _uow.Admins.GetAsync(a => a.Id == id);
 
+            if (admin == null)
+            {
+                return NotFound();
+            }
+
+            await _uow.Admins.DeleteAsync(admin);
+
+            return Ok(admin);
+        }
+
+        [HttpDelete("{Admin}")]
+        public async Task<ActionResult<Admin>> Delete(Admin admin)
+        {
             if (admin == null)
             {
                 return NotFound();
