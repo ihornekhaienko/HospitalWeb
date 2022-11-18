@@ -9,11 +9,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class DiagnosesController : ControllerBase
     {
         private readonly ILogger<DiagnosesController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _uow;
 
         public DiagnosesController(
             ILogger<DiagnosesController> logger,
-            UnitOfWork uow)
+            ApiUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
@@ -28,7 +28,14 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Diagnosis>> Get(int id)
         {
-            return await _uow.Diagnoses.GetAsync(d => d.DiagnosisId == id);
+            var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisId == id);
+
+            if (diagnosis == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(diagnosis);
         }
 
         [HttpPost]
@@ -62,6 +69,19 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisId == id);
 
+            if (diagnosis == null)
+            {
+                return NotFound();
+            }
+
+            await _uow.Diagnoses.DeleteAsync(diagnosis);
+
+            return Ok(diagnosis);
+        }
+
+        [HttpDelete("{Diagnosis}")]
+        public async Task<ActionResult<Diagnosis>> Delete(Diagnosis diagnosis)
+        {
             if (diagnosis == null)
             {
                 return NotFound();
