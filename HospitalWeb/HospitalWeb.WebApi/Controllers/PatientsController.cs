@@ -138,7 +138,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <param name="searchString">Patient's id or Email</param>
         /// <returns>The Patient object</returns>
-        [HttpGet("{id}")]
+        [HttpGet("{searchString}")]
         public async Task<ActionResult<Patient>> Get(string searchString)
         {
             var patient = await _uow.Patients.GetAsync(p => p.Id == searchString || p.Email == searchString);
