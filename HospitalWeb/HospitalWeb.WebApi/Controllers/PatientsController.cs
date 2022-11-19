@@ -8,6 +8,9 @@ using Newtonsoft.Json;
 
 namespace HospitalWeb.WebApi.Controllers
 {
+    /// <summary>
+    /// Patients
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class PatientsController : ControllerBase
@@ -26,6 +29,15 @@ namespace HospitalWeb.WebApi.Controllers
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Returns a filtered list of Patients
+        /// </summary>
+        /// <param name="searchString">Search string that identifies Admin</param>
+        /// <param name="locality">Locality's Id</param>
+        /// <param name="sortOrder">Sorting order of the filtered list</param>
+        /// <param name="pageSize">Count of the result on one page</param>
+        /// <param name="pageNumber">Number of the page</param>
+        /// <returns>Fltered list of Patients</returns>
         [HttpGet]
         public async Task<IEnumerable<Patient>> Get(
             string searchString,
@@ -121,10 +133,15 @@ namespace HospitalWeb.WebApi.Controllers
             return patients;
         }
 
+        /// <summary>
+        /// Returns the Patient found by Id or Email
+        /// </summary>
+        /// <param name="searchString">Patient's id or Email</param>
+        /// <returns>The Patient object</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Patient>> Get(string id)
+        public async Task<ActionResult<Patient>> Get(string searchString)
         {
-            var patient = await _uow.Patients.GetAsync(p => p.Id == id || p.Email == id);
+            var patient = await _uow.Patients.GetAsync(p => p.Id == searchString || p.Email == searchString);
 
             if (patient == null)
             {
@@ -134,6 +151,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(patient);
         }
 
+        /// <summary>
+        /// Creates the new Patient
+        /// </summary>
+        /// <param name="patient">Patient to create</param>
+        /// <returns>The Patient object</returns>
         [HttpPost]
         public async Task<ActionResult<Patient>> Post(PatientResourceModel patient)
         {
@@ -185,6 +207,11 @@ namespace HospitalWeb.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates the Patient object data
+        /// </summary>
+        /// <param name="patient">The Patient to update</param>
+        /// <returns>The Patient object</returns>
         [HttpPut]
         public async Task<ActionResult<Patient>> Put(Patient patient)
         {
@@ -205,10 +232,15 @@ namespace HospitalWeb.WebApi.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Patient>> Delete(string id)
+        /// <summary>
+        /// Deletes the Patient found by Id or Email
+        /// </summary>
+        /// <param name="searchString">Patient's id or Email</param>
+        /// <returns>The Patient object</returns>
+        [HttpDelete("{searchString}")]
+        public async Task<ActionResult<Patient>> Delete(string searchString)
         {
-            var patient = await _uow.Patients.GetAsync(p => p.Id == id);
+            var patient = await _uow.Patients.GetAsync(p => p.Id == searchString || p.Email == searchString);
 
             if (patient == null)
             {
@@ -220,6 +252,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(patient);
         }
 
+        /// <summary>
+        /// Deletes the Patient 
+        /// </summary>
+        /// <param name="patient">The Patient object</param>
+        /// <returns>The Patient object</returns>
         [HttpDelete("{Patient}")]
         public async Task<ActionResult<Patient>> Delete(Patient patient)
         {

@@ -10,6 +10,10 @@ using Newtonsoft.Json;
 
 namespace HospitalWeb.WebApi.Controllers
 {
+    /// <summary>
+    /// Users with Admin role
+    /// </summary>
+    [Produces("application/json")]
     [ApiController]
     [Route("api/[controller]")]
     public class AdminsController : ControllerBase
@@ -28,6 +32,14 @@ namespace HospitalWeb.WebApi.Controllers
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Returns a filtered list of Admins
+        /// </summary>
+        /// <param name="searchString">Search string that identifies Admin</param>
+        /// <param name="sortOrder">Sorting order of the filtered list</param>
+        /// <param name="pageSize">Count of the result on one page</param>
+        /// <param name="pageNumber">Number of the page</param>
+        /// <returns>The list of admins</returns>
         [HttpGet]
         public async Task<IEnumerable<Admin>> Get(
             string searchString = null,
@@ -107,6 +119,11 @@ namespace HospitalWeb.WebApi.Controllers
             return admins;
         }
 
+        /// <summary>
+        /// Returns the Admin found by Id or Email
+        /// </summary>
+        /// <param name="searchString">Admin's id or Email</param>
+        /// <returns>The Admin object</returns>
         [HttpGet("{searchString}")]
         public async Task<ActionResult<Admin>> Get(string searchString)
         {
@@ -120,6 +137,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(admin);
         }
 
+        /// <summary>
+        /// Creates the new Admin
+        /// </summary>
+        /// <param name="admin">Admin to create</param>
+        /// <returns>The Admin object</returns>
         [HttpPost]
         public async Task<ActionResult<Admin>> Post(AdminResourceModel admin)
         {
@@ -162,6 +184,11 @@ namespace HospitalWeb.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates the Admin object data
+        /// </summary>
+        /// <param name="admin">The Admin to update</param>
+        /// <returns>The Admin object</returns>
         [HttpPut]
         public async Task<ActionResult<Admin>> Put(Admin admin)
         {
@@ -182,10 +209,15 @@ namespace HospitalWeb.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes the Admin found by Id or Email
+        /// </summary>
+        /// <param name="searchString">Admin's id or Email</param>
+        /// <returns>The Admin object</returns>
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Admin>> Delete(string id)
+        public async Task<ActionResult<Admin>> Delete(string searchString)
         {
-            var admin = await _uow.Admins.GetAsync(a => a.Id == id);
+            var admin = await _uow.Admins.GetAsync(a => a.Id == searchString || a.Email == searchString);
 
             if (admin == null)
             {
@@ -197,6 +229,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(admin);
         }
 
+        /// <summary>
+        /// Deletes the Admin 
+        /// </summary>
+        /// <param name="admin">The Admin object</param>
+        /// <returns>The Admin object</returns>
         [HttpDelete("{Admin}")]
         public async Task<ActionResult<Admin>> Delete(Admin admin)
         {

@@ -6,6 +6,10 @@ using Newtonsoft.Json;
 
 namespace HospitalWeb.WebApi.Controllers
 {
+    /// <summary>
+    /// Hospital Appointments
+    /// </summary>
+    [Produces("application/json")]
     [ApiController]
     [Route("api/[controller]")]
     public class AppointmentsController : ControllerBase
@@ -21,6 +25,18 @@ namespace HospitalWeb.WebApi.Controllers
             _uow = uow;
         }
 
+        /// <summary>
+        /// Returns a filtered list of Appointments
+        /// </summary>
+        /// <param name="searchString">String for searching through Specialty or Diagnosis</param>
+        /// <param name="userId">Appointment owner's id</param>
+        /// <param name="state">Appointment state</param>
+        /// <param name="fromDate">Starting date for searching</param>
+        /// <param name="toDate">Ending date for searching</param>
+        /// <param name="sortOrder">Sorting order of the filtered list</param>
+        /// <param name="pageSize">Count of the result on one page</param>
+        /// <param name="pageNumber">Number of the page</param>
+        /// <returns>Filtered list of Appointments</returns>
         [HttpGet]
         public async Task<IEnumerable<Appointment>> Get(
             string searchString = null,
@@ -120,6 +136,11 @@ namespace HospitalWeb.WebApi.Controllers
             return appointments;
         }
 
+        /// <summary>
+        /// Returns Appointment found by Id
+        /// </summary>
+        /// <param name="id">Appointment Id</param>
+        /// <returns>Appointment object</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Appointment>> Get(int id)
         {
@@ -133,6 +154,12 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(appointment);
         }
 
+        /// <summary>
+        /// Returns Appointment found by DoctorId and its Date
+        /// </summary>
+        /// <param name="doctor">DoctorId</param>
+        /// <param name="date">Date</param>
+        /// <returns>Appointment object</returns>
         [HttpGet("details")]
         public async Task<ActionResult<Appointment>> Get(string doctor, DateTime date)
         {
@@ -147,6 +174,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(appointment);
         }
 
+        /// <summary>
+        /// Creates new Appointment
+        /// </summary>
+        /// <param name="appointment">Appointment to create</param>
+        /// <returns>Appointment object</returns>
         [HttpPost]
         public async Task<ActionResult<Appointment>> Post(Appointment appointment)
         {
@@ -160,6 +192,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(appointment);
         }
 
+        /// <summary>
+        /// Updates Appointment's data
+        /// </summary>
+        /// <param name="appointment">Appointment to update</param>
+        /// <returns>Appointment object</returns>
         [HttpPut]
         public async Task<ActionResult<Appointment>> Put(Appointment appointment)
         {
@@ -173,6 +210,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(appointment);
         }
 
+        /// <summary>
+        /// Deletes Appointment
+        /// </summary>
+        /// <param name="id">Appointment's id</param>
+        /// <returns>Appointment object</returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult<Appointment>> Delete(int id)
         {
@@ -188,6 +230,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(appointment);
         }
 
+        /// <summary>
+        /// Deletes Appointment
+        /// </summary>
+        /// <param name="appointment">Appointment to delete</param>
+        /// <returns>Appointment object</returns>
         [HttpDelete("{Appointment}")]
         public async Task<ActionResult<Appointment>> Delete(Appointment appointment)
         {

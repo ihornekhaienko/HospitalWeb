@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
 {
+    /// <summary>
+    /// Diagnoses
+    /// </summary>
+    [Produces("application/json")]
     [ApiController]
     [Route("api/[controller]")]
     public class DiagnosesController : ControllerBase
@@ -19,12 +23,21 @@ namespace HospitalWeb.WebApi.Controllers
             _uow = uow;
         }
 
+        /// <summary>
+        /// Returns a list of diagnoses
+        /// </summary>
+        /// <returns>List of diagnoses</returns>
         [HttpGet]
         public async Task<IEnumerable<Diagnosis>> Get()
         {
             return await _uow.Diagnoses.GetAllAsync();
         }
 
+        /// <summary>
+        /// Returns a Diagnosis found by id
+        /// </summary>
+        /// <param name="id">Diagnosis id</param>
+        /// <returns>The Diagnosis object</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Diagnosis>> Get(int id)
         {
@@ -38,6 +51,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(diagnosis);
         }
 
+        /// <summary>
+        /// Returns a Diagnosis found by its name
+        /// </summary>
+        /// <param name="name">Diagnosis name</param>
+        /// <returns>The Diagnosis object</returns>
         [HttpGet("details")]
         public async Task<ActionResult<Diagnosis>> Get(string name)
         {
@@ -51,6 +69,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(diagnosis);
         }
 
+        /// <summary>
+        /// Creates the new Diagnosis
+        /// </summary>
+        /// <param name="diagnosis">Diagnosis to create</param>
+        /// <returns>The Diagnosis object</returns>
         [HttpPost]
         public async Task<ActionResult<Diagnosis>> Post(Diagnosis diagnosis)
         {
@@ -64,6 +87,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(diagnosis);
         }
 
+        /// <summary>
+        /// Updates the Diagnosis object data
+        /// </summary>
+        /// <param name="diagnosis">The Diagnosis to update</param>
+        /// <returns>The Diagnosis object</returns>
         [HttpPut]
         public async Task<ActionResult<Diagnosis>> Put(Diagnosis diagnosis)
         {
@@ -77,6 +105,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(diagnosis);
         }
 
+        /// <summary>
+        /// Deletes the Diagnosis found by Id
+        /// </summary>
+        /// <param name="id">Diagnosis's id</param>
+        /// <returns>The Diagnosis object</returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult<Diagnosis>> Delete(int id)
         {
@@ -92,6 +125,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(diagnosis);
         }
 
+        /// <summary>
+        /// Deletes the Diagnosis 
+        /// </summary>
+        /// <param name="diagnosis">The Diagnosis object</param>
+        /// <returns>The Diagnosis object</returns>
         [HttpDelete("{Diagnosis}")]
         public async Task<ActionResult<Diagnosis>> Delete(Diagnosis diagnosis)
         {

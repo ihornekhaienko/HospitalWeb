@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
 {
+    /// <summary>
+    /// Doctor Schedules
+    /// </summary>
+    [Produces("application/json")]
     [ApiController]
     [Route("api/[controller]")]
     public class SchedulesController : ControllerBase
@@ -19,12 +23,21 @@ namespace HospitalWeb.WebApi.Controllers
             _uow = uow;
         }
 
+        /// <summary>
+        /// Returns a list of Schedules
+        /// </summary>
+        /// <returns>List of Schedules</returns>
         [HttpGet]
         public async Task<IEnumerable<Schedule>> Get()
         {
             return await _uow.Schedules.GetAllAsync();
         }
 
+        /// <summary>
+        /// Returns the Schedule found by Id
+        /// </summary>
+        /// <param name="id">Schedule's id</param>
+        /// <returns>The Schedule object</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Schedule>> Get(int id)
         {
@@ -38,6 +51,12 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(schedule);
         }
 
+        /// <summary>
+        /// Returns the Schedule found by Doctor and Day
+        /// </summary>
+        /// <param name="doctor">Doctor</param>
+        /// <param name="day">Day of week</param>
+        /// <returns>The Schedule object</returns>
         [HttpGet("details")]
         public async Task<ActionResult<Schedule>> Get(string doctor, string day)
         {
@@ -51,6 +70,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(schedule);
         }
 
+        /// <summary>
+        /// Creates the new Schedule
+        /// </summary>
+        /// <param name="schedule">Schedule to create</param>
+        /// <returns>The Schedule object</returns>
         [HttpPost]
         public async Task<ActionResult<Schedule>> Post(Schedule schedule)
         {
@@ -64,6 +88,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(schedule);
         }
 
+        /// <summary>
+        /// Updates the Schedule object data
+        /// </summary>
+        /// <param name="schedule">The Schedule to update</param>
+        /// <returns>The Schedule object</returns>
         [HttpPut]
         public async Task<ActionResult<Schedule>> Put(Schedule schedule)
         {
@@ -77,6 +106,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(schedule);
         }
 
+        /// <summary>
+        /// Deletes the Schedule found by Id
+        /// </summary>
+        /// <param name="id">Schedule's id</param>
+        /// <returns>The Schedule object</returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult<Schedule>> Delete(int id)
         {
@@ -92,6 +126,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(schedule);
         }
 
+        /// <summary>
+        /// Deletes the Schedule 
+        /// </summary>
+        /// <param name="schedule">The Schedule object</param>
+        /// <returns>The Schedule object</returns>
         [HttpDelete("{Schedule}")]
         public async Task<ActionResult<Schedule>> Delete(Schedule schedule)
         {

@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
 {
+    /// <summary>
+    /// Patients Addresses
+    /// </summary>
+    [Produces("application/json")]
     [ApiController]
     [Route("api/[controller]")]
     public class AddressesController : ControllerBase
@@ -19,12 +23,21 @@ namespace HospitalWeb.WebApi.Controllers
             _uow = uow;
         }
 
+        /// <summary>
+        /// Returns a list of Addresses
+        /// </summary>
+        /// <returns> A list of Addresses </returns>
         [HttpGet]
         public async Task<IEnumerable<Address>> Get()
         {
             return await _uow.Addresses.GetAllAsync();
         }
 
+        /// <summary>
+        /// Returns the Address object found by Id
+        /// </summary>
+        /// <param name="id"> Address id </param>
+        /// <returns> The Address object </returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Address>> Get(int id)
         {
@@ -38,6 +51,12 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(address);
         }
 
+        /// <summary>
+        /// Returns the Address object found by full address text and locality name
+        /// </summary>
+        /// <param name="address"> Full address </param>
+        /// <param name="locality"> Locality name </param>
+        /// <returns> The Address object </returns>
         [HttpGet("details")]
         public async Task<ActionResult<Address>> Get(string address, string locality)
         {
@@ -51,6 +70,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(obj);
         }
 
+        /// <summary>
+        /// Creates a new Address object
+        /// </summary>
+        /// <param name="address"> The Address object  </param>
+        /// <returns> The Address object </returns>
         [HttpPost]
         public async Task<ActionResult<Address>> Post(Address address)
         {
@@ -64,6 +88,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(address);
         }
 
+        /// <summary>
+        /// Updates the Address object data
+        /// </summary>
+        /// <param name="address"> The Address object  </param>
+        /// <returns> The Address object </returns>
         [HttpPut]
         public async Task<ActionResult<Address>> Put(Address address)
         {
@@ -77,6 +106,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(address);
         }
 
+        /// <summary>
+        /// Deletes the Address object
+        /// </summary>
+        /// <param name="id"> The Address object id </param>
+        /// <returns> The Address object </returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult<Address>> Delete(int id)
         {
@@ -92,6 +126,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(address);
         }
 
+        /// <summary>
+        /// Deletes the Address object
+        /// </summary>
+        /// <param name="address"> The Address object  </param>
+        /// <returns> The Address object </returns>
         [HttpDelete("{Address}")]
         public async Task<ActionResult<Address>> Delete(Address address)
         {

@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
 {
+    /// <summary>
+    /// Application Users
+    /// </summary>
+    [Produces("application/json")]
     [ApiController]
     [Route("api/[controller]")]
     public class AppUsersController : ControllerBase
@@ -24,12 +28,21 @@ namespace HospitalWeb.WebApi.Controllers
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Returns a list of registered Users
+        /// </summary>
+        /// <returns>List of users</returns>
         [HttpGet]
         public async Task<IEnumerable<AppUser>> Get()
         {
             return await _uow.AppUsers.GetAllAsync();
         }
 
+        /// <summary>
+        /// Returns the User found by Id or Email
+        /// </summary>
+        /// <param name="searchString">User's id or Email</param>
+        /// <returns>The User object</returns>
         [HttpGet("{searchString}")]
         public async Task<ActionResult<AppUser>> Get(string searchString)
         {
@@ -43,6 +56,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(user);
         }
 
+        /// <summary>
+        /// Creates the new User
+        /// </summary>
+        /// <param name="user">User to create</param>
+        /// <returns>The User object</returns>
         [HttpPost]
         public async Task<ActionResult<AppUser>> Post(AppUserResourceModel user)
         {
@@ -82,6 +100,11 @@ namespace HospitalWeb.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates the User object data
+        /// </summary>
+        /// <param name="user">The User to update</param>
+        /// <returns>The User object</returns>
         [HttpPut]
         public async Task<ActionResult<AppUser>> Put(AppUserResourceModel user)
         {
@@ -130,10 +153,15 @@ namespace HospitalWeb.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes the User found by Id or Email
+        /// </summary>
+        /// <param name="searchString">User's id or Email</param>
+        /// <returns>The User object</returns>
         [HttpDelete("{id}")]
-        public async Task<ActionResult<AppUser>> Delete(string id)
+        public async Task<ActionResult<AppUser>> Delete(string searchString)
         {
-            var user = await _uow.AppUsers.GetAsync(a => a.Id == id);
+            var user = await _uow.AppUsers.GetAsync(a => a.Id == searchString || a.Email == searchString);
 
             if (user == null)
             {
@@ -145,6 +173,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// Deletes the User
+        /// </summary>
+        /// <param name="user">The User to delete</param>
+        /// <returns>The User object</returns>
         [HttpDelete("{AppUser}")]
         public async Task<ActionResult<AppUser>> Delete(AppUser user)
         {

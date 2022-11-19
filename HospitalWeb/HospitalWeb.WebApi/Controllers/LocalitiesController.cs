@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
 {
+    /// <summary>
+    /// Localities
+    /// </summary>
+    [Produces("application/json")]
     [ApiController]
     [Route("api/[controller]")]
     public class LocalitiesController : ControllerBase
@@ -19,12 +23,21 @@ namespace HospitalWeb.WebApi.Controllers
             _uow = uow;
         }
 
+        /// <summary>
+        /// Returns a list of Localities
+        /// </summary>
+        /// <returns>List of Localities</returns>
         [HttpGet]
         public async Task<IEnumerable<Locality>> Get()
         {
             return await _uow.Localities.GetAllAsync();
         }
 
+        /// <summary>
+        /// Returns the Locality found by Id
+        /// </summary>
+        /// <param name="id">Locality's id</param>
+        /// <returns>The Locality object</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Locality>> Get(int id)
         {
@@ -38,6 +51,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(locality);
         }
 
+        /// <summary>
+        /// Returns the Locality found by name
+        /// </summary>
+        /// <param name="name">Locality's name</param>
+        /// <returns>The Locality object</returns>
         [HttpGet("details")]
         public async Task<ActionResult<Locality>> Get(string name)
         {
@@ -51,6 +69,11 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(locality);
         }
 
+        /// <summary>
+        /// Creates the new Locality
+        /// </summary>
+        /// <param name="locality">Locality to create</param>
+        /// <returns>The Locality object</returns>
         [HttpPost]
         public async Task<ActionResult<Locality>> Post(Locality locality)
         {
@@ -64,6 +87,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(locality);
         }
 
+        /// <summary>
+        /// Updates the Locality object data
+        /// </summary>
+        /// <param name="locality">The Locality to update</param>
+        /// <returns>The Locality object</returns>
         [HttpPut]
         public async Task<ActionResult<Locality>> Put(Locality locality)
         {
@@ -77,6 +105,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(locality);
         }
 
+        /// <summary>
+        /// Deletes the Locality found by Id
+        /// </summary>
+        /// <param name="id">Locality's id</param>
+        /// <returns>The Locality object</returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult<Locality>> Delete(int id)
         {
@@ -92,6 +125,11 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(locality);
         }
 
+        /// <summary>
+        /// Deletes the Locality 
+        /// </summary>
+        /// <param name="locality">The Locality object</param>
+        /// <returns>The Locality object</returns>
         [HttpDelete("{Locality}")]
         public async Task<ActionResult<Locality>> Delete(Locality locality)
         {
