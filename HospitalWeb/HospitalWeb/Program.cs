@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HospitalWeb;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using HospitalWeb.WebApi.Clients.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -19,7 +20,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
 
-builder.Services.AddUnitOfWork();
+builder.Services.AddApi();
 builder.Services.AddEmailNotifier();
 builder.Services.AddPasswordGenerator();
 builder.Services.AddFileManager();
