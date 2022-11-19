@@ -1,5 +1,4 @@
-﻿using HospitalWeb.DAL.Services.Implementations;
-using HospitalWeb.Services.Interfaces;
+﻿using HospitalWeb.WebApi.Clients.Implementations;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -9,15 +8,14 @@ namespace HospitalWeb.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
 
         public HomeController(
             ILogger<HomeController> logger,
-            INotifier notifier,
-            UnitOfWork uow)
+            ApiUnitOfWork api)
         {
             _logger = logger;
-            _uow = uow;
+            _api = api;
         }
 
         [HttpGet]
@@ -47,7 +45,8 @@ namespace HospitalWeb.Controllers
 
         public IActionResult UpdateAppointmentStates()
         {
-            _uow.Appointments.UpdateStates();
+            _api.Appointments.UpdateStates();
+
             return Ok();
         }
     }

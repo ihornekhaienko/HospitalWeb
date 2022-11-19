@@ -4,6 +4,8 @@ using HospitalWeb.Services.Extensions;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.ViewModels.Manage;
+using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,23 +18,20 @@ namespace HospitalWeb.Controllers
     {
         private readonly ILogger<ManageController> _logger;
         private readonly IWebHostEnvironment _environment;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
         private readonly IFileManager _fileManager;
         private readonly INotifier _notifier;
 
         public ManageController(
             ILogger<ManageController> logger, 
             IWebHostEnvironment environment,
-            UserManager<AppUser> userManager,
-            UnitOfWork uow,
+            ApiUnitOfWork api,
             IFileManager fileManager,
             INotifier notifier)
         {
             _logger = logger;
             _environment = environment;
-            _userManager = userManager;
-            _uow = uow;
+            _api = api;
             _fileManager = fileManager;
             _notifier = notifier;
         }
@@ -61,7 +60,15 @@ namespace HospitalWeb.Controllers
         public async Task<IActionResult> AdminProfile()
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            var admin = _uow.Admins.Get(a => a.Email == User.Identity.Name);
+
+            var response = _api.Admins.Get(User.Identity.Name);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var admin = _api.Admins.Read(response);
 
             var model = new AdminProfileViewModel
             {
@@ -77,11 +84,18 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AdminProfile(AdminProfileViewModel model)
+        public IActionResult AdminProfile(AdminProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var admin = _uow.Admins.Get(a => a.Email == User.Identity.Name);
+                var response = _api.Admins.Get(User.Identity.Name);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var admin = _api.Admins.Read(response);
 
                 admin.UserName = model.Email;
                 admin.Email = model.Email;
@@ -89,15 +103,17 @@ namespace HospitalWeb.Controllers
                 admin.Name = model.Name;
                 admin.PhoneNumber = model.Phone;
 
-                var result = await _userManager.UpdateAsync(admin);
+                response = _api.Admins.Put(admin);
 
-                if (result.Succeeded)
+                if (response.IsSuccessStatusCode)
                 {
                     return RedirectToAction("Profile", "Manage");
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
+                    var errors = _api.Admins.ReadErrors(response);
+
+                    foreach (var error in errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
@@ -112,7 +128,15 @@ namespace HospitalWeb.Controllers
         public async Task<IActionResult> DoctorProfile()
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            var doctor = _uow.Doctors.Get(d => d.Email == User.Identity.Name);
+
+            var response = _api.Doctors.Get(User.Identity.Name);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var doctor = _api.Doctors.Read(response);
 
             var model = new DoctorProfileViewModel
             {
@@ -128,11 +152,18 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DoctorProfile(DoctorProfileViewModel model)
+        public IActionResult DoctorProfile(DoctorProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var doctor = _uow.Doctors.Get(d => d.Email == User.Identity.Name);
+                var response = _api.Doctors.Get(User.Identity.Name);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var doctor = _api.Doctors.Read(response);
 
                 doctor.UserName = model.Email;
                 doctor.Email = model.Email;
@@ -140,15 +171,17 @@ namespace HospitalWeb.Controllers
                 doctor.Name = model.Name;
                 doctor.PhoneNumber = model.Phone;
 
-                var result = await _userManager.UpdateAsync(doctor);
+                response = _api.Doctors.Put(doctor);
 
-                if (result.Succeeded)
+                if (response.IsSuccessStatusCode)
                 {
                     return RedirectToAction("Profile", "Manage");
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
+                    var errors = _api.Doctors.ReadErrors(response);
+
+                    foreach (var error in errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
@@ -163,7 +196,15 @@ namespace HospitalWeb.Controllers
         public async Task<IActionResult> PatientProfile()
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            var patient = _uow.Patients.Get(p => p.Email == User.Identity.Name);
+
+            var response = _api.Patients.Get(User.Identity.Name);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var patient = _api.Patients.Read(response);
 
             var model = new PatientProfileViewModel
             {
@@ -180,13 +221,21 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PatientProfile(PatientProfileViewModel model)
+        public IActionResult PatientProfile(PatientProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var locality = _uow.Localities.GetOrCreate(model.Locality);
-                var address = _uow.Addresses.GetOrCreate(model.Address, locality);
-                var patient = _uow.Patients.Get(d => d.Email == User.Identity.Name);
+                var locality = _api.Localities.GetOrCreate(model.Locality);
+                var address = _api.Addresses.GetOrCreate(model.Address, locality);
+
+                var response = _api.Patients.Get(User.Identity.Name);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var patient = _api.Patients.Read(response);
 
                 patient.UserName = model.Email;
                 patient.Email = model.Email;
@@ -195,15 +244,17 @@ namespace HospitalWeb.Controllers
                 patient.PhoneNumber = model.Phone;
                 patient.Address = address;
 
-                var result = await _userManager.UpdateAsync(patient);
+                response = _api.Patients.Put(patient);
 
-                if (result.Succeeded)
+                if (response.IsSuccessStatusCode)
                 {
                     return RedirectToAction("Profile", "Manage");
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
+                    var errors = _api.Patients.ReadErrors(response);
+
+                    foreach (var error in errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
@@ -224,10 +275,18 @@ namespace HospitalWeb.Controllers
 
                     if (bytes != null && bytes.IsImage())
                     {
-                        var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+                        var response = _api.AppUsers.Get(User.Identity.Name);
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            return NotFound();
+                        }
+
+                        var user = _api.AppUsers.Read(response);
 
                         user.Image = bytes;
-                        var result = await _userManager.UpdateAsync(user);
+                        
+                        _api.AppUsers.Put(user);
 
                         return RedirectToAction("Profile", "Manage");
                     }
@@ -262,17 +321,25 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-                    var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    var user = new AppUserResourceModel
+                    {
+                        Email = User.Identity.Name,
+                        Password = model.OldPassword,
+                        NewPassword = model.NewPassword
+                    };
 
-                    if (result.Succeeded)
+                    var response = _api.AppUsers.Put(user);
+
+                    if (response.IsSuccessStatusCode)
                     {
                         await _notifier.NotifyUpdate(user.Email, user.Email);
                         return RedirectToAction("Profile", "Manage");
                     }
                     else
                     {
-                        foreach (var error in result.Errors)
+                        var errors = _api.AppUsers.ReadErrors(response);
+
+                        foreach (var error in errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
                         }

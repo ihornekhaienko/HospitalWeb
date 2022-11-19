@@ -1,9 +1,9 @@
 ﻿using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.Filters.Builders.Implementations;
-using HospitalWeb.Filters.Models.SortStates;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
+using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,19 +14,19 @@ namespace HospitalWeb.Controllers
     {
         private readonly ILogger<TreatmentController> _logger;
         private readonly IWebHostEnvironment _environment;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
         private readonly IFileManager _fileManager;
 
         public TreatmentController(
             ILogger<TreatmentController> logger,
             IWebHostEnvironment environment,
-            UnitOfWork uow,
+            ApiUnitOfWork api,
             IFileManager fileManager
             )
         {
             _logger = logger;
             _environment = environment;
-            _uow = uow;
+            _api = api;
             _fileManager = fileManager;
         }
 
@@ -39,12 +39,18 @@ namespace HospitalWeb.Controllers
             int page = 1,
             AppointmentSortState sortOrder = AppointmentSortState.DateDesc)
         {
-            _uow.Appointments.UpdateStates();
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            var userId = _uow.Patients.Get(p => p.Email == User.Identity.Name).Id;
+            var response = _api.Patients.Get(User.Identity.Name);
 
-            var builder = new AppointmentsViewModelBuilder(_uow, 
-                page, searchString, sortOrder, state: state, fromTime: fromDate, toTime: toDate, patientId: userId);
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var userId = _api.Patients.Read(response).Id;
+
+            var builder = new AppointmentsViewModelBuilder(_api, 
+                page, searchString, sortOrder, userId, state: state, fromTime: fromDate, toTime: toDate);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
@@ -57,14 +63,19 @@ namespace HospitalWeb.Controllers
         {
             try
             {
-                _uow.Appointments.UpdateStates();
-                var appointment = _uow.Appointments
-                    .Get(a => a.AppointmentId == id);
+                var response = _api.Appointments.Get(id);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var appointment = _api.Appointments.Read(response);
 
                 if (appointment.State == State.Planned)
                 {
                     appointment.State = State.Canceled;
-                    _uow.Appointments.Update(appointment);
+                    _api.Appointments.Put(appointment);
 
                     return RedirectToAction("History", "Treatment");
                 }

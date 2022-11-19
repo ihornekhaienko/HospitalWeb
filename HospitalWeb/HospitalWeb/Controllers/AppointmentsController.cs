@@ -1,10 +1,10 @@
 ﻿using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.Filters.Builders.Implementations;
-using HospitalWeb.Filters.Models.SortStates;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Appointments;
 using HospitalWeb.ViewModels.Error;
+using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,19 +14,19 @@ namespace HospitalWeb.Controllers
     {
         private readonly ILogger<AppointmentsController> _logger;
         private readonly IWebHostEnvironment _environment;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
         private readonly IFileManager _fileManager;
 
         public AppointmentsController(
             ILogger<AppointmentsController> logger,
             IWebHostEnvironment environment,
-            UnitOfWork uow,
+            ApiUnitOfWork api,
             IFileManager fileManager
             )
         {
             _logger = logger;
             _environment = environment;
-            _uow = uow;
+            _api = api;
             _fileManager = fileManager;
         }
 
@@ -34,9 +34,14 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult Details(int id)
         {
-            _uow.Appointments.UpdateStates();
-            var appointment = _uow.Appointments
-                .Get(a => a.AppointmentId == id);
+            var response = _api.Appointments.Get(id);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var appointment = _api.Appointments.Read(response);
 
             var model = new AppointmentViewModel
             {
@@ -63,12 +68,19 @@ namespace HospitalWeb.Controllers
             int page = 1,
             AppointmentSortState sortOrder = AppointmentSortState.DateDesc)
         {
-            _uow.Appointments.UpdateStates();
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            var userId = _uow.Doctors.Get(p => p.Email == User.Identity.Name).Id;
 
-            var builder = new AppointmentsViewModelBuilder(_uow,
-                page, searchString, sortOrder, state: state, fromTime: fromDate, toTime: toDate, doctorId: userId);
+            var response = _api.Doctors.Get(User.Identity.Name);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var userId = _api.Doctors.Read(response).Id;
+
+            var builder = new AppointmentsViewModelBuilder(_api,
+                page, searchString, sortOrder, userId, state: state, fromTime: fromDate, toTime: toDate);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
@@ -84,15 +96,22 @@ namespace HospitalWeb.Controllers
                     int page = 1,
                     AppointmentSortState sortOrder = AppointmentSortState.DateAsc)
         {
-            _uow.Appointments.UpdateStates();
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            var userId = _uow.Doctors
-                .Get(p => p.Email == User.Identity.Name).Id;
+
+            var response = _api.Doctors.Get(User.Identity.Name);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var userId = _api.Doctors.Read(response).Id;
+
             var start = DateTime.Today;
             var end = start.AddDays(1).AddTicks(-1);
 
-            var builder = new AppointmentsViewModelBuilder(_uow,
-                page, searchString, sortOrder, state: state, fromTime: start, toTime: end, doctorId: userId);
+            var builder = new AppointmentsViewModelBuilder(_api,
+                page, searchString, sortOrder, userId, state: state, fromTime: start, toTime: end);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
@@ -106,14 +125,19 @@ namespace HospitalWeb.Controllers
         {
             try
             {
-                _uow.Appointments.UpdateStates();
-                var appointment = _uow.Appointments
-                    .Get(a => a.AppointmentId == id);
+                var response = _api.Appointments.Get(id);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var appointment = _api.Appointments.Read(response);
 
                 if (appointment.State == State.Planned)
                 {
                     appointment.State = State.Canceled;
-                    _uow.Appointments.Update(appointment);
+                    _api.Appointments.Put(appointment);
 
                     return RedirectToAction("History", "Appointments");
                 }
@@ -133,13 +157,21 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult Fill(int id)
         {
-            _uow.Appointments.UpdateStates();
-            ViewBag.Diagnoses = _uow.Diagnoses
-                .GetAll()
+            var response = _api.Diagnoses.Get();
+
+            ViewBag.Diagnoses = _api.Diagnoses
+                .ReadMany(response)
                 .OrderBy(d => d.DiagnosisName)
                 .Select(d => d.DiagnosisName);
-            var appointment = _uow.Appointments
-                .Get(a => a.AppointmentId == id);
+
+            response = _api.Appointments.Get(id);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var appointment = _api.Appointments.Read(response);
 
             var model = new AppointmentViewModel
             {
@@ -162,16 +194,38 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    _uow.Appointments.UpdateStates();
-                    var appointment = _uow.Appointments
-                    .Get(a => a.AppointmentId == model.AppointmentId);
+                    var response = _api.Appointments.Get(model.AppointmentId);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        return NotFound();
+                    }
+
+                    var appointment = _api.Appointments.Read(response);
 
                     if (appointment.State == State.Planned)
                     {
-                        appointment.Diagnosis = _uow.Diagnoses.GetOrCreate(model.Diagnosis);
+                        response = _api.Diagnoses.Get(model.Diagnosis);
+                        Diagnosis diagnosis;
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            diagnosis = _api.Diagnoses.Read(response);
+                        }
+                        else
+                        {
+                            diagnosis = new Diagnosis
+                            {
+                                DiagnosisName = model.Diagnosis
+                            };
+
+                            _api.Diagnoses.Post(diagnosis);
+                        }
+
+                        appointment.Diagnosis = diagnosis;
                         appointment.Prescription = model.Prescription;
                         appointment.State = State.Completed;
-                        _uow.Appointments.Update(appointment);
+                        _api.Appointments.Put(appointment);
 
                         return RedirectToAction("Today", "Appointments");
                     }

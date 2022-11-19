@@ -1,10 +1,10 @@
 ﻿using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.Filters.Builders.Implementations;
-using HospitalWeb.Filters.Models.SortStates;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Doctors;
 using HospitalWeb.ViewModels.Error;
+using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,21 +14,21 @@ namespace HospitalWeb.Controllers
     {
         private readonly ILogger<DoctorsController> _logger;
         private readonly IWebHostEnvironment _environment;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
         private readonly IFileManager _fileManager;
         private readonly IScheduleGenerator _scheduleGenerator;
 
         public DoctorsController(
             ILogger<DoctorsController> logger,
             IWebHostEnvironment environment,
-            UnitOfWork uow,
+            ApiUnitOfWork api,
             IFileManager fileManager,
             IScheduleGenerator scheduleGenerator
             )
         {
             _logger = logger;
             _environment = environment;
-            _uow = uow;
+            _api = api;
             _fileManager = fileManager;
             _scheduleGenerator = scheduleGenerator;
         }
@@ -42,7 +42,7 @@ namespace HospitalWeb.Controllers
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
-            var builder = new DoctorsViewModelBuilder(_uow, page, searchString, sortOrder, specialty);
+            var builder = new DoctorsViewModelBuilder(_api, page, searchString, sortOrder, specialty);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
@@ -54,8 +54,15 @@ namespace HospitalWeb.Controllers
         public async Task<IActionResult> Details(string id)
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-            var doctor = _uow.Doctors
-                .Get(d => d.Id == id);          
+
+            var response = _api.Doctors.Get(id);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var doctor = _api.Doctors.Read(id);
 
             var model = new DoctorDetailsViewModel
             {
@@ -73,8 +80,15 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult Schedule(string id, DateTime date)
         {
-            var doctor = _uow.Doctors
-                .Get(d => d.Id == id);
+            var response = _api.Doctors.Get(id);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var doctor = _api.Doctors.Read(id);
+
             var model = _scheduleGenerator.GenerateWeekSchedule(doctor, date);
 
             return PartialView("_SchedulePartial", model);
@@ -85,9 +99,19 @@ namespace HospitalWeb.Controllers
         {
             try
             {
-                var patient = _uow.Patients.Get(p => p.Email == User.Identity.Name);
-                var doctor = _uow.Doctors.Get(d => d.Id == doctorId);
-                _logger.LogCritical(_uow.Appointments.IsDateFree(doctor, date).ToString());
+                var response = _api.Patients.Get(User.Identity.Name);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+                var patient = _api.Patients.Read(response);
+
+                response = _api.Doctors.Get(doctorId);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+               var doctor = _api.Doctors.Read(response);
 
                var appointment = new Appointment
                 {
@@ -97,7 +121,7 @@ namespace HospitalWeb.Controllers
                     Patient = patient
                 };
 
-                _uow.Appointments.Create(appointment);
+                _api.Appointments.Post(appointment);
 
                 return RedirectToAction("Details", "Doctors", new { id = doctorId });
             }

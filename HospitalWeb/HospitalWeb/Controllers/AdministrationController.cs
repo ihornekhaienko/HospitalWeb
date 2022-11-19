@@ -1,13 +1,12 @@
 ﻿using HospitalWeb.Services.Interfaces;
 using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.ViewModels.Administration;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HospitalWeb.Filters.Builders.Implementations;
-using HospitalWeb.Filters.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
+using HospitalWeb.WebApi.Models.SortStates;
+using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 
 namespace HospitalWeb.Controllers
 {
@@ -15,22 +14,18 @@ namespace HospitalWeb.Controllers
     public class AdministrationController : Controller
     {
         private readonly ILogger<AdministrationController> _logger;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
         private readonly IPasswordGenerator _passwordGenerator;
         private readonly INotifier _notifier;
 
         public AdministrationController(
             ILogger<AdministrationController> logger,
-            UserManager<AppUser> userManager,
-            UnitOfWork uow,
+            ApiUnitOfWork api,
             IPasswordGenerator passwordGenerator,
-            INotifier notifier
-            )
+            INotifier notifier)
         {
             _logger = logger;
-            _userManager = userManager;
-            _uow = uow;
+            _api = api;
             _passwordGenerator = passwordGenerator;
             _notifier = notifier;
         }
@@ -41,48 +36,15 @@ namespace HospitalWeb.Controllers
             int page = 1,
             AdminSortState sortOrder = AdminSortState.Id)
         {
-            ViewBag.CurrentAdmin = _uow.Admins
-                .Get(a => a.UserName == User.Identity.Name);
+            var response = _api.Admins.Get(User.Identity.Name);
+            ViewBag.CurrentAdmin = _api.Admins.Read(response);
 
-            var builder = new AdminsViewModelBuilder(_uow, page, searchString, sortOrder);
+            var builder = new AdminsViewModelBuilder(_api, page, searchString, sortOrder);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
-
+            
             return View(viewModel);
-        }
-
-        public async Task<IActionResult> DeleteAdmin(string id)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(id))
-                {
-                    return NotFound();
-                }
-
-                var admin = _uow.Admins
-                    .Get(m => m.Id == id);
-
-                if (admin == null)
-                {
-                    return NotFound();
-                }
-
-                var result = await _userManager.DeleteAsync(admin);
-
-                if (result.Succeeded)
-                {
-                    await _notifier.NotifyDelete(admin.Email, admin.Email);
-                }
-
-                return RedirectToAction("Admins", "Administration");
-            }
-            catch (Exception err)
-            {
-                _logger.LogCritical(err.StackTrace);
-                return RedirectToAction("Index", "Error", err.Message);
-            }
         }
 
         [HttpGet]
@@ -98,7 +60,9 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var admin = new Admin
+                    var password = _passwordGenerator.GeneratePassword(null);
+
+                    var admin = new AdminResourceModel
                     {
                         Name = model.Name,
                         Surname = model.Surname,
@@ -106,23 +70,23 @@ namespace HospitalWeb.Controllers
                         UserName = model.Email,
                         PhoneNumber = model.Phone,
                         IsSuperAdmin = model.IsSuperAdmin,
-                        EmailConfirmed = true
+                        EmailConfirmed = true,
+                        Password = password
                     };
 
-                    var password = _passwordGenerator.GeneratePassword(null);
+                    var response =_api.Admins.Post(admin);
 
-                    var result = await _userManager.CreateAsync(admin, password);
-
-                    if (result.Succeeded)
+                    if (response.IsSuccessStatusCode)
                     {
-                        await _userManager.AddToRoleAsync(admin, "Admin");
                         await _notifier.NotifyAdd(admin.Email, admin.Email, password);
 
                         return RedirectToAction("Admins", "Administration");
                     }
                     else
                     {
-                        foreach (var error in result.Errors)
+                        var errors = _api.Admins.ReadErrors(response);
+
+                        foreach (var error in errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
                         }
@@ -146,13 +110,14 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            var admin = _uow.Admins
-                .Get(a => a.Id == id);
+            var response = _api.Admins.Get(id);
 
-            if (admin == null)
+            if (!response.IsSuccessStatusCode)
             {
                 return NotFound();
             }
+
+            var admin = _api.Admins.Read(response);
 
             var model = new AdminViewModel
             {
@@ -173,8 +138,14 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var admin = _uow.Admins
-                        .Get(a => a.Email == model.Email);
+                    var response = _api.Admins.Get(model.Email);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        return NotFound();
+                    }
+
+                    var admin = _api.Admins.Read(response);
 
                     admin.UserName = model.Email;
                     admin.Email = model.Email;
@@ -183,9 +154,9 @@ namespace HospitalWeb.Controllers
                     admin.PhoneNumber = model.Phone;
                     admin.IsSuperAdmin = model.IsSuperAdmin;
 
-                    var result = await _userManager.UpdateAsync(admin);
+                    response = _api.Admins.Put(admin);
 
-                    if (result.Succeeded)
+                    if (response.IsSuccessStatusCode)
                     {
                         await _notifier.NotifyUpdate(admin.Email, admin.Email);
 
@@ -193,7 +164,9 @@ namespace HospitalWeb.Controllers
                     }
                     else
                     {
-                        foreach (var error in result.Errors)
+                        var errors = _api.Admins.ReadErrors(response);
+
+                        foreach (var error in errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
                         }
@@ -209,22 +182,7 @@ namespace HospitalWeb.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult Doctors(
-            string searchString,
-            int? specialty,
-            int page = 1,
-            DoctorSortState sortOrder = DoctorSortState.Id)
-        {
-            var builder = new DoctorsViewModelBuilder(_uow, page, searchString, sortOrder, specialty);
-            var director = new ViewModelBuilderDirector();
-            director.MakeViewModel(builder);
-            var viewModel = builder.GetViewModel();
-
-            return View(viewModel);
-        }
-
-        public async Task<IActionResult> DeleteDoctor(string id)
+        public async Task<IActionResult> DeleteAdmin(string id)
         {
             try
             {
@@ -233,22 +191,22 @@ namespace HospitalWeb.Controllers
                     return NotFound();
                 }
 
-                var doctor = _uow.Doctors
-                    .Get(m => m.Id == id);
+                var response = _api.Admins.Get(id);
 
-                if (doctor == null)
+                if (!response.IsSuccessStatusCode)
                 {
                     return NotFound();
                 }
 
-                var result = await _userManager.DeleteAsync(doctor);
+                var admin = _api.Admins.Read(response);
+                var result = _api.Admins.Delete(id);
 
-                if (result.Succeeded)
+                if (result.IsSuccessStatusCode)
                 {
-                    await _notifier.NotifyDelete(doctor.Email, doctor.Email);
+                    await _notifier.NotifyDelete(admin.Email, admin.Email);
                 }
 
-                return RedirectToAction("Doctors", "Administration");
+                return RedirectToAction("Admins", "Administration");
             }
             catch (Exception err)
             {
@@ -258,10 +216,32 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpGet]
+        public IActionResult Doctors(
+            string searchString,
+            int? specialty,
+            int page = 1,
+            DoctorSortState sortOrder = DoctorSortState.Id)
+        {
+            var builder = new DoctorsViewModelBuilder(_api, page, searchString, sortOrder, specialty);
+            var director = new ViewModelBuilderDirector();
+            director.MakeViewModel(builder);
+            var viewModel = builder.GetViewModel();
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
         public IActionResult CreateDoctor()
         {
-            ViewBag.Specialties = _uow.Specialties
-                .GetAll()
+            var response = _api.Specialties.Get();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Specialties = _api.Specialties
+                .ReadMany(response)
                 .Select(s => s.SpecialtyName)
                 .OrderBy(s => s);
 
@@ -275,31 +255,34 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var specialty = _uow.Specialties.GetOrCreate(model.Specialty);
-                    var doctor = new Doctor
+                    var specialty = _api.Specialties.GetOrCreate(model.Specialty);
+                    var password = _passwordGenerator.GeneratePassword(null);
+
+                    var doctor = new DoctorResourceModel
                     {
                         Name = model.Name,
                         Surname = model.Surname,
                         Email = model.Email,
                         UserName = model.Email,
                         PhoneNumber = model.Phone,
-                        Specialty = specialty,
-                        EmailConfirmed = true
+                        SpecialtyId = specialty.SpecialtyId,
+                        EmailConfirmed = true,
+                        Password = password
                     };
-                    var password = _passwordGenerator.GeneratePassword(null);
 
-                    var result = await _userManager.CreateAsync(doctor, password);
+                    var response = _api.Doctors.Post(doctor);
 
-                    if (result.Succeeded)
+                    if (response.IsSuccessStatusCode)
                     {
-                        await _userManager.AddToRoleAsync(doctor, "Doctor");
                         await _notifier.NotifyAdd(doctor.Email, doctor.Email, password);
 
                         return RedirectToAction("Doctors", "Administration");
                     }
                     else
                     {
-                        foreach (var error in result.Errors)
+                        var errors = _api.Doctors.ReadErrors(response);
+
+                        foreach (var error in errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
                         }
@@ -318,19 +301,24 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult EditDoctor(string id)
         {
-            ViewBag.Specialties = _uow.Specialties.GetAll().Select(s => s.SpecialtyName);
+            var response = _api.Specialties.Get();
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+            ViewBag.Specialties = _api.Specialties.ReadMany(response);
+            
             if (string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
             }
 
-            var doctor = _uow.Doctors
-                .Get(d => d.Id == id);
-
-            if (doctor == null)
+            response = _api.Doctors.Get(id);
+            if (!response.IsSuccessStatusCode)
             {
                 return NotFound();
             }
+            var doctor = _api.Doctors.Read(response);
 
             var model = new DoctorViewModel
             {
@@ -351,15 +339,16 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var specialty = _uow.Specialties
-                        .GetOrCreate(model.Specialty);
-                    var doctor = _uow.Doctors
-                        .Get(a => a.Email == model.Email);
+                    var specialty = _api.Specialties.GetOrCreate(model.Specialty);
 
-                    if (doctor == null || specialty == null)
+                    var response = _api.Doctors.Get(model.Email);
+
+                    if (!response.IsSuccessStatusCode)
                     {
                         return NotFound();
                     }
+
+                    var doctor = _api.Doctors.Read(response);
 
                     doctor.UserName = model.Email;
                     doctor.Email = model.Email;
@@ -368,9 +357,9 @@ namespace HospitalWeb.Controllers
                     doctor.PhoneNumber = model.Phone;
                     doctor.Specialty = specialty;
 
-                    var result = await _userManager.UpdateAsync(doctor);
+                    response = _api.Doctors.Put(doctor);
 
-                    if (result.Succeeded)
+                    if (response.IsSuccessStatusCode)
                     {
                         await _notifier.NotifyUpdate(doctor.Email, doctor.Email);
 
@@ -378,7 +367,9 @@ namespace HospitalWeb.Controllers
                     }
                     else
                     {
-                        foreach (var error in result.Errors)
+                        var errors = _api.Doctors.ReadErrors(response);
+
+                        foreach (var error in errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
                         }
@@ -394,6 +385,40 @@ namespace HospitalWeb.Controllers
             }
         }
 
+        public async Task<IActionResult> DeleteDoctor(string id)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return NotFound();
+                }
+
+                var response = _api.Doctors.Get(id);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var doctor = _api.Doctors.Read(response);
+
+                response = _api.Doctors.Delete(doctor);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await _notifier.NotifyDelete(doctor.Email, doctor.Email);
+                }
+
+                return RedirectToAction("Doctors", "Administration");
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
+            }
+        }
+
         [HttpGet]
         public IActionResult Patients(
             string searchString,
@@ -401,7 +426,7 @@ namespace HospitalWeb.Controllers
             int page = 1,
             PatientSortState sortOrder = PatientSortState.Id)
         {
-            var builder = new PatientsViewModelBuilder(_uow, page, searchString, sortOrder, locality);
+            var builder = new PatientsViewModelBuilder(_api, page, searchString, sortOrder, locality);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
@@ -418,17 +443,16 @@ namespace HospitalWeb.Controllers
                     return NotFound();
                 }
 
-                var patient = _uow.Patients
-                    .Get(m => m.Id == id);
-
-                if (patient == null)
+                var response = _api.Patients.Get(id);
+                if (!response.IsSuccessStatusCode)
                 {
                     return NotFound();
                 }
+                var patient = _api.Patients.Read(response);
 
-                var result = await _userManager.DeleteAsync(patient);
+                response = _api.Patients.Delete(patient);
 
-                if (result.Succeeded)
+                if (response.IsSuccessStatusCode)
                 {
                     await _notifier.NotifyDelete(patient.Email, patient.Email);
                 }
@@ -444,7 +468,7 @@ namespace HospitalWeb.Controllers
         
         public IActionResult DoctorSchedule(string id, string day)
         {
-            if (_uow.Schedules.Contains(s => s.Doctor.Id == id && s.DayOfWeek.ToString() == day))
+            if (_api.Schedules.Get(id, day).IsSuccessStatusCode)
             {
                 return RedirectToAction("EditDoctorSchedule", "Administration", new { id = id, day = day });
             }
@@ -455,11 +479,18 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AddDoctorSchedule(string id, string day)
+        public IActionResult AddDoctorSchedule(string id, string day)
         {
             DoctorSlotViewModel model;
 
-            var doctor = await _userManager.FindByIdAsync(id);
+            var response = _api.Doctors.Get(id);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var doctor = _api.Doctors.Read(response);
 
             model = new DoctorSlotViewModel
             {
@@ -472,11 +503,19 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddDoctorSchedule(DoctorSlotViewModel model)
+        public IActionResult AddDoctorSchedule(DoctorSlotViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var doctor = await _userManager.FindByIdAsync(model.DoctorId) as Doctor;
+                var response = _api.Doctors.Get(model.DoctorId);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var doctor = _api.Doctors.Read(response);
+
                 DayOfWeek dayOfWeek;
                 Enum.TryParse(model.DayOfWeek, out dayOfWeek);
 
@@ -488,7 +527,7 @@ namespace HospitalWeb.Controllers
                     EndTime = model.EndTime
                 };
 
-                _uow.Schedules.Create(schedule);
+                _api.Schedules.Post(schedule);
 
                 return RedirectToAction("DoctorSchedule", "Administration", new { id = model.DoctorId, day = model.DayOfWeek });
             }
@@ -498,7 +537,14 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult EditDoctorSchedule(string id, string day)
         {
-            var schedule = _uow.Schedules.GetDoctorScheduleByDay(id, day);
+            var response = _api.Schedules.Get(id, day);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var schedule = _api.Schedules.Read(response);
 
             DoctorSlotViewModel model;
 
@@ -525,12 +571,19 @@ namespace HospitalWeb.Controllers
                     return NotFound();
                 }
                 
-                var schedule = _uow.Schedules.Get(s => s.ScheduleId == (int)model.ScheduleId);
+                var response = _api.Schedules.Get((int)model.ScheduleId);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var schedule = _api.Schedules.Read(response);
 
                 schedule.StartTime = model.StartTime;
                 schedule.EndTime = model.EndTime;
 
-                _uow.Schedules.Update(schedule);
+                _api.Schedules.Put(schedule);
 
                 return RedirectToAction("DoctorSchedule", "Administration", new { id = model.DoctorId, day = model.DayOfWeek });
             }
@@ -545,8 +598,16 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            var schedule = _uow.Schedules.Get(s => s.ScheduleId == (int)model.ScheduleId);
-            _uow.Schedules.Delete(schedule);
+            var response = _api.Schedules.Get((int)model.ScheduleId);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var schedule = _api.Schedules.Read(response);
+
+            _api.Schedules.Delete(schedule);
 
             return RedirectToAction("Doctors", "Administration");
         }

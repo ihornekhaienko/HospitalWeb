@@ -1,12 +1,14 @@
 ﻿using HospitalWeb.Services.Interfaces;
 using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.ViewModels.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HospitalWeb.ViewModels.Error;
+using System.Security.Claims;
+using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 
 namespace HospitalWeb.Controllers
 {
@@ -18,7 +20,7 @@ namespace HospitalWeb.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
         private readonly IFileManager _fileManager;
         private readonly INotifier _notifier;
 
@@ -27,7 +29,7 @@ namespace HospitalWeb.Controllers
             IWebHostEnvironment environment,
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            UnitOfWork uow,
+            ApiUnitOfWork api,
             IFileManager fileManager,
             INotifier notifier
             )
@@ -36,7 +38,7 @@ namespace HospitalWeb.Controllers
             _environment = environment;
             _userManager = userManager;
             _signInManager = signInManager;
-            _uow = uow;
+            _api = api;
             _fileManager = fileManager;
             _notifier = notifier;
         }
@@ -57,27 +59,30 @@ namespace HospitalWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var locality = _uow.Localities.GetOrCreate(model.Locality);
-                var address = _uow.Addresses.GetOrCreate(model.Address, locality);
+                var locality = _api.Localities.GetOrCreate(model.Locality);
+                var address = _api.Addresses.GetOrCreate(model.Address, locality);
                 Sex sex;
                 Enum.TryParse(model.Sex, out sex);
 
-                var patient = new Patient
+                var resource = new PatientResourceModel
                 {
                     Name = model.Name,
                     Surname = model.Surname,
                     UserName = model.Email,
                     Email = model.Email,
                     PhoneNumber = model.Phone,
-                    Address = address,
+                    AddressId = address.AddressId,
                     BirthDate = model.BirthDate,
-                    Sex = sex
+                    Sex = sex,
+                    Password = model.Password
                 };
 
-                var result = await _userManager.CreateAsync(patient, model.Password);
+                var response = _api.Patients.Post(resource);
 
-                if (result.Succeeded)
+                if (response.IsSuccessStatusCode)
                 {
+                    var patient = _api.Patients.Read(response);
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(patient);
                     var callbackUrl = Url.Action(
                         "ConfirmEmail",
@@ -87,14 +92,15 @@ namespace HospitalWeb.Controllers
                         );
                     await _notifier.SendConfirmationLink(model.Email, callbackUrl);
 
-                    await _userManager.AddToRoleAsync(patient, "Patient");
                     await _signInManager.SignInAsync(patient, false);
 
                     return RedirectToLocal(returnUrl);
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
+                    var errors = _api.Patients.ReadErrors(response);
+
+                    foreach (var error in errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
@@ -110,6 +116,7 @@ namespace HospitalWeb.Controllers
         {
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
             ViewBag.ReturnUrl = returnUrl;
+            ViewBag.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             return View();
         }
@@ -135,6 +142,113 @@ namespace HospitalWeb.Controllers
             }
 
             return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account",
+                                    new { returnUrl });
+
+            var properties =
+                _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+            return new ChallengeResult(provider, properties);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            if (remoteError != null)
+            {
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = $"Error from external provider: {remoteError}" });
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var result = await _signInManager
+                .ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: false);
+
+            if (result.Succeeded)
+            {
+                return RedirectToLocal(returnUrl);
+            }
+            else
+            {
+                ViewBag.ReturnUrl = returnUrl;
+                ViewBag.LoginProvider = info.LoginProvider;
+                var model = new ExternalLoginViewModel
+                {
+                    Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                };
+
+                return View("ExternalLogin", model);
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExternalLoginConfirm(ExternalLoginViewModel model, string returnUrl = null)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var info = await _signInManager.GetExternalLoginInfoAsync();
+
+                    if (info == null)
+                    {
+                        throw new ApplicationException("Error loading external login information during confirmation.");
+                    }
+
+                    var locality = _api.Localities.GetOrCreate(model.Locality);
+                    var address = _api.Addresses.GetOrCreate(model.Address, locality);
+                    Sex sex;
+                    Enum.TryParse(model.Sex, out sex);
+
+                    var patient = new Patient
+                    {
+                        Name = model.Name,
+                        Surname = model.Surname,
+                        UserName = model.Email,
+                        Email = model.Email,
+                        PhoneNumber = model.Phone,
+                        Address = address,
+                        BirthDate = model.BirthDate,
+                        Sex = sex
+                    };
+
+                    var response = _api.Patients.Post(patient);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = await _userManager.AddLoginAsync(patient, info);
+
+                        if (result.Succeeded)
+                        {
+                            await _signInManager.SignInAsync(patient, false);
+
+                            return RedirectToLocal(returnUrl);
+                        }
+                    }
+                }
+
+                ViewBag.ReturnUrl = returnUrl;
+                return View("ExternalLogin", model);
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [HttpPost]
@@ -163,11 +277,14 @@ namespace HospitalWeb.Controllers
                 {
                     return RedirectToAction(nameof(HomeController.Index), "Home");
                 }
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null)
+
+                var response = _api.AppUsers.Get(userId);
+                if (!response.IsSuccessStatusCode)
                 {
-                    throw new ApplicationException($"Unable to load user with ID '{userId}'.");
+                    return NotFound();
                 }
+                var user = _api.AppUsers.Read(response);
+
                 var result = await _userManager.ConfirmEmailAsync(user, code);
 
                 if (!result.Succeeded)
@@ -200,7 +317,12 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    var response = _api.AppUsers.Get(model.Email);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        return NotFound();
+                    }
+                    var user = _api.AppUsers.Read(response);
 
                     if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                     {
