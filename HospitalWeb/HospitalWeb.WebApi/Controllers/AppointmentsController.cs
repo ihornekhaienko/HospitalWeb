@@ -111,16 +111,11 @@ namespace HospitalWeb.WebApi.Controllers
             var appointments = await _uow.Appointments
                 .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
 
-            var metadata = new
-            {
-                TotalCount = totalCount,
-                Count = appointments.Count(),
-                PageSize = pageSize,
-                PageNumber = pageNumber,
-                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
-            };
-
-            Response.Headers.Add("Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Add("TotalCount", totalCount.ToString());
+            Response.Headers.Add("Count", appointments.Count().ToString());
+            Response.Headers.Add("PageSize", pageSize.ToString());
+            Response.Headers.Add("PageNumber", pageNumber.ToString());
+            Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
 
             return appointments;
         }
@@ -129,6 +124,20 @@ namespace HospitalWeb.WebApi.Controllers
         public async Task<ActionResult<Appointment>> Get(int id)
         {
             var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
+
+            if (appointment == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(appointment);
+        }
+
+        [HttpGet("details")]
+        public async Task<ActionResult<Appointment>> Get(string doctor, DateTime date)
+        {
+            var appointment = await _uow.Appointments
+                .GetAsync(a => a.Doctor.Id == doctor && DateTime.Compare(a.AppointmentDate, date) == 0);
 
             if (appointment == null)
             {

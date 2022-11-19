@@ -38,6 +38,19 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(specialty);
         }
 
+        [HttpGet("details")]
+        public async Task<ActionResult<Specialty>> Get(string name)
+        {
+            var specialty = await _uow.Specialties.GetAsync(s => s.SpecialtyName == name);
+
+            if (specialty == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(specialty);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Specialty>> Post(Specialty specialty)
         {

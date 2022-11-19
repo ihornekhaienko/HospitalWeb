@@ -38,6 +38,19 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(schedule);
         }
 
+        [HttpGet("details")]
+        public async Task<ActionResult<Schedule>> Get(string doctor, string day)
+        {
+            var schedule = await _uow.Schedules.GetAsync(s => s.Doctor.Id == doctor && s.DayOfWeek.ToString() == day);
+
+            if (schedule == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(schedule);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Schedule>> Post(Schedule schedule)
         {

@@ -38,6 +38,19 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(diagnosis);
         }
 
+        [HttpGet("details")]
+        public async Task<ActionResult<Diagnosis>> Get(string name)
+        {
+            var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisName == name);
+
+            if (diagnosis == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(diagnosis);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Diagnosis>> Post(Diagnosis diagnosis)
         {

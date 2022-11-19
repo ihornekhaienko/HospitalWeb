@@ -38,6 +38,19 @@ namespace HospitalWeb.WebApi.Controllers
             return new ObjectResult(address);
         }
 
+        [HttpGet("details")]
+        public async Task<ActionResult<Address>> Get(string address, string locality)
+        {
+            var obj = await _uow.Addresses.GetAsync(a => a.FullAddress == address && a.Locality.LocalityName == locality);
+
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(obj);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Address>> Post(Address address)
         {

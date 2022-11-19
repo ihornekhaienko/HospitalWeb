@@ -1,6 +1,8 @@
 ﻿using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -12,13 +14,16 @@ namespace HospitalWeb.WebApi.Controllers
     {
         private readonly ILogger<DoctorsController> _logger;
         private readonly UnitOfWork _uow;
+        private readonly UserManager<AppUser> _userManager;
 
         public DoctorsController(
             ILogger<DoctorsController> logger,
-            UnitOfWork uow)
+            UnitOfWork uow,
+            UserManager<AppUser> userManager)
         {
             _logger = logger;
             _uow = uow;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -98,16 +103,11 @@ namespace HospitalWeb.WebApi.Controllers
             var doctors = await _uow.Doctors
                 .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
 
-            var metadata = new
-            {
-                TotalCount = totalCount,
-                Count = doctors.Count(),
-                PageSize = pageSize,
-                PageNumber = pageNumber,
-                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
-            };
-
-            Response.Headers.Add("Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Add("TotalCount", totalCount.ToString());
+            Response.Headers.Add("Count", doctors.Count().ToString());
+            Response.Headers.Add("PageSize", pageSize.ToString());
+            Response.Headers.Add("PageNumber", pageNumber.ToString());
+            Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
 
             return doctors;
         }
@@ -126,16 +126,45 @@ namespace HospitalWeb.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Doctor>> Post(Doctor doctor)
+        public async Task<ActionResult<Doctor>> Post(DoctorResourceModel doctor)
         {
             if (doctor == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Doctors.CreateAsync(doctor);
+            var entity = new Doctor
+            {
+                Name = doctor.Name,
+                Surname = doctor.Surname,
+                Email = doctor.Email,
+                UserName = doctor.Email,
+                PhoneNumber = doctor.PhoneNumber,
+                SpecialtyId = doctor.SpecialtyId,
+                EmailConfirmed = doctor.EmailConfirmed
+            };
 
-            return Ok(doctor);
+            IdentityResult result;
+
+            if (string.IsNullOrWhiteSpace(doctor.Password))
+            {
+                result = await _userManager.CreateAsync(entity);
+            }
+            else
+            {
+                result = await _userManager.CreateAsync(entity, doctor.Password);
+            }
+
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(entity, "Doctor");
+
+                return Ok(entity);
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
         }
 
         [HttpPut]
@@ -146,9 +175,16 @@ namespace HospitalWeb.WebApi.Controllers
                 return BadRequest();
             }
 
-            await _uow.Doctors.UpdateAsync(doctor);
+            var result = await _userManager.UpdateAsync(doctor);
 
-            return Ok(doctor);
+            if (result.Succeeded)
+            {
+                return Ok(doctor);
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
         }
 
         [HttpDelete("{id}")]
@@ -161,7 +197,7 @@ namespace HospitalWeb.WebApi.Controllers
                 return NotFound();
             }
 
-            await _uow.Doctors.DeleteAsync(doctor);
+            await _userManager.DeleteAsync(doctor);
 
             return Ok(doctor);
         }
@@ -174,7 +210,7 @@ namespace HospitalWeb.WebApi.Controllers
                 return NotFound();
             }
 
-            await _uow.Doctors.DeleteAsync(doctor);
+            await _userManager.DeleteAsync(doctor);
 
             return Ok(doctor);
         }
