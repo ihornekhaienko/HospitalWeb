@@ -5,14 +5,15 @@ using HospitalWeb.Filters.Models;
 using HospitalWeb.Filters.Models.DTO;
 using HospitalWeb.Filters.Models.FilterModels;
 using HospitalWeb.Filters.Models.SortModels;
-using HospitalWeb.Filters.Models.SortStates;
 using HospitalWeb.Filters.Models.ViewModels;
+using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.SortStates;
 
 namespace HospitalWeb.Filters.Builders.Implementations
 {
     public class PatientsViewModelBuilder : ViewModelBuilder<PatientsViewModel>
     {
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
         private readonly int? _locality;
         private readonly PatientSortState _sortOrder;
         private IEnumerable<PatientDTO> _patients;
@@ -22,7 +23,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
         private int _count = 0;
 
         public PatientsViewModelBuilder(
-            UnitOfWork uow,
+            ApiUnitOfWork api,
             int pageNumber,
             string searchString,
             PatientSortState sortOrder,
@@ -30,105 +31,43 @@ namespace HospitalWeb.Filters.Builders.Implementations
             int pageSize = 10
             ) : base(pageNumber, pageSize, searchString)
         {
-            _uow = uow;
+            _api = api;
             _sortOrder = sortOrder;
             _locality = locality;
         }
 
         public override void BuildEntityModel()
         {
-            Func<Patient, bool> filter = (p) =>
+            var response = _api.Patients.Filter(_searchString, _locality, _sortOrder, _pageSize, _pageNumber);
+
+            if (response.IsSuccessStatusCode)
             {
-                bool result = true;
+                _patients = _api.Patients.ReadMany(response)
+                    .Select(p => new PatientDTO
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Surname = p.Surname,
+                        Email = p.Email,
+                        PhoneNumber = p.PhoneNumber,
+                        Image = p.Image,
+                        BirthDate = p.BirthDate,
+                        Address = p.Address.ToString()
+                    });
 
-                if (!string.IsNullOrWhiteSpace(_searchString))
-                {
-                    result = p.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
-                    p.Surname.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
-                    p.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
-                }
-
-                if (_locality != null && _locality != 0)
-                {
-                    result = result && p.Address.Locality.LocalityId == _locality;
-                }
-
-                return result;
-            };
-
-            Func<IQueryable<Patient>, IOrderedQueryable<Patient>> orderBy = (patients) =>
+                _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());
+            }
+            else
             {
-                _count = patients.Count();
-
-                switch (_sortModel.Current)
-                {
-                    case PatientSortState.NameAsc:
-                        patients = patients.OrderBy(p => p.Name);
-                        break;
-                    case PatientSortState.NameDesc:
-                        patients = patients.OrderByDescending(p => p.Name);
-                        break;
-                    case PatientSortState.SurnameAsc:
-                        patients = patients.OrderBy(p => p.Surname);
-                        break;
-                    case PatientSortState.SurnameDesc:
-                        patients = patients.OrderByDescending(p => p.Surname);
-                        break;
-                    case PatientSortState.EmailAsc:
-                        patients = patients.OrderBy(p => p.Email);
-                        break;
-                    case PatientSortState.EmailDesc:
-                        patients = patients.OrderByDescending(p => p.Email);
-                        break;
-                    case PatientSortState.PhoneAsc:
-                        patients = patients.OrderBy(p => p.PhoneNumber);
-                        break;
-                    case PatientSortState.PhoneDesc:
-                        patients = patients.OrderByDescending(p => p.PhoneNumber);
-                        break;
-                    case PatientSortState.BirthDateAsc:
-                        patients = patients.OrderBy(p => p.BirthDate);
-                        break;
-                    case PatientSortState.BirthDateDesc:
-                        patients = patients.OrderByDescending(p => p.BirthDate);
-                        break;
-                    case PatientSortState.AddressAsc:
-                        patients = patients
-                            .OrderBy(p => p.Address.FullAddress)
-                            .ThenBy(a => a.Address.Locality.LocalityName);
-                        break;
-                    case PatientSortState.AddressDesc:
-                        patients = patients
-                            .OrderByDescending(p => p.Address.FullAddress)
-                            .ThenByDescending(a => a.Address.Locality.LocalityName);
-                        break;
-                    default:
-                        patients = patients.OrderBy(d => d.Id);
-                        break;
-                }
-
-                return  (IOrderedQueryable<Patient>)patients;
-            };
-
-            _patients = _uow.Patients
-                .GetAll(filter: filter, orderBy: orderBy, first: _pageSize, offset: (_pageNumber - 1) * _pageSize)
-                .Select(p => new PatientDTO
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Surname = p.Surname,
-                    Email = p.Email,
-                    PhoneNumber = p.PhoneNumber,
-                    Image = p.Image,
-                    BirthDate = p.BirthDate,
-                    Address = p.Address.ToString()
-                });
+                throw new Exception("Failed loading patients");
+            }
         }
 
         public override void BuildFilterModel()
         {
-            var localities = _uow.Localities
-                .GetAll()
+            var response = _api.Localities.Get();
+            var localities = _api.Localities
+                .ReadMany(response)
                 .OrderBy(l => l.LocalityName)
                 .Select(l => new LocalityDTO { LocalityId = l.LocalityId, LocalityName = l.LocalityName })
                 .ToList();

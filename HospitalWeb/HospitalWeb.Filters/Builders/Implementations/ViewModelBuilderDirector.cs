@@ -6,9 +6,9 @@ namespace HospitalWeb.Filters.Builders.Implementations
     {
         public void MakeViewModel(IViewModelBuilder builder)
         {
+            builder.BuildEntityModel();
             builder.BuildFilterModel();
             builder.BuildSortModel();
-            builder.BuildEntityModel();
             builder.BuildPageModel();
         }
     }

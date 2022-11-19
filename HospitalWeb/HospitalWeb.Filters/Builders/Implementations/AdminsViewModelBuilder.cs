@@ -5,14 +5,15 @@ using HospitalWeb.Filters.Models;
 using HospitalWeb.Filters.Models.DTO;
 using HospitalWeb.Filters.Models.FilterModels;
 using HospitalWeb.Filters.Models.SortModels;
-using HospitalWeb.Filters.Models.SortStates;
 using HospitalWeb.Filters.Models.ViewModels;
+using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.SortStates;
 
 namespace HospitalWeb.Filters.Builders.Implementations
 {
     public class AdminsViewModelBuilder : ViewModelBuilder<AdminsViewModel>
     {
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
         private readonly AdminSortState _sortOrder;
         private IEnumerable<AdminDTO> _admins;
         private PageModel _pageModel;
@@ -21,89 +22,41 @@ namespace HospitalWeb.Filters.Builders.Implementations
         private int _count = 0;
 
         public AdminsViewModelBuilder(
-            UnitOfWork uow,
+            ApiUnitOfWork api,
             int pageNumber,
             string searchString,
             AdminSortState sortOrder,
             int pageSize = 10
             ) : base(pageNumber, pageSize, searchString)
         {
-            _uow = uow;
+            _api = api;
             _sortOrder = sortOrder;
         }
 
         public override void BuildEntityModel()
         {
-            Func<Admin, bool> filter = (a) =>
+            var response = _api.Admins.Filter(_searchString, _sortOrder, _pageSize, _pageNumber);
+
+            if (response.IsSuccessStatusCode)
             {
-                bool result = true;
+                _admins = _api.Admins.ReadMany(response)
+                    .Select(a => new AdminDTO
+                    {
+                        Id = a.Id,
+                        Email = a.Email,
+                        PhoneNumber = a.PhoneNumber,
+                        Name = a.Name,
+                        Surname = a.Surname,
+                        Image = a.Image,
+                        IsSuperAdmin = a.IsSuperAdmin
+                    });
 
-                if (!string.IsNullOrWhiteSpace(_searchString))
-                {
-                    result = a.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
-                    a.Surname.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
-                    a.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
-                }
-
-                return result;
-            };
-
-            Func<IQueryable<Admin>, IOrderedQueryable<Admin>> orderBy = (admins) =>
+                _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());
+            }
+            else
             {
-                _count = admins.Count();
-
-                switch (_sortModel.Current)
-                {
-                    case AdminSortState.NameAsc:
-                        admins = admins.OrderBy(a => a.Name);
-                        break;
-                    case AdminSortState.NameDesc:
-                        admins = admins.OrderByDescending(a => a.Name);
-                        break;
-                    case AdminSortState.SurnameAsc:
-                        admins = admins.OrderBy(a => a.Surname);
-                        break;
-                    case AdminSortState.SurnameDesc:
-                        admins = admins.OrderByDescending(a => a.Surname);
-                        break;
-                    case AdminSortState.EmailAsc:
-                        admins = admins.OrderBy(a => a.Email);
-                        break;
-                    case AdminSortState.EmailDesc:
-                        admins = admins.OrderByDescending(a => a.Email);
-                        break;
-                    case AdminSortState.PhoneAsc:
-                        admins = admins.OrderBy(a => a.PhoneNumber);
-                        break;
-                    case AdminSortState.PhoneDesc:
-                        admins = admins.OrderByDescending(a => a.PhoneNumber);
-                        break;
-                    case AdminSortState.LevelAsc:
-                        admins = admins.OrderBy(a => a.IsSuperAdmin);
-                        break;
-                    case AdminSortState.LevelDesc:
-                        admins = admins.OrderByDescending(a => a.IsSuperAdmin);
-                        break;
-                    default:
-                        admins = admins.OrderBy(a => a.Id);
-                        break;
-                }
-
-                return (IOrderedQueryable<Admin>)admins;
-            };
-
-            _admins = _uow.Admins
-                .GetAll(filter: filter, orderBy: orderBy, first: _pageSize, offset: (_pageNumber - 1) * _pageSize)
-                .Select(a => new AdminDTO
-                {
-                    Id = a.Id,
-                    Email = a.Email,
-                    PhoneNumber = a.PhoneNumber,
-                    Name = a.Name,
-                    Surname = a.Surname,
-                    Image = a.Image,
-                    IsSuperAdmin = a.IsSuperAdmin
-                });
+                throw new Exception("Failed loading doctors");
+            }
         }
 
         public override void BuildFilterModel()
