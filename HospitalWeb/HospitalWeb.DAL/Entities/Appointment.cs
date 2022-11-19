@@ -23,8 +23,13 @@ namespace HospitalWeb.DAL.Entities
         public DateTime AppointmentDate { get; set; }
         public State State { get; set; }
 
+        public int DiagnosisId { get; set; }
         public Diagnosis Diagnosis { get; set; }
+
+        public string DoctorId { get; set; }
         public Doctor Doctor { get; set; }
+
+        public string PatientId { get; set; }
         public Patient Patient { get; set; }
     }
 }

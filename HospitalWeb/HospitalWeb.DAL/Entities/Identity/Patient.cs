@@ -17,9 +17,12 @@ namespace HospitalWeb.DAL.Entities.Identity
         }
 
         public Sex Sex { get; set; }
+
         public DateTime BirthDate { get; set; }
 
+        public int AddressId { get; set; }
         public Address Address { get; set; }
+
         public ICollection<Appointment> Appointments { get; set; }
     }
 }
