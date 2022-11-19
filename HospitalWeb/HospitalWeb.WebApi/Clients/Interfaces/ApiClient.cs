@@ -18,6 +18,10 @@
 
         public abstract TType Read(HttpResponseMessage response);
 
+        public abstract TType Read(TIdentifier identifier);
+
+        public abstract IEnumerable<TType> ReadMany(HttpResponseMessage response);
+
         public abstract HttpResponseMessage Post(TType obj);
 
         public abstract HttpResponseMessage Put(TType obj);

@@ -8,6 +8,10 @@
 
         public TType Read(HttpResponseMessage response);
 
+        public TType Read(TIdentifier identifier);
+
+        public IEnumerable<TType> ReadMany(HttpResponseMessage response);
+
         public HttpResponseMessage Post(TType obj);
 
         public HttpResponseMessage Put(TType obj);

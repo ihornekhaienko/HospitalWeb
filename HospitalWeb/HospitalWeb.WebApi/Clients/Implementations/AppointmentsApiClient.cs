@@ -21,7 +21,12 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.GetAsync($"Appointments/{identifier}").Result;
         }
 
-        public HttpResponseMessage Get(
+        public HttpResponseMessage Get(string doctor, DateTime date)
+        {
+            return _client.GetAsync($"Appointments/details?doctor={doctor}&date={date}").Result;
+        }
+
+        public HttpResponseMessage Filter(
             string searchString = null,
             string userId = null,
             int? state = null,
@@ -38,6 +43,17 @@ namespace HospitalWeb.WebApi.Clients.Implementations
         public override Appointment Read(HttpResponseMessage response)
         {
             return response.Content.ReadAsAsync<Appointment>().Result;
+        }
+
+        public override Appointment Read(int identifier)
+        {
+            var response = Get(identifier);
+            return Read(response);
+        }
+
+        public override IEnumerable<Appointment> ReadMany(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<IEnumerable<Appointment>>().Result;
         }
 
         public override HttpResponseMessage Post(Appointment obj)
@@ -58,6 +74,44 @@ namespace HospitalWeb.WebApi.Clients.Implementations
         public override HttpResponseMessage Delete(int identifier)
         {
             return _client.DeleteAsync($"Appointments/{identifier}").Result;
+        }
+
+        public bool IsDateFree(string doctor, DateTime date)
+        {
+            var response = Get(doctor, date);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var appointment = Read(response);
+
+                if (appointment.State == State.Planned || appointment.State == State.Active || appointment.State == State.Completed)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void UpdateStates()
+        {
+            var date = DateTime.Today.AddDays(-1);
+
+            var response = Filter(toDate: date);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var appointments = ReadMany(response);
+
+                foreach (var appointment in appointments)
+                {
+                    if (appointment.State == State.Planned)
+                    {
+                        appointment.State = State.Missed;
+                        Put(appointment);
+                    }    
+                }
+            }
         }
     }
 }

@@ -1,10 +1,9 @@
-﻿using HospitalWeb.WebApi.Clients.Implementations;
-
-namespace HospitalWeb.DAL.Services.Implementations
+﻿namespace HospitalWeb.WebApi.Clients.Implementations
 {
     public class ApiUnitOfWork
     {
         private readonly IConfiguration _config;
+        private AppUsersApiClient _appUsersApiClient;
         private AddressesApiClient _addressesApiClient;
         private AdminsApiClient _adminsApiClient;
         private AppointmentsApiClient _appointmentsApiClient;
@@ -18,6 +17,16 @@ namespace HospitalWeb.DAL.Services.Implementations
         public ApiUnitOfWork(IConfiguration config)
         {
             _config = config;
+        }
+
+        public AppUsersApiClient AppUsers
+        {
+            get
+            {
+                if (_appUsersApiClient == null)
+                    _appUsersApiClient = new AppUsersApiClient(_config);
+                return _appUsersApiClient;
+            }
         }
 
         public AddressesApiClient Addresses

@@ -19,9 +19,50 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.GetAsync($"Specialties/{identifier}").Result;
         }
 
+        public HttpResponseMessage Get(string name)
+        {
+            return _client.GetAsync($"Specialties/details?name={name}").Result;
+        }
+
+        public Specialty GetOrCreate(string name)
+        {
+            var response = Get(name);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Read(response);
+            }
+            else
+            {
+                var specialty = new Specialty
+                {
+                    SpecialtyName = name
+                };
+
+                return Read(Post(specialty));
+            }
+        }
+
+        public Specialty Read(string name)
+        {
+            var response = Get(name);
+            return Read(response);
+        }
+
+        public override Specialty Read(int identifier)
+        {
+            var response = Get(identifier);
+            return Read(response);
+        }
+
         public override Specialty Read(HttpResponseMessage response)
         {
             return response.Content.ReadAsAsync<Specialty>().Result;
+        }
+
+        public override IEnumerable<Specialty> ReadMany(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<IEnumerable<Specialty>>().Result;
         }
 
         public override HttpResponseMessage Post(Specialty obj)

@@ -19,9 +19,25 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.GetAsync($"Diagnoses/{identifier}").Result;
         }
 
+        public HttpResponseMessage Get(string name)
+        {
+            return _client.GetAsync($"Diagnoses/details?name={name}").Result;
+        }
+
         public override Diagnosis Read(HttpResponseMessage response)
         {
             return response.Content.ReadAsAsync<Diagnosis>().Result;
+        }
+
+        public override Diagnosis Read(int identifier)
+        {
+            var response = Get(identifier);
+            return Read(response);
+        }
+
+        public override IEnumerable<Diagnosis> ReadMany(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<IEnumerable<Diagnosis>>().Result;
         }
 
         public override HttpResponseMessage Post(Diagnosis obj)

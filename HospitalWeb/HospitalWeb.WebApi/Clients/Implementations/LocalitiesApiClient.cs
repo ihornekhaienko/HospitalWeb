@@ -19,9 +19,44 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.GetAsync($"Localities/{identifier}").Result;
         }
 
+        public HttpResponseMessage Get(string name)
+        {
+            return _client.GetAsync($"Localities/details?name={name}").Result;
+        }
+
+        public Locality GetOrCreate(string name)
+        {
+            var response = Get(name);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Read(response);
+            }
+            else
+            {
+                var locality = new Locality
+                {
+                    LocalityName = name
+                };
+
+                return Read(Post(locality));
+            }
+        }
+
         public override Locality Read(HttpResponseMessage response)
         {
             return response.Content.ReadAsAsync<Locality>().Result;
+        }
+
+        public override Locality Read(int identifier)
+        {
+            var response = Get(identifier);
+            return Read(response);
+        }
+
+        public override IEnumerable<Locality> ReadMany(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<IEnumerable<Locality>>().Result;
         }
 
         public override HttpResponseMessage Post(Locality obj)

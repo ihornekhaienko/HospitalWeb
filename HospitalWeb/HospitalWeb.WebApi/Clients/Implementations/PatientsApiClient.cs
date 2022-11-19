@@ -1,6 +1,8 @@
 ﻿using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.WebApi.Clients.Interfaces;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
+using Microsoft.AspNetCore.Identity;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
@@ -15,7 +17,7 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.GetAsync("Patients").Result;
         }
 
-        public HttpResponseMessage Get(
+        public HttpResponseMessage Filter(
             string searchString,
             int? locality,
             PatientSortState sortOrder = PatientSortState.Id,
@@ -36,7 +38,40 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return response.Content.ReadAsAsync<Patient>().Result;
         }
 
+        public override Patient Read(string identifier)
+        {
+            var response = Get(identifier);
+            return Read(response);
+        }
+
+        public override IEnumerable<Patient> ReadMany(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<IEnumerable<Patient>>().Result;
+        }
+
+        public IEnumerable<IdentityError> ReadErrors(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<IEnumerable<IdentityError>>().Result;
+        }
+
         public override HttpResponseMessage Post(Patient obj)
+        {
+            var model = new PatientResourceModel
+            {
+                Name = obj.Name,
+                Surname = obj.Surname,
+                UserName = obj.Email,
+                Email = obj.Email,
+                PhoneNumber = obj.PhoneNumber,
+                AddressId = obj.AddressId,
+                BirthDate = obj.BirthDate,
+                Sex = obj.Sex
+            };
+
+            return _client.PostAsJsonAsync("Patients", model).Result;
+        }
+
+        public HttpResponseMessage Post(PatientResourceModel obj)
         {
             return _client.PostAsJsonAsync("Patients", obj).Result;
         }

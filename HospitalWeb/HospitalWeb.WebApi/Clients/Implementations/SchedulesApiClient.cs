@@ -19,9 +19,25 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.GetAsync($"Schedules/{identifier}").Result;
         }
 
+        public HttpResponseMessage Get(string doctor, string day)
+        {
+            return _client.GetAsync($"Schedules/details?doctor={doctor}&day={day}").Result;
+        }
+
         public override Schedule Read(HttpResponseMessage response)
         {
             return response.Content.ReadAsAsync<Schedule>().Result;
+        }
+
+        public override Schedule Read(int identifier)
+        {
+            var response = Get(identifier);
+            return Read(response);
+        }
+
+        public override IEnumerable<Schedule> ReadMany(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<IEnumerable<Schedule>>().Result;
         }
 
         public override HttpResponseMessage Post(Schedule obj)

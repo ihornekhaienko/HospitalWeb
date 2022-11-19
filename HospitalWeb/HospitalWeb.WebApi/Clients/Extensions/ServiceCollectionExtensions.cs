@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Services.Implementations;
+﻿using HospitalWeb.WebApi.Clients.Implementations;
 
 namespace HospitalWeb.WebApi.Clients.Extensions
 {
