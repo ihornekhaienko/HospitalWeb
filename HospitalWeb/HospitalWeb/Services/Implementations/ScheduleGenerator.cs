@@ -1,27 +1,26 @@
 ﻿using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Doctors;
+using HospitalWeb.WebApi.Clients.Implementations;
 
 namespace HospitalWeb.Services.Implementations
 {
     public class ScheduleGenerator : IScheduleGenerator
     {
-        private readonly UnitOfWork _uow;
+        private readonly ApiUnitOfWork _api;
         private DateTime _today;
 
-        public ScheduleGenerator(UnitOfWork uow)
+        public ScheduleGenerator(ApiUnitOfWork api)
         {
-            _uow = uow;
+            _api = api;
             _today = DateTime.Now;
         }
 
         public ScheduleViewModel GenerateDaySchedule(Doctor doctor, DateTime date)
         {
-            var schedule = _uow.Schedules
-                .Get(s => s.DayOfWeek == date.DayOfWeek && s.Doctor.Id == doctor.Id);
+            var response = _api.Schedules.Get(doctor.Id, date.DayOfWeek.ToString());
 
-            if (schedule == null || date < _today)
+            if (!response.IsSuccessStatusCode || date < _today)
             {
                 return new ScheduleViewModel
                 {
@@ -29,6 +28,8 @@ namespace HospitalWeb.Services.Implementations
                     Slots = new List<SlotViewModel>()
                 };
             }
+
+            var schedule = _api.Schedules.Read(response);
 
             List<SlotViewModel> slots = new List<SlotViewModel>();
             var startTime = new DateTime(date.Year, date.Month, date.Day, 
@@ -42,12 +43,12 @@ namespace HospitalWeb.Services.Implementations
                 {
                     if (time.Hour - _today.Hour >= 1)
                     {
-                        slots.Add(new SlotViewModel { Time = time, IsFree = _uow.Appointments.IsDateFree(doctor, time) });
+                        slots.Add(new SlotViewModel { Time = time, IsFree = _api.Appointments.IsDateFree(doctor.Id, time) });
                     }
                 }
                 else
                 {
-                    slots.Add(new SlotViewModel { Time = time, IsFree = _uow.Appointments.IsDateFree(doctor, time) });
+                    slots.Add(new SlotViewModel { Time = time, IsFree = _api.Appointments.IsDateFree(doctor.Id, time) });
                 }    
             }
 
