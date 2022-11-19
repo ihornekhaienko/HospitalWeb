@@ -5,6 +5,7 @@ namespace HospitalWeb.DAL.Services.Implementations
     public class UnitOfWork : IDisposable
     {
         private readonly AppDbContext _db;
+        private AppUserRepository _appUserRepository;
         private AddressRepository _addressRepository;
         private AdminRepository _adminRepository;
         private AppointmentRepository _appointmentRepository;
@@ -18,6 +19,16 @@ namespace HospitalWeb.DAL.Services.Implementations
         public UnitOfWork(AppDbContext db)
         {
             _db = db;
+        }
+
+        public AppUserRepository AppUsers
+        {
+            get
+            {
+                if (_appUserRepository == null)
+                    _appUserRepository = new AppUserRepository(_db);
+                return _appUserRepository;
+            }
         }
 
         public AddressRepository Addresses

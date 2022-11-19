@@ -175,28 +175,5 @@ namespace HospitalWeb.DAL.Services.Implementations
             _db.Entry(item).State = EntityState.Modified;
             await _db.SaveChangesAsync();
         }
-
-        public bool IsDateFree(Doctor doctor, DateTime date)
-        {
-            return !_db.Appointments
-                .Any(a => DateTime.Compare(a.AppointmentDate, date) == 0 &&
-                     a.Doctor == doctor &&
-                     (a.State == State.Active || a.State == State.Planned || a.State == State.Completed)
-                );
-        }
-
-        public void UpdateStates()
-        {
-            var date = DateTime.Today;
-            var missed = _db.Appointments.Where(a => a.AppointmentDate < date && a.State == State.Planned);
-
-            foreach (var a in missed)
-            {
-                a.State = State.Missed;
-            }
-
-            _db.Appointments.UpdateRange(missed);
-            _db.SaveChanges();
-        }
     }
 }
