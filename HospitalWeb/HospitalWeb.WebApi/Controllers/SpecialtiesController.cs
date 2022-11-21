@@ -1,5 +1,7 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
@@ -75,16 +77,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="specialty">Specialty to create</param>
         /// <returns>The Specialty object</returns>
         [HttpPost]
-        public async Task<ActionResult<Specialty>> Post(Specialty specialty)
+        public async Task<ActionResult<Specialty>> Post(SpecialtyResourceModel specialty)
         {
             if (specialty == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Specialties.CreateAsync(specialty);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<SpecialtyResourceModel, Specialty>());
+            var mapper = new Mapper(config);
 
-            return Ok(specialty);
+            var entity = mapper.Map<SpecialtyResourceModel, Specialty>(specialty);
+
+            await _uow.Specialties.CreateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -93,16 +100,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="specialty">The Specialty to update</param>
         /// <returns>The Specialty object</returns>
         [HttpPut]
-        public async Task<ActionResult<Specialty>> Put(Specialty specialty)
+        public async Task<ActionResult<Specialty>> Put(SpecialtyResourceModel specialty)
         {
             if (specialty == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Specialties.UpdateAsync(specialty);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<SpecialtyResourceModel, Specialty>());
+            var mapper = new Mapper(config);
 
-            return Ok(specialty);
+            var entity = mapper.Map<SpecialtyResourceModel, Specialty>(specialty);
+
+            await _uow.Specialties.UpdateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -115,24 +127,6 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var specialty = await _uow.Specialties.GetAsync(s => s.SpecialtyId == id);
 
-            if (specialty == null)
-            {
-                return NotFound();
-            }
-
-            await _uow.Specialties.DeleteAsync(specialty);
-
-            return Ok(specialty);
-        }
-
-        /// <summary>
-        /// Deletes the Specialty 
-        /// </summary>
-        /// <param name="specialty">The Specialty object</param>
-        /// <returns>The Specialty object</returns>
-        [HttpDelete("{Specialty}")]
-        public async Task<ActionResult<Specialty>> Delete(Specialty specialty)
-        {
             if (specialty == null)
             {
                 return NotFound();

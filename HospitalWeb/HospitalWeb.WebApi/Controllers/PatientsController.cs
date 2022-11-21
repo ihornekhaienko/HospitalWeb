@@ -1,4 +1,5 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
@@ -166,17 +167,10 @@ namespace HospitalWeb.WebApi.Controllers
                     return BadRequest();
                 }
 
-                var entity = new Patient
-                {
-                    Name = patient.Name,
-                    Surname = patient.Surname,
-                    Email = patient.Email,
-                    UserName = patient.Email,
-                    PhoneNumber = patient.PhoneNumber,
-                    AddressId = patient.AddressId,
-                    Sex = patient.Sex,
-                    BirthDate = patient.BirthDate
-                };
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<PatientResourceModel, Patient>());
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<PatientResourceModel, Patient>(patient);
 
                 IdentityResult result;
 
@@ -213,18 +207,23 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="patient">The Patient to update</param>
         /// <returns>The Patient object</returns>
         [HttpPut]
-        public async Task<ActionResult<Patient>> Put(Patient patient)
+        public async Task<ActionResult<Patient>> Put(PatientResourceModel patient)
         {
             if (patient == null)
             {
                 return BadRequest();
             }
 
-            var result = await _userManager.UpdateAsync(patient);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<PatientResourceModel, Patient>());
+            var mapper = new Mapper(config);
+
+            var entity = mapper.Map<PatientResourceModel, Patient>(patient);
+
+            var result = await _userManager.UpdateAsync(entity);
 
             if (result.Succeeded)
             {
-                return Ok(patient);
+                return Ok(entity);
             }
             else
             {
@@ -242,24 +241,6 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var patient = await _uow.Patients.GetAsync(p => p.Id == searchString || p.Email == searchString);
 
-            if (patient == null)
-            {
-                return NotFound();
-            }
-
-            await _userManager.DeleteAsync(patient);
-
-            return Ok(patient);
-        }
-
-        /// <summary>
-        /// Deletes the Patient 
-        /// </summary>
-        /// <param name="patient">The Patient object</param>
-        /// <returns>The Patient object</returns>
-        [HttpDelete("{Patient}")]
-        public async Task<ActionResult<Patient>> Delete(Patient patient)
-        {
             if (patient == null)
             {
                 return NotFound();

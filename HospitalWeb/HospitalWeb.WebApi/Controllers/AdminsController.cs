@@ -1,4 +1,5 @@
-﻿using HospitalWeb.DAL.Data;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
@@ -150,16 +151,10 @@ namespace HospitalWeb.WebApi.Controllers
                 return BadRequest();
             }
 
-            var entity = new Admin
-            {
-                Name = admin.Name,
-                Surname = admin.Surname,
-                Email = admin.Email,
-                UserName = admin.Email,
-                PhoneNumber = admin.PhoneNumber,
-                IsSuperAdmin = admin.IsSuperAdmin,
-                EmailConfirmed = admin.EmailConfirmed
-            };
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AdminResourceModel, Admin>());
+            var mapper = new Mapper(config);
+
+            var entity = mapper.Map<AdminResourceModel, Admin>(admin);
 
             IdentityResult result;
 
@@ -190,18 +185,23 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="admin">The Admin to update</param>
         /// <returns>The Admin object</returns>
         [HttpPut]
-        public async Task<ActionResult<Admin>> Put(Admin admin)
+        public async Task<ActionResult<Admin>> Put(AdminResourceModel admin)
         {
             if (admin == null)
             {
                 return BadRequest();
             }
 
-            var result = await _userManager.UpdateAsync(admin);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AdminResourceModel, Admin>());
+            var mapper = new Mapper(config);
+
+            var entity = mapper.Map<AdminResourceModel, Admin>(admin);
+
+            var result = await _userManager.UpdateAsync(entity);
 
             if (result.Succeeded)
             {
-                return Ok(admin);
+                return Ok(entity);
             }
             else
             {
@@ -219,24 +219,6 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var admin = await _uow.Admins.GetAsync(a => a.Id == searchString || a.Email == searchString);
 
-            if (admin == null)
-            {
-                return NotFound();
-            }
-
-            await _userManager.DeleteAsync(admin);
-
-            return Ok(admin);
-        }
-
-        /// <summary>
-        /// Deletes the Admin 
-        /// </summary>
-        /// <param name="admin">The Admin object</param>
-        /// <returns>The Admin object</returns>
-        [HttpDelete("{Admin}")]
-        public async Task<ActionResult<Admin>> Delete(Admin admin)
-        {
             if (admin == null)
             {
                 return NotFound();

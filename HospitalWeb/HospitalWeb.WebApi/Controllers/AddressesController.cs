@@ -1,5 +1,7 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
@@ -76,16 +78,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="address"> The Address object  </param>
         /// <returns> The Address object </returns>
         [HttpPost]
-        public async Task<ActionResult<Address>> Post(Address address)
+        public async Task<ActionResult<Address>> Post(AddressResourceModel address)
         {
             if (address == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Addresses.CreateAsync(address);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AddressResourceModel, Address>());
+            var mapper = new Mapper(config);
 
-            return Ok(address);
+            var entity = mapper.Map<AddressResourceModel, Address>(address);
+
+            await _uow.Addresses.CreateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -94,16 +101,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="address"> The Address object  </param>
         /// <returns> The Address object </returns>
         [HttpPut]
-        public async Task<ActionResult<Address>> Put(Address address)
+        public async Task<ActionResult<Address>> Put(AddressResourceModel address)
         {
             if (address == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Addresses.UpdateAsync(address);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AddressResourceModel, Address>());
+            var mapper = new Mapper(config);
 
-            return Ok(address);
+            var entity = mapper.Map<AddressResourceModel, Address>(address);
+
+            await _uow.Addresses.UpdateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -116,24 +128,6 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var address = await _uow.Addresses.GetAsync(a => a.AddressId == id);
 
-            if (address == null)
-            {
-                return NotFound();
-            }
-
-            await _uow.Addresses.DeleteAsync(address);
-
-            return Ok(address);
-        }
-
-        /// <summary>
-        /// Deletes the Address object
-        /// </summary>
-        /// <param name="address"> The Address object  </param>
-        /// <returns> The Address object </returns>
-        [HttpDelete("{Address}")]
-        public async Task<ActionResult<Address>> Delete(Address address)
-        {
             if (address == null)
             {
                 return NotFound();

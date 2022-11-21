@@ -1,5 +1,7 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
@@ -75,16 +77,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="locality">Locality to create</param>
         /// <returns>The Locality object</returns>
         [HttpPost]
-        public async Task<ActionResult<Locality>> Post(Locality locality)
+        public async Task<ActionResult<Locality>> Post(LocalityResourceModel locality)
         {
             if (locality == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Localities.CreateAsync(locality);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<LocalityResourceModel, Locality>());
+            var mapper = new Mapper(config);
 
-            return Ok(locality);
+            var entity = mapper.Map<LocalityResourceModel, Locality>(locality);
+
+            await _uow.Localities.CreateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -93,16 +100,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="locality">The Locality to update</param>
         /// <returns>The Locality object</returns>
         [HttpPut]
-        public async Task<ActionResult<Locality>> Put(Locality locality)
+        public async Task<ActionResult<Locality>> Put(LocalityResourceModel locality)
         {
             if (locality == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Localities.UpdateAsync(locality);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<LocalityResourceModel, Locality>());
+            var mapper = new Mapper(config);
 
-            return Ok(locality);
+            var entity = mapper.Map<LocalityResourceModel, Locality>(locality);
+
+            await _uow.Localities.UpdateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -115,24 +127,6 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id);
 
-            if (locality == null)
-            {
-                return NotFound();
-            }
-
-            await _uow.Localities.DeleteAsync(locality);
-
-            return Ok(locality);
-        }
-
-        /// <summary>
-        /// Deletes the Locality 
-        /// </summary>
-        /// <param name="locality">The Locality object</param>
-        /// <returns>The Locality object</returns>
-        [HttpDelete("{Locality}")]
-        public async Task<ActionResult<Locality>> Delete(Locality locality)
-        {
             if (locality == null)
             {
                 return NotFound();

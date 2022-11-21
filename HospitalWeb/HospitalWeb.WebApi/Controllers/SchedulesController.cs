@@ -1,5 +1,7 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
@@ -76,16 +78,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="schedule">Schedule to create</param>
         /// <returns>The Schedule object</returns>
         [HttpPost]
-        public async Task<ActionResult<Schedule>> Post(Schedule schedule)
+        public async Task<ActionResult<Schedule>> Post(ScheduleResourceModel schedule)
         {
             if (schedule == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Schedules.CreateAsync(schedule);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<ScheduleResourceModel, Schedule>());
+            var mapper = new Mapper(config);
 
-            return Ok(schedule);
+            var entity = mapper.Map<ScheduleResourceModel, Schedule>(schedule);
+
+            await _uow.Schedules.CreateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -94,16 +101,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="schedule">The Schedule to update</param>
         /// <returns>The Schedule object</returns>
         [HttpPut]
-        public async Task<ActionResult<Schedule>> Put(Schedule schedule)
+        public async Task<ActionResult<Schedule>> Put(ScheduleResourceModel schedule)
         {
             if (schedule == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Schedules.UpdateAsync(schedule);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<ScheduleResourceModel, Schedule>());
+            var mapper = new Mapper(config);
 
-            return Ok(schedule);
+            var entity = mapper.Map<ScheduleResourceModel, Schedule>(schedule);
+
+            await _uow.Schedules.UpdateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -116,24 +128,6 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id);
 
-            if (schedule == null)
-            {
-                return NotFound();
-            }
-
-            await _uow.Schedules.DeleteAsync(schedule);
-
-            return Ok(schedule);
-        }
-
-        /// <summary>
-        /// Deletes the Schedule 
-        /// </summary>
-        /// <param name="schedule">The Schedule object</param>
-        /// <returns>The Schedule object</returns>
-        [HttpDelete("{Schedule}")]
-        public async Task<ActionResult<Schedule>> Delete(Schedule schedule)
-        {
             if (schedule == null)
             {
                 return NotFound();

@@ -1,5 +1,7 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers
@@ -75,14 +77,19 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="diagnosis">Diagnosis to create</param>
         /// <returns>The Diagnosis object</returns>
         [HttpPost]
-        public async Task<ActionResult<Diagnosis>> Post(Diagnosis diagnosis)
+        public async Task<ActionResult<Diagnosis>> Post(DiagnosisResourceModel diagnosis)
         {
             if (diagnosis == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Diagnoses.CreateAsync(diagnosis);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<DiagnosisResourceModel, Diagnosis>());
+            var mapper = new Mapper(config);
+
+            var entity = mapper.Map<DiagnosisResourceModel, Diagnosis>(diagnosis);
+
+            await _uow.Diagnoses.CreateAsync(entity);
 
             return Ok(diagnosis);
         }
@@ -93,16 +100,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="diagnosis">The Diagnosis to update</param>
         /// <returns>The Diagnosis object</returns>
         [HttpPut]
-        public async Task<ActionResult<Diagnosis>> Put(Diagnosis diagnosis)
+        public async Task<ActionResult<Diagnosis>> Put(DiagnosisResourceModel diagnosis)
         {
             if (diagnosis == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Diagnoses.UpdateAsync(diagnosis);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<DiagnosisResourceModel, Diagnosis>());
+            var mapper = new Mapper(config);
 
-            return Ok(diagnosis);
+            var entity = mapper.Map<DiagnosisResourceModel, Diagnosis>(diagnosis);
+
+            await _uow.Diagnoses.UpdateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -115,24 +127,6 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisId == id);
 
-            if (diagnosis == null)
-            {
-                return NotFound();
-            }
-
-            await _uow.Diagnoses.DeleteAsync(diagnosis);
-
-            return Ok(diagnosis);
-        }
-
-        /// <summary>
-        /// Deletes the Diagnosis 
-        /// </summary>
-        /// <param name="diagnosis">The Diagnosis object</param>
-        /// <returns>The Diagnosis object</returns>
-        [HttpDelete("{Diagnosis}")]
-        public async Task<ActionResult<Diagnosis>> Delete(Diagnosis diagnosis)
-        {
             if (diagnosis == null)
             {
                 return NotFound();

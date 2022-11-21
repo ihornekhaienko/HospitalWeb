@@ -1,5 +1,7 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -180,16 +182,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="appointment">Appointment to create</param>
         /// <returns>Appointment object</returns>
         [HttpPost]
-        public async Task<ActionResult<Appointment>> Post(Appointment appointment)
+        public async Task<ActionResult<Appointment>> Post(AppointmentResourceModel appointment)
         {
             if (appointment == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Appointments.CreateAsync(appointment);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppointmentResourceModel, Appointment>());
+            var mapper = new Mapper(config);
 
-            return Ok(appointment);
+            var entity = mapper.Map<AppointmentResourceModel, Appointment>(appointment);
+
+            await _uow.Appointments.CreateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -198,16 +205,21 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="appointment">Appointment to update</param>
         /// <returns>Appointment object</returns>
         [HttpPut]
-        public async Task<ActionResult<Appointment>> Put(Appointment appointment)
+        public async Task<ActionResult<Appointment>> Put(AppointmentResourceModel appointment)
         {
             if (appointment == null)
             {
                 return BadRequest();
             }
 
-            await _uow.Appointments.UpdateAsync(appointment);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppointmentResourceModel, Appointment>());
+            var mapper = new Mapper(config);
 
-            return Ok(appointment);
+            var entity = mapper.Map<AppointmentResourceModel, Appointment>(appointment);
+
+            await _uow.Appointments.UpdateAsync(entity);
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -220,24 +232,6 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
 
-            if (appointment == null)
-            {
-                return NotFound();
-            }
-
-            await _uow.Appointments.DeleteAsync(appointment);
-
-            return Ok(appointment);
-        }
-
-        /// <summary>
-        /// Deletes Appointment
-        /// </summary>
-        /// <param name="appointment">Appointment to delete</param>
-        /// <returns>Appointment object</returns>
-        [HttpDelete("{Appointment}")]
-        public async Task<ActionResult<Appointment>> Delete(Appointment appointment)
-        {
             if (appointment == null)
             {
                 return NotFound();

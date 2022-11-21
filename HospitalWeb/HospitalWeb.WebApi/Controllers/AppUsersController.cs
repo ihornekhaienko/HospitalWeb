@@ -1,4 +1,5 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Identity;
@@ -69,15 +70,10 @@ namespace HospitalWeb.WebApi.Controllers
                 return BadRequest();
             }
 
-            var entity = new AppUser
-            {
-                Name = user.Name,
-                Surname = user.Surname,
-                Email = user.Email,
-                UserName = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                EmailConfirmed = user.EmailConfirmed
-            };
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUserResourceModel, AppUser>());
+            var mapper = new Mapper(config);
+
+            var entity = mapper.Map<AppUserResourceModel, AppUser>(user);
 
             IdentityResult result;
 
@@ -113,17 +109,10 @@ namespace HospitalWeb.WebApi.Controllers
                 return BadRequest();
             }
 
-            var entity = await _uow.AppUsers.GetAsync(a => a.Email == user.Email);
-            entity.UserName = user.UserName;
-            entity.PhoneNumber = user.PhoneNumber;
-            entity.Name = user.Name;
-            entity.Surname = user.Surname;
-            entity.Image = user.Image;
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUserResourceModel, AppUser>());
+            var mapper = new Mapper(config);
 
-            if (entity == null)
-            {
-                return BadRequest();
-            }
+            var entity = mapper.Map<AppUserResourceModel, AppUser>(user);
 
             IdentityResult result;
 
@@ -133,7 +122,7 @@ namespace HospitalWeb.WebApi.Controllers
 
                 if (result.Succeeded)
                 {
-                    return Ok(user);
+                    return Ok(entity);
                 }
                 else
                 {
@@ -145,7 +134,7 @@ namespace HospitalWeb.WebApi.Controllers
 
             if (result.Succeeded)
             {
-                return Ok(user);
+                return Ok(entity);
             }
             else
             {
@@ -163,24 +152,6 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var user = await _uow.AppUsers.GetAsync(a => a.Id == searchString || a.Email == searchString);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            await _userManager.DeleteAsync(user);
-
-            return Ok(user);
-        }
-
-        /// <summary>
-        /// Deletes the User
-        /// </summary>
-        /// <param name="user">The User to delete</param>
-        /// <returns>The User object</returns>
-        [HttpDelete("{AppUser}")]
-        public async Task<ActionResult<AppUser>> Delete(AppUser user)
-        {
             if (user == null)
             {
                 return NotFound();
