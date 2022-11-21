@@ -1,6 +1,6 @@
 ﻿namespace HospitalWeb.WebApi.Clients.Interfaces
 {
-    public abstract class ApiClient<TType, TIdentifier> : IApiClient<TType, TIdentifier>
+    public abstract class ApiClient<TEntity, TResource, TIdentifier> : IApiClient<TEntity, TResource, TIdentifier>
     {
         protected readonly HttpClient _client;
         protected readonly IConfiguration _config;
@@ -16,17 +16,15 @@
 
         public abstract HttpResponseMessage Get(TIdentifier identifier);
 
-        public abstract TType Read(HttpResponseMessage response);
+        public abstract TEntity Read(HttpResponseMessage response);
 
-        public abstract TType Read(TIdentifier identifier);
+        public abstract TEntity Read(TIdentifier identifier);
 
-        public abstract IEnumerable<TType> ReadMany(HttpResponseMessage response);
+        public abstract IEnumerable<TEntity> ReadMany(HttpResponseMessage response);
 
-        public abstract HttpResponseMessage Post(TType obj);
+        public abstract HttpResponseMessage Post(TResource obj);
 
-        public abstract HttpResponseMessage Put(TType obj);
-
-        public abstract HttpResponseMessage Delete(TType obj);
+        public abstract HttpResponseMessage Put(TResource obj);
 
         public abstract HttpResponseMessage Delete(TIdentifier identifier);
     }
