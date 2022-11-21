@@ -136,10 +136,14 @@ namespace HospitalWeb.Controllers
                 }
                 else
                 {
+                    ViewBag.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
                     ModelState.AddModelError(string.Empty, "Wrong email or password");
+
                     return View(model);
                 }
             }
+
+            ViewBag.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             return View(model);
         }
