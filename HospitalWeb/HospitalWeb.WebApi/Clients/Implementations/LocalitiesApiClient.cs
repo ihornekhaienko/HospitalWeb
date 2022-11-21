@@ -1,9 +1,10 @@
 ﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Clients.Interfaces;
+using HospitalWeb.WebApi.Models.ResourceModels;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class LocalitiesApiClient : ApiClient<Locality, int>
+    public class LocalitiesApiClient : ApiClient<Locality, LocalityResourceModel, int>
     {
         public LocalitiesApiClient(IConfiguration config) : base(config)
         {
@@ -34,7 +35,7 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             }
             else
             {
-                var locality = new Locality
+                var locality = new LocalityResourceModel
                 {
                     LocalityName = name
                 };
@@ -59,19 +60,14 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return response.Content.ReadAsAsync<IEnumerable<Locality>>().Result;
         }
 
-        public override HttpResponseMessage Post(Locality obj)
+        public override HttpResponseMessage Post(LocalityResourceModel obj)
         {
             return _client.PostAsJsonAsync("Localities", obj).Result;
         }
 
-        public override HttpResponseMessage Put(Locality obj)
+        public override HttpResponseMessage Put(LocalityResourceModel obj)
         {
             return _client.PutAsJsonAsync("Localities", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(Locality obj)
-        {
-            return _client.DeleteAsync($"Localities/{obj}").Result;
         }
 
         public override HttpResponseMessage Delete(int identifier)

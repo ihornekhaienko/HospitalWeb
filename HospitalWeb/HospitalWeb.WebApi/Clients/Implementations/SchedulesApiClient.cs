@@ -1,9 +1,10 @@
 ﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Clients.Interfaces;
+using HospitalWeb.WebApi.Models.ResourceModels;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class SchedulesApiClient : ApiClient<Schedule, int>
+    public class SchedulesApiClient : ApiClient<Schedule, ScheduleResourceModel, int>
     {
         public SchedulesApiClient(IConfiguration config) : base(config)
         {
@@ -40,19 +41,14 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return response.Content.ReadAsAsync<IEnumerable<Schedule>>().Result;
         }
 
-        public override HttpResponseMessage Post(Schedule obj)
+        public override HttpResponseMessage Post(ScheduleResourceModel obj)
         {
             return _client.PostAsJsonAsync("Schedules", obj).Result;
         }
 
-        public override HttpResponseMessage Put(Schedule obj)
+        public override HttpResponseMessage Put(ScheduleResourceModel obj)
         {
             return _client.PutAsJsonAsync("Schedules", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(Schedule obj)
-        {
-            return _client.DeleteAsync($"Schedules/{obj}").Result;
         }
 
         public override HttpResponseMessage Delete(int identifier)

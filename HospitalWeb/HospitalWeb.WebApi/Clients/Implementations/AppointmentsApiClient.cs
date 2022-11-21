@@ -1,11 +1,12 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Clients.Interfaces;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
-using System.Text;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class AppointmentsApiClient : ApiClient<Appointment, int>
+    public class AppointmentsApiClient : ApiClient<Appointment, AppointmentResourceModel, int>
     {
         public AppointmentsApiClient(IConfiguration config) : base(config)
         {
@@ -56,19 +57,14 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return response.Content.ReadAsAsync<IEnumerable<Appointment>>().Result;
         }
 
-        public override HttpResponseMessage Post(Appointment obj)
+        public override HttpResponseMessage Post(AppointmentResourceModel obj)
         {
             return _client.PostAsJsonAsync("Appointments", obj).Result;
         }
 
-        public override HttpResponseMessage Put(Appointment obj)
+        public override HttpResponseMessage Put(AppointmentResourceModel obj)
         {
             return _client.PutAsJsonAsync("Appointments", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(Appointment obj)
-        {
-            return _client.DeleteAsync($"Appointments/{obj}").Result;
         }
 
         public override HttpResponseMessage Delete(int identifier)
@@ -108,7 +104,13 @@ namespace HospitalWeb.WebApi.Clients.Implementations
                     if (appointment.State == State.Planned)
                     {
                         appointment.State = State.Missed;
-                        Put(appointment);
+
+                        var config = new MapperConfiguration(cfg => cfg.CreateMap<Appointment, AppointmentResourceModel>());
+                        var mapper = new Mapper(config);
+
+                        var model = mapper.Map<Appointment, AppointmentResourceModel>(appointment);
+
+                        Put(model);
                     }    
                 }
             }

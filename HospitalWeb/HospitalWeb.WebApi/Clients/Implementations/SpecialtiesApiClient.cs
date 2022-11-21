@@ -1,9 +1,10 @@
 ﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Clients.Interfaces;
+using HospitalWeb.WebApi.Models.ResourceModels;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class SpecialtiesApiClient : ApiClient<Specialty, int>
+    public class SpecialtiesApiClient : ApiClient<Specialty, SpecialtyResourceModel, int>
     {
         public SpecialtiesApiClient(IConfiguration config) : base(config)
         {
@@ -34,7 +35,7 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             }
             else
             {
-                var specialty = new Specialty
+                var specialty = new SpecialtyResourceModel
                 {
                     SpecialtyName = name
                 };
@@ -65,19 +66,14 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return response.Content.ReadAsAsync<IEnumerable<Specialty>>().Result;
         }
 
-        public override HttpResponseMessage Post(Specialty obj)
+        public override HttpResponseMessage Post(SpecialtyResourceModel obj)
         {
             return _client.PostAsJsonAsync("Specialties", obj).Result;
         }
 
-        public override HttpResponseMessage Put(Specialty obj)
+        public override HttpResponseMessage Put(SpecialtyResourceModel obj)
         {
             return _client.PutAsJsonAsync("Specialties", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(Specialty obj)
-        {
-            return _client.DeleteAsync($"Specialties/{obj}").Result;
         }
 
         public override HttpResponseMessage Delete(int identifier)

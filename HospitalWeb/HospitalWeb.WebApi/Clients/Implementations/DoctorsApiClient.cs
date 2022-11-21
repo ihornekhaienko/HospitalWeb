@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class DoctorsApiClient : ApiClient<Doctor, string>
+    public class DoctorsApiClient : ApiClient<Doctor, DoctorResourceModel, string>
     {
         public DoctorsApiClient(IConfiguration config) : base(config)
         {
@@ -54,35 +54,14 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return response.Content.ReadAsAsync<IEnumerable<IdentityError>>().Result;
         }
 
-        public override HttpResponseMessage Post(Doctor obj)
-        {
-            var model = new DoctorResourceModel
-            {
-                Name = obj.Name,
-                Surname = obj.Surname,
-                Email = obj.Email,
-                UserName = obj.Email,
-                PhoneNumber = obj.PhoneNumber,
-                SpecialtyId = obj.SpecialtyId,
-                EmailConfirmed = obj.EmailConfirmed
-            };
-
-            return _client.PostAsJsonAsync("Doctors", model).Result;
-        }
-
-        public HttpResponseMessage Post(DoctorResourceModel obj)
+        public override HttpResponseMessage Post(DoctorResourceModel obj)
         {
             return _client.PostAsJsonAsync("Doctors", obj).Result;
         }
 
-        public override HttpResponseMessage Put(Doctor obj)
+        public override HttpResponseMessage Put(DoctorResourceModel obj)
         {
             return _client.PutAsJsonAsync("Doctors", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(Doctor obj)
-        {
-            return _client.DeleteAsync($"Doctors/{obj}").Result;
         }
 
         public override HttpResponseMessage Delete(string identifier)

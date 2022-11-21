@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class AppUsersApiClient : ApiClient<AppUser, string>
+    public class AppUsersApiClient : ApiClient<AppUser, AppUserResourceModel, string>
     {
         public AppUsersApiClient(IConfiguration config) : base(config)
         {
@@ -42,47 +42,14 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return response.Content.ReadAsAsync<IEnumerable<IdentityError>>().Result;
         }
 
-        public override HttpResponseMessage Post(AppUser obj)
-        {
-            var model = new AppUserResourceModel
-            {
-                Name = obj.Name,
-                Surname = obj.Surname,
-                Email = obj.Email,
-                UserName = obj.Email,
-                PhoneNumber = obj.PhoneNumber
-            };
-
-            return _client.PostAsJsonAsync("AppUsers", model).Result;
-        }
-
-        public HttpResponseMessage Post(AppUserResourceModel obj)
+        public override HttpResponseMessage Post(AppUserResourceModel obj)
         {
             return _client.PostAsJsonAsync("AppUsers", obj).Result;
         }
 
-        public override HttpResponseMessage Put(AppUser obj)
-        {
-            var model = new AppUserResourceModel
-            {
-                Name = obj.Name,
-                Surname = obj.Surname,
-                Email = obj.Email,
-                UserName = obj.Email,
-                PhoneNumber = obj.PhoneNumber,
-                Image = obj.Image
-            };
-            return _client.PutAsJsonAsync("AppUsers", model).Result;
-        }
-
-        public HttpResponseMessage Put(AppUserResourceModel obj)
+        public override HttpResponseMessage Put(AppUserResourceModel obj)
         {
             return _client.PutAsJsonAsync("AppUsers", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(AppUser obj)
-        {
-            return _client.DeleteAsync($"AppUsers/{obj}").Result;
         }
 
         public override HttpResponseMessage Delete(string identifier)

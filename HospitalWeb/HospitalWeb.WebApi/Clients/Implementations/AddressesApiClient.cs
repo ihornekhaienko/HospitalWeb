@@ -1,9 +1,10 @@
 ﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Clients.Interfaces;
+using HospitalWeb.WebApi.Models.ResourceModels;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class AddressesApiClient : ApiClient<Address, int>
+    public class AddressesApiClient : ApiClient<Address, AddressResourceModel, int>
     {
         public AddressesApiClient(IConfiguration config) : base(config)
         {
@@ -34,7 +35,7 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             }
             else
             {
-                var obj = new Address
+                var obj = new AddressResourceModel
                 {
                     FullAddress = address,
                     LocalityId = locality.LocalityId
@@ -60,19 +61,14 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return response.Content.ReadAsAsync<IEnumerable<Address>>().Result;
         }
 
-        public override HttpResponseMessage Post(Address obj)
+        public override HttpResponseMessage Post(AddressResourceModel obj)
         {
             return _client.PostAsJsonAsync("Addresses", obj).Result;
         }
 
-        public override HttpResponseMessage Put(Address obj)
+        public override HttpResponseMessage Put(AddressResourceModel obj)
         {
             return _client.PutAsJsonAsync("Addresses", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(Address obj)
-        {
-            return _client.DeleteAsync($"Addresses/{obj}").Result;
         }
 
         public override HttpResponseMessage Delete(int identifier)
