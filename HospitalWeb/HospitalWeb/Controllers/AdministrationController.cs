@@ -519,7 +519,7 @@ namespace HospitalWeb.Controllers
                 DayOfWeek dayOfWeek;
                 Enum.TryParse(model.DayOfWeek, out dayOfWeek);
 
-                var schedule = new ScheduleResourceModel
+                var schedule = new Schedule
                 {
                     DoctorId = doctor.Id,
                     DayOfWeek = dayOfWeek,

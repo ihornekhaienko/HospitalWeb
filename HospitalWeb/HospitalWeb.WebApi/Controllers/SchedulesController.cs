@@ -62,7 +62,15 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Schedule>> Get(string doctor, string day)
         {
-            var schedule = await _uow.Schedules.GetAsync(s => s.Doctor.Id == doctor && s.DayOfWeek.ToString() == day);
+            DayOfWeek dayOfWeek;
+            var result = Enum.TryParse(day, out dayOfWeek);
+
+            if (!result)
+            {
+                return BadRequest();
+            }
+
+            var schedule = await _uow.Schedules.GetAsync(s => s.Doctor.Id == doctor && s.DayOfWeek == dayOfWeek);
 
             if (schedule == null)
             {
