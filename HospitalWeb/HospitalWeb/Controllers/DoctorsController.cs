@@ -117,7 +117,7 @@ namespace HospitalWeb.Controllers
                 {
                     AppointmentDate = date,
                     State = State.Planned,
-                    Doctor = doctor,
+                    DoctorId = doctor.Id,
                     Patient = patient
                 };
 

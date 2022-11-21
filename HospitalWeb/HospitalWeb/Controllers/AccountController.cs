@@ -221,14 +221,14 @@ namespace HospitalWeb.Controllers
                     Sex sex;
                     Enum.TryParse(model.Sex, out sex);
 
-                    var patient = new Patient
+                    var patient = new PatientResourceModel
                     {
                         Name = model.Name,
                         Surname = model.Surname,
                         UserName = model.Email,
                         Email = model.Email,
                         PhoneNumber = model.Phone,
-                        Address = address,
+                        AddressId = address.AddressId,
                         BirthDate = model.BirthDate,
                         Sex = sex
                     };
@@ -237,11 +237,12 @@ namespace HospitalWeb.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var result = await _userManager.AddLoginAsync(patient, info);
+                        var entity = _api.Patients.Read(response);
+                        var result = await _userManager.AddLoginAsync(entity, info);
 
                         if (result.Succeeded)
                         {
-                            await _signInManager.SignInAsync(patient, false);
+                            await _signInManager.SignInAsync(entity, false);
 
                             return RedirectToLocal(returnUrl);
                         }

@@ -146,7 +146,7 @@ namespace HospitalWeb.Controllers
                     }
 
                     var admin = _api.Admins.Read(response);
-
+                    
                     admin.UserName = model.Email;
                     admin.Email = model.Email;
                     admin.Name = model.Name;
@@ -403,7 +403,7 @@ namespace HospitalWeb.Controllers
 
                 var doctor = _api.Doctors.Read(response);
 
-                response = _api.Doctors.Delete(doctor);
+                response = _api.Doctors.Delete(doctor.Id);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -450,7 +450,7 @@ namespace HospitalWeb.Controllers
                 }
                 var patient = _api.Patients.Read(response);
 
-                response = _api.Patients.Delete(patient);
+                response = _api.Patients.Delete(patient.Id);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -519,9 +519,9 @@ namespace HospitalWeb.Controllers
                 DayOfWeek dayOfWeek;
                 Enum.TryParse(model.DayOfWeek, out dayOfWeek);
 
-                var schedule = new Schedule
+                var schedule = new ScheduleResourceModel
                 {
-                    Doctor = doctor,
+                    DoctorId = doctor.Id,
                     DayOfWeek = dayOfWeek,
                     StartTime = model.StartTime,
                     EndTime = model.EndTime
@@ -607,7 +607,7 @@ namespace HospitalWeb.Controllers
 
             var schedule = _api.Schedules.Read(response);
 
-            _api.Schedules.Delete(schedule);
+            _api.Schedules.Delete(schedule.ScheduleId);
 
             return RedirectToAction("Doctors", "Administration");
         }
