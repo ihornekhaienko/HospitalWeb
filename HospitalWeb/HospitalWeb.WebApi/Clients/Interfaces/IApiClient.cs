@@ -14,7 +14,11 @@
 
         public HttpResponseMessage Post(TResource obj);
 
+        public HttpResponseMessage Post(TEntity obj);
+
         public HttpResponseMessage Put(TResource obj);
+
+        public HttpResponseMessage Put(TEntity obj);
 
         public HttpResponseMessage Delete(TIdentifier identifier);
     }

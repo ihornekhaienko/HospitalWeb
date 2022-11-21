@@ -1,4 +1,5 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Clients.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 
@@ -65,9 +66,29 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.PostAsJsonAsync("Localities", obj).Result;
         }
 
+        public override HttpResponseMessage Post(Locality obj)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Locality, LocalityResourceModel>());
+            var mapper = new Mapper(config);
+
+            var model = mapper.Map<Locality, LocalityResourceModel>(obj);
+
+            return Post(model);
+        }
+
         public override HttpResponseMessage Put(LocalityResourceModel obj)
         {
             return _client.PutAsJsonAsync("Localities", obj).Result;
+        }
+
+        public override HttpResponseMessage Put(Locality obj)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Locality, LocalityResourceModel>());
+            var mapper = new Mapper(config);
+
+            var model = mapper.Map<Locality, LocalityResourceModel>(obj);
+
+            return Put(model);
         }
 
         public override HttpResponseMessage Delete(int identifier)

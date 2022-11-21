@@ -1,4 +1,5 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
+﻿using AutoMapper;
+using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.WebApi.Clients.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Identity;
@@ -47,9 +48,29 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.PostAsJsonAsync("AppUsers", obj).Result;
         }
 
+        public override HttpResponseMessage Post(AppUser obj)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUser, AppUserResourceModel>());
+            var mapper = new Mapper(config);
+
+            var model = mapper.Map<AppUser, AppUserResourceModel>(obj);
+
+            return Post(model);
+        }
+
         public override HttpResponseMessage Put(AppUserResourceModel obj)
         {
             return _client.PutAsJsonAsync("AppUsers", obj).Result;
+        }
+
+        public override HttpResponseMessage Put(AppUser obj)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUser, AppUserResourceModel>());
+            var mapper = new Mapper(config);
+
+            var model = mapper.Map<AppUser, AppUserResourceModel>(obj);
+
+            return Put(model);
         }
 
         public override HttpResponseMessage Delete(string identifier)

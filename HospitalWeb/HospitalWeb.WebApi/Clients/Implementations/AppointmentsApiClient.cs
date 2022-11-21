@@ -62,9 +62,29 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.PostAsJsonAsync("Appointments", obj).Result;
         }
 
+        public override HttpResponseMessage Post(Appointment obj)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Appointment, AppointmentResourceModel>());
+            var mapper = new Mapper(config);
+
+            var model = mapper.Map<Appointment, AppointmentResourceModel>(obj);
+
+            return Post(model);
+        }
+
         public override HttpResponseMessage Put(AppointmentResourceModel obj)
         {
             return _client.PutAsJsonAsync("Appointments", obj).Result;
+        }
+
+        public override HttpResponseMessage Put(Appointment obj)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Appointment, AppointmentResourceModel>());
+            var mapper = new Mapper(config);
+
+            var model = mapper.Map<Appointment, AppointmentResourceModel>(obj);
+
+            return Put(model);
         }
 
         public override HttpResponseMessage Delete(int identifier)
