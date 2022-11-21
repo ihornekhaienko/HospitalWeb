@@ -4,6 +4,8 @@ namespace HospitalWeb.WebApi.Models.ResourceModels
 {
     public class DoctorResourceModel
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
 
         public string Surname { get; set; }
@@ -16,8 +18,8 @@ namespace HospitalWeb.WebApi.Models.ResourceModels
 
         public string Password { get; set; }
 
-        public int SpecialtyId { get; set; }
-
         public bool EmailConfirmed { get; set; }
+
+        public int SpecialtyId { get; set; }
     }
 }

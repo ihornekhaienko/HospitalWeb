@@ -4,6 +4,8 @@ namespace HospitalWeb.WebApi.Models.ResourceModels
 {
     public class PatientResourceModel
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
 
         public string Surname { get; set; }
