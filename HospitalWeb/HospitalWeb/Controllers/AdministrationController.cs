@@ -355,7 +355,7 @@ namespace HospitalWeb.Controllers
                     doctor.Name = model.Name;
                     doctor.Surname = model.Surname;
                     doctor.PhoneNumber = model.Phone;
-                    doctor.Specialty = specialty;
+                    doctor.SpecialtyId = specialty.SpecialtyId;
 
                     response = _api.Doctors.Put(doctor);
 
@@ -375,6 +375,13 @@ namespace HospitalWeb.Controllers
                         }
                     }
                 }
+
+                var result = _api.Specialties.Get();
+                if (!result.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+                ViewBag.Specialties = _api.Specialties.ReadMany(result);
 
                 return View(model);
             }

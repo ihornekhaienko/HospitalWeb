@@ -19,6 +19,7 @@ namespace HospitalWeb.Controllers
         private readonly ILogger<ManageController> _logger;
         private readonly IWebHostEnvironment _environment;
         private readonly ApiUnitOfWork _api;
+        private readonly UserManager<AppUser> _userManager;
         private readonly IFileManager _fileManager;
         private readonly INotifier _notifier;
 
@@ -26,12 +27,14 @@ namespace HospitalWeb.Controllers
             ILogger<ManageController> logger, 
             IWebHostEnvironment environment,
             ApiUnitOfWork api,
+            UserManager<AppUser> userManager,
             IFileManager fileManager,
             INotifier notifier)
         {
             _logger = logger;
             _environment = environment;
             _api = api;
+            _userManager = userManager;
             _fileManager = fileManager;
             _notifier = notifier;
         }
@@ -321,25 +324,23 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var user = new AppUserResourceModel
+                    var response = _api.AppUsers.Get(User.Identity.Name);
+                    if (!response.IsSuccessStatusCode)
                     {
-                        Email = User.Identity.Name,
-                        Password = model.OldPassword,
-                        NewPassword = model.NewPassword
-                    };
+                        return NotFound();
+                    }
+                    var user = _api.AppUsers.Read(response);
 
-                    var response = _api.AppUsers.Put(user);
+                    var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 
-                    if (response.IsSuccessStatusCode)
+                    if (result.Succeeded)
                     {
                         await _notifier.NotifyUpdate(user.Email, user.Email);
                         return RedirectToAction("Profile", "Manage");
                     }
                     else
                     {
-                        var errors = _api.AppUsers.ReadErrors(response);
-
-                        foreach (var error in errors)
+                        foreach (var error in result.Errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
                         }
