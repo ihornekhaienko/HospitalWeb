@@ -32,7 +32,11 @@ builder.Services.AddSwaggerGen(s =>
 });
 
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlServer(connection);
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
 
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
