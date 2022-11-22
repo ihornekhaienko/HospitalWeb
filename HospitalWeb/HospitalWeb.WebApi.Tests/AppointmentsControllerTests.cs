@@ -76,7 +76,7 @@ namespace HospitalWeb.WebApi.Tests
             var httpContextMock = new Mock<HttpContext>();
             httpContextMock.Setup(m => m.Response.Headers).Returns(headerMock.Object);
 
-            var correct = appointments.Where(a =>
+            var filtered = appointments.Where(a =>
                 a.State == state &&
                 DateTime.Compare(toDate, a.AppointmentDate) >= 0).ToList();
 
@@ -87,7 +87,7 @@ namespace HospitalWeb.WebApi.Tests
                 It.IsAny<Func<IQueryable<Appointment>, IIncludableQueryable<Appointment, object>>>(),
                 It.IsAny<int>(),
                 It.IsAny<int>()
-                )).ReturnsAsync(correct);
+                )).ReturnsAsync(filtered);
             var uow = new Mock<IUnitOfWork>();
             uow.Setup(u => u.Appointments).Returns(appointmentRepo.Object);
 
@@ -107,7 +107,7 @@ namespace HospitalWeb.WebApi.Tests
             result.Should().NotBeNullOrEmpty();
             result.Should().BeOfType<List<Appointment>>();
             result.Should().AllBeOfType<Appointment>();
-            result.Count().Should().Be(appointments.Count);
+            result.Count().Should().Be(filtered.Count);
         }
 
         [Fact]
