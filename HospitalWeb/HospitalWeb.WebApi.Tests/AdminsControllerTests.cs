@@ -75,10 +75,11 @@ namespace HospitalWeb.WebApi.Tests
             var admins = DataGenerator.GetTestAdmins();
 
             var searchString = admins.Last().Email;
+            int pageSize = 10;
 
             var filtered = admins.Where(a => a.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
                     a.Surname.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
-                    a.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+                    a.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase)).Take(pageSize).ToList();
 
             var adminRepo = new Mock<IRepository<Admin>>();
             adminRepo.Setup(r => r.GetAllAsync(
@@ -102,7 +103,7 @@ namespace HospitalWeb.WebApi.Tests
             };
 
             //Act
-            var result = await controller.Get();
+            var result = await controller.Get(searchString: searchString, pageSize: pageSize);
 
             //Assert
             adminRepo.Verify();
