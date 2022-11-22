@@ -1,4 +1,5 @@
 ﻿using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.DAL.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HospitalWeb.DAL.Services.Extensions
@@ -7,7 +8,7 @@ namespace HospitalWeb.DAL.Services.Extensions
     {
         public static void AddUnitOfWork(this IServiceCollection services)
         {
-            services.AddScoped<UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
     }
 }

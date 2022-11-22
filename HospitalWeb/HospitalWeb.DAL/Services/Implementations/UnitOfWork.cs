@@ -1,122 +1,130 @@
 ﻿using HospitalWeb.DAL.Data;
+using HospitalWeb.DAL.Entities;
+using HospitalWeb.DAL.Entities.Identity;
+using HospitalWeb.DAL.Services.Interfaces;
 
 namespace HospitalWeb.DAL.Services.Implementations
 {
-    public class UnitOfWork : IDisposable
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _db;
-        private AppUserRepository _appUserRepository;
-        private AddressRepository _addressRepository;
-        private AdminRepository _adminRepository;
-        private AppointmentRepository _appointmentRepository;
-        private DiagnosisRepository _diagnosisRepository;
-        private DoctorRepository _doctorRepository;
-        private LocalityRepository _localityRepository;
-        private PatientRepository _patientRepository;
-        private ScheduleRepository _scheduleRepository;
-        private SpecialtyRepository _specialtyRepository;
+        private GenericRepository<AppUser> _appUserRepository;
+        private GenericRepository<Address> _addressRepository;
+        private GenericRepository<Admin> _adminRepository;
+        private GenericRepository<Appointment> _appointmentRepository;
+        private GenericRepository<Diagnosis> _diagnosisRepository;
+        private GenericRepository<Doctor> _doctorRepository;
+        private GenericRepository<Locality> _localityRepository;
+        private GenericRepository<Patient> _patientRepository;
+        private GenericRepository<Schedule> _scheduleRepository;
+        private GenericRepository<Specialty> _specialtyRepository;
 
         public UnitOfWork(AppDbContext db)
         {
             _db = db;
         }
 
-        public AppUserRepository AppUsers
+        public virtual void Detach()
+        {
+            _db.ChangeTracker.Clear();
+        }
+
+        public virtual IRepository<AppUser> AppUsers
         {
             get
             {
                 if (_appUserRepository == null)
-                    _appUserRepository = new AppUserRepository(_db);
+                    _appUserRepository = new GenericRepository<AppUser>(_db);
                 return _appUserRepository;
             }
         }
 
-        public AddressRepository Addresses
+        public virtual IRepository<Address> Addresses
         {
             get
             {
                 if (_addressRepository == null)
-                    _addressRepository = new AddressRepository(_db);
+                    _addressRepository = new GenericRepository<Address>(_db);
                 return _addressRepository;
             }
         }
 
-        public AdminRepository Admins
+        public virtual IRepository<Admin> Admins
         {
             get
             {
                 if (_adminRepository == null)
-                    _adminRepository = new AdminRepository(_db);
+                    _adminRepository = new GenericRepository<Admin>(_db);
                 return _adminRepository;
             }
         }
 
-        public AppointmentRepository Appointments
+        public virtual IRepository<Appointment> Appointments
         {
             get
             {
                 if (_appointmentRepository == null)
-                    _appointmentRepository = new AppointmentRepository(_db);
+                    _appointmentRepository = new GenericRepository<Appointment>(_db);
                 return _appointmentRepository;
             }
         }
 
-        public DiagnosisRepository Diagnoses
+        public virtual IRepository<Diagnosis> Diagnoses
         {
             get
             {
                 if (_diagnosisRepository == null)
-                    _diagnosisRepository = new DiagnosisRepository(_db);
+                    _diagnosisRepository = new GenericRepository<Diagnosis>(_db);
                 return _diagnosisRepository;
             }
         }
 
-        public DoctorRepository Doctors
+        public virtual IRepository<Doctor> Doctors
         {
             get
             {
                 if (_doctorRepository == null)
-                    _doctorRepository = new DoctorRepository(_db);
+                    _doctorRepository = new GenericRepository<Doctor>(_db);
                 return _doctorRepository;
             }
         }
 
-        public LocalityRepository Localities
+        public virtual IRepository<Locality> Localities
         {
             get
             {
                 if (_localityRepository == null)
-                    _localityRepository = new LocalityRepository(_db);
+                    _localityRepository = new GenericRepository<Locality>(_db);
                 return _localityRepository;
             }
         }
 
-        public PatientRepository Patients
+        public virtual IRepository<Patient> Patients
         {
             get
             {
                 if (_patientRepository == null)
-                    _patientRepository = new PatientRepository(_db);
+                    _patientRepository = new GenericRepository<Patient>(_db);
                 return _patientRepository;
             }
         }
 
-        public ScheduleRepository Schedules
+        public virtual IRepository<Schedule> Schedules
         {
             get
             {
                 if (_scheduleRepository == null)
-                    _scheduleRepository = new ScheduleRepository(_db);
+                    _scheduleRepository = new GenericRepository<Schedule>(_db);
                 return _scheduleRepository;
             }
         }
 
-        public SpecialtyRepository Specialties
+        public virtual IRepository<Specialty> Specialties
         {
             get
             {
                 if (_specialtyRepository == null)
-                    _specialtyRepository = new SpecialtyRepository(_db);
+                    _specialtyRepository = new GenericRepository<Specialty>(_db);
                 return _specialtyRepository;
             }
         }
