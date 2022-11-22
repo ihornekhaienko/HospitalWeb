@@ -107,7 +107,7 @@ namespace HospitalWeb.WebApi.Controllers
 
             await _uow.Diagnoses.CreateAsync(entity);
 
-            return Ok(diagnosis);
+            return Ok(entity);
         }
 
         /// <summary>
