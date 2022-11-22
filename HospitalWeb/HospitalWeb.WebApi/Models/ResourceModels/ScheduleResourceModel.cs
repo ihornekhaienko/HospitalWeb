@@ -2,8 +2,6 @@
 {
     public class ScheduleResourceModel
     {
-        public int? ScheduleId { get; set; }
-
         public DayOfWeek DayOfWeek { get; set; }
 
         public DateTime StartTime { get; set; }

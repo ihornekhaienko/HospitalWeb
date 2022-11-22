@@ -4,8 +4,6 @@ namespace HospitalWeb.WebApi.Models.ResourceModels
 {
     public class AppointmentResourceModel
     {
-        public int? AppointmentId { get; set; }
-
         public string Prescription { get; set; }
 
         public DateTime AppointmentDate { get; set; }

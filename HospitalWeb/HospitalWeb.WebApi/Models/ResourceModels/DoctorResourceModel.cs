@@ -2,24 +2,8 @@
 
 namespace HospitalWeb.WebApi.Models.ResourceModels
 {
-    public class DoctorResourceModel
+    public class DoctorResourceModel : AppUserResourceModel
     {
-        public string Id { get; set; }
-
-        public string Name { get; set; }
-
-        public string Surname { get; set; }
-
-        public string Email { get; set; }
-
-        public string UserName { get; set; }
-
-        public string PhoneNumber { get; set; }
-
-        public string Password { get; set; }
-
-        public bool EmailConfirmed { get; set; }
-
         public int SpecialtyId { get; set; }
     }
 }
