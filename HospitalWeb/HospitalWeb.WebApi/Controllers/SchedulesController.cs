@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.WebApi.Controllers
 {
@@ -15,11 +17,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class SchedulesController : ControllerBase
     {
         private readonly ILogger<SchedulesController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
 
         public SchedulesController(
             ILogger<SchedulesController> logger,
-            UnitOfWork uow)
+            IUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
@@ -32,7 +34,7 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet]
         public async Task<IEnumerable<Schedule>> Get()
         {
-            return await _uow.Schedules.GetAllAsync();
+            return await _uow.Schedules.GetAllAsync(include: s => s.Include(d => d.Doctor));
         }
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Schedule>> Get(int id)
         {
-            var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id);
+            var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id, include: s => s.Include(d => d.Doctor));
 
             if (schedule == null)
             {
@@ -70,7 +72,9 @@ namespace HospitalWeb.WebApi.Controllers
                 return BadRequest();
             }
 
-            var schedule = await _uow.Schedules.GetAsync(s => s.Doctor.Id == doctor && s.DayOfWeek == dayOfWeek);
+            var schedule = await _uow.Schedules.GetAsync(s => s.Doctor.Id == doctor && s.DayOfWeek == dayOfWeek,
+                include: 
+                s => s.Include(d => d.Doctor));
 
             if (schedule == null)
             {
@@ -109,21 +113,16 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="schedule">The Schedule to update</param>
         /// <returns>The Schedule object</returns>
         [HttpPut]
-        public async Task<ActionResult<Schedule>> Put(ScheduleResourceModel schedule)
+        public async Task<ActionResult<Schedule>> Put(Schedule schedule)
         {
             if (schedule == null)
             {
                 return BadRequest();
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<ScheduleResourceModel, Schedule>());
-            var mapper = new Mapper(config);
+            await _uow.Schedules.UpdateAsync(schedule);
 
-            var entity = mapper.Map<ScheduleResourceModel, Schedule>(schedule);
-
-            await _uow.Schedules.UpdateAsync(entity);
-
-            return Ok(entity);
+            return Ok(schedule);
         }
 
         /// <summary>

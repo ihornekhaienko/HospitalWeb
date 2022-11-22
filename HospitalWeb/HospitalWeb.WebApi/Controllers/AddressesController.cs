@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.WebApi.Controllers
 {
@@ -15,11 +16,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class AddressesController : ControllerBase
     {
         private readonly ILogger<AddressesController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
 
         public AddressesController(
             ILogger<AddressesController> logger,
-            UnitOfWork uow)
+            IUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
@@ -32,7 +33,9 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet]
         public async Task<IEnumerable<Address>> Get()
         {
-            return await _uow.Addresses.GetAllAsync();
+            return await _uow.Addresses.GetAllAsync(include: a => a
+                .Include(a => a.Locality)
+                .Include(a => a.Patients));
         }
 
         /// <summary>
@@ -43,7 +46,10 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Address>> Get(int id)
         {
-            var address = await _uow.Addresses.GetAsync(a => a.AddressId == id);
+            var address = await _uow.Addresses.GetAsync(a => a.AddressId == id, 
+                include: a => a
+                .Include(a => a.Locality)
+                .Include(a => a.Patients));
 
             if (address == null)
             {
@@ -62,7 +68,11 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Address>> Get(string address, string locality)
         {
-            var obj = await _uow.Addresses.GetAsync(a => a.FullAddress == address && a.Locality.LocalityName == locality);
+            var obj = await _uow.Addresses
+                .GetAsync(a => a.FullAddress == address && a.Locality.LocalityName == locality,
+                include: a => a
+                .Include(a => a.Locality)
+                .Include(a => a.Patients));
 
             if (obj == null)
             {
@@ -101,21 +111,16 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="address"> The Address object  </param>
         /// <returns> The Address object </returns>
         [HttpPut]
-        public async Task<ActionResult<Address>> Put(AddressResourceModel address)
+        public async Task<ActionResult<Address>> Put(Address address)
         {
             if (address == null)
             {
                 return BadRequest();
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<AddressResourceModel, Address>());
-            var mapper = new Mapper(config);
+            await _uow.Addresses.UpdateAsync(address);
 
-            var entity = mapper.Map<AddressResourceModel, Address>(address);
-
-            await _uow.Addresses.UpdateAsync(entity);
-
-            return Ok(entity);
+            return Ok(address);
         }
 
         /// <summary>

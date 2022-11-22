@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
-using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace HospitalWeb.WebApi.Controllers
 {
@@ -20,13 +17,13 @@ namespace HospitalWeb.WebApi.Controllers
     public class AdminsController : ControllerBase
     {
         private readonly ILogger<AdminsController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
         private readonly UserManager<AppUser> _userManager;
 
         public AdminsController(
             ILogger<AdminsController> logger,
-            UnitOfWork uow,
-             UserManager<AppUser> userManager)
+            IUnitOfWork uow,
+            UserManager<AppUser> userManager)
         {
             _logger = logger;
             _uow = uow;
@@ -185,23 +182,18 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="admin">The Admin to update</param>
         /// <returns>The Admin object</returns>
         [HttpPut]
-        public async Task<ActionResult<Admin>> Put(AdminResourceModel admin)
+        public async Task<ActionResult<Admin>> Put(Admin admin)
         {
             if (admin == null)
             {
                 return BadRequest();
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<AdminResourceModel, Admin>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<AdminResourceModel, Admin>(admin);
-
-            var result = await _userManager.UpdateAsync(entity);
+            var result = await _userManager.UpdateAsync(admin);
 
             if (result.Succeeded)
             {
-                return Ok(entity);
+                return Ok(admin);
             }
             else
             {

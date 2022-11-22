@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +16,12 @@ namespace HospitalWeb.WebApi.Controllers
     public class AppUsersController : ControllerBase
     {
         private readonly ILogger<AppUsersController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
         private readonly UserManager<AppUser> _userManager;
 
         public AppUsersController(
             ILogger<AppUsersController> logger,
-            UnitOfWork uow,
+            IUnitOfWork uow,
             UserManager<AppUser> userManager)
         {
             _logger = logger;
@@ -102,39 +102,18 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="user">The User to update</param>
         /// <returns>The User object</returns>
         [HttpPut]
-        public async Task<ActionResult<AppUser>> Put(AppUserResourceModel user)
+        public async Task<ActionResult<AppUser>> Put(AppUser user)
         {
             if (user == null)
             {
                 return BadRequest();
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUserResourceModel, AppUser>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<AppUserResourceModel, AppUser>(user);
-
-            IdentityResult result;
-
-            if (!string.IsNullOrWhiteSpace(user.NewPassword))
-            {
-                result = await _userManager.ChangePasswordAsync(entity, user.Password, user.NewPassword);
-
-                if (result.Succeeded)
-                {
-                    return Ok(entity);
-                }
-                else
-                {
-                    return BadRequest(result.Errors);
-                }
-            }
-
-            result = await _userManager.UpdateAsync(entity);
+            var result = await _userManager.UpdateAsync(user);
 
             if (result.Succeeded)
             {
-                return Ok(entity);
+                return Ok(user);
             }
             else
             {

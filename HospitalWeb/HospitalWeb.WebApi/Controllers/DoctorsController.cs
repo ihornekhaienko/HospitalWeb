@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.WebApi.Controllers
 {
@@ -18,12 +18,12 @@ namespace HospitalWeb.WebApi.Controllers
     public class DoctorsController : ControllerBase
     {
         private readonly ILogger<DoctorsController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
         private readonly UserManager<AppUser> _userManager;
 
         public DoctorsController(
             ILogger<DoctorsController> logger,
-            UnitOfWork uow,
+            IUnitOfWork uow,
             UserManager<AppUser> userManager)
         {
             _logger = logger;
@@ -115,7 +115,12 @@ namespace HospitalWeb.WebApi.Controllers
             };
 
             var doctors = await _uow.Doctors
-                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
+                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize,
+                include: d => d
+                .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
+                .Include(d => d.Schedules)
+                .Include(d => d.Specialty));
 
             Response.Headers.Add("TotalCount", totalCount.ToString());
             Response.Headers.Add("Count", doctors.Count().ToString());
@@ -134,7 +139,12 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{searchString}")]
         public async Task<ActionResult<Doctor>> Get(string searchString)
         {
-            var doctor = await _uow.Doctors.GetAsync(d => d.Id == searchString || d.Email == searchString);
+            var doctor = await _uow.Doctors.GetAsync(d => d.Id == searchString || d.Email == searchString,
+                include: d => d
+                .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
+                .Include(d => d.Schedules)
+                .Include(d => d.Specialty));
 
             if (doctor == null)
             {
@@ -191,23 +201,18 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="doctor">The Doctor to update</param>
         /// <returns>The Doctor object</returns>
         [HttpPut]
-        public async Task<ActionResult<Doctor>> Put(DoctorResourceModel doctor)
+        public async Task<ActionResult<Doctor>> Put(Doctor doctor)
         {
             if (doctor == null)
             {
                 return BadRequest();
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<DoctorResourceModel, Doctor>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<DoctorResourceModel, Doctor>(doctor);
-
-            var result = await _userManager.UpdateAsync(entity);
+            var result = await _userManager.UpdateAsync(doctor);
 
             if (result.Succeeded)
             {
-                return Ok(entity);
+                return Ok(doctor);
             }
             else
             {
@@ -223,16 +228,24 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpDelete("{searchString}")]
         public async Task<ActionResult<Doctor>> Delete(string searchString)
         {
-            var doctor = await _uow.Doctors.GetAsync(d => d.Id == searchString || d.Email == searchString);
-
-            if (doctor == null)
+            try
             {
-                return NotFound();
+                var doctor = await _uow.Doctors.GetAsync(d => d.Id == searchString || d.Email == searchString);
+
+                if (doctor == null)
+                {
+                    return NotFound();
+                }
+
+                await _userManager.DeleteAsync(doctor);
+
+                return Ok(doctor);
             }
-
-            await _userManager.DeleteAsync(doctor);
-
-            return Ok(doctor);
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.Message);
+                return BadRequest(err.Message);
+            }
         }
     }
 }

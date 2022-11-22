@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.WebApi.Controllers
 {
@@ -17,11 +17,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class AppointmentsController : ControllerBase
     {
         private readonly ILogger<AppointmentsController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
 
         public AppointmentsController(
             ILogger<AppointmentsController> logger,
-            UnitOfWork uow)
+            IUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
@@ -127,7 +127,14 @@ namespace HospitalWeb.WebApi.Controllers
             };
 
             var appointments = await _uow.Appointments
-                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
+                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize,
+                include: a => a
+                .Include(a => a.Diagnosis)
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Specialty)
+                .Include(a => a.Patient)
+                    .ThenInclude(p => p.Address)
+                        .ThenInclude(a => a.Locality));
 
             Response.Headers.Add("TotalCount", totalCount.ToString());
             Response.Headers.Add("Count", appointments.Count().ToString());
@@ -146,7 +153,14 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Appointment>> Get(int id)
         {
-            var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
+            var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id,
+                include: a => a
+                .Include(a => a.Diagnosis)
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Specialty)
+                .Include(a => a.Patient)
+                    .ThenInclude(p => p.Address)
+                        .ThenInclude(a => a.Locality));
 
             if (appointment == null)
             {
@@ -166,7 +180,14 @@ namespace HospitalWeb.WebApi.Controllers
         public async Task<ActionResult<Appointment>> Get(string doctor, DateTime date)
         {
             var appointment = await _uow.Appointments
-                .GetAsync(a => a.Doctor.Id == doctor && DateTime.Compare(a.AppointmentDate, date) == 0);
+                .GetAsync(a => a.Doctor.Id == doctor && DateTime.Compare(a.AppointmentDate, date) == 0, 
+                include: a => a
+                .Include(a => a.Diagnosis)
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Specialty)
+                .Include(a => a.Patient)
+                    .ThenInclude(p => p.Address)
+                        .ThenInclude(a => a.Locality));
 
             if (appointment == null)
             {
@@ -205,21 +226,16 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="appointment">Appointment to update</param>
         /// <returns>Appointment object</returns>
         [HttpPut]
-        public async Task<ActionResult<Appointment>> Put(AppointmentResourceModel appointment)
+        public async Task<ActionResult<Appointment>> Put(Appointment appointment)
         {
             if (appointment == null)
             {
                 return BadRequest();
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppointmentResourceModel, Appointment>());
-            var mapper = new Mapper(config);
+            await _uow.Appointments.UpdateAsync(appointment);
 
-            var entity = mapper.Map<AppointmentResourceModel, Appointment>(appointment);
-
-            await _uow.Appointments.UpdateAsync(entity);
-
-            return Ok(entity);
+            return Ok(appointment);
         }
 
         /// <summary>

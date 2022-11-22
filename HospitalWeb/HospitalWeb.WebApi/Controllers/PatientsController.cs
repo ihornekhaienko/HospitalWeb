@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.WebApi.Controllers
 {
@@ -17,12 +17,12 @@ namespace HospitalWeb.WebApi.Controllers
     public class PatientsController : ControllerBase
     {
         private readonly ILogger<PatientsController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
         private readonly UserManager<AppUser> _userManager;
 
         public PatientsController(
             ILogger<PatientsController> logger,
-            UnitOfWork uow,
+            IUnitOfWork uow,
             UserManager<AppUser> userManager)
         {
             _logger = logger;
@@ -123,7 +123,12 @@ namespace HospitalWeb.WebApi.Controllers
             };
 
             var patients = await _uow.Patients
-                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize);
+                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize,
+                include: p => p
+                 .Include(p => p.Address)
+                    .ThenInclude(a => a.Locality)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Diagnosis));
 
             Response.Headers.Add("TotalCount", totalCount.ToString());
             Response.Headers.Add("Count", patients.Count().ToString());
@@ -142,7 +147,12 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{searchString}")]
         public async Task<ActionResult<Patient>> Get(string searchString)
         {
-            var patient = await _uow.Patients.GetAsync(p => p.Id == searchString || p.Email == searchString);
+            var patient = await _uow.Patients.GetAsync(p => p.Id == searchString || p.Email == searchString,
+                 include: p => p
+                 .Include(p => p.Address)
+                    .ThenInclude(a => a.Locality)
+                .Include(p => p.Appointments)
+                    .ThenInclude(a => a.Diagnosis));
 
             if (patient == null)
             {
@@ -207,23 +217,18 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="patient">The Patient to update</param>
         /// <returns>The Patient object</returns>
         [HttpPut]
-        public async Task<ActionResult<Patient>> Put(PatientResourceModel patient)
+        public async Task<ActionResult<Patient>> Put(Patient patient)
         {
             if (patient == null)
             {
                 return BadRequest();
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PatientResourceModel, Patient>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<PatientResourceModel, Patient>(patient);
-
-            var result = await _userManager.UpdateAsync(entity);
+            var result = await _userManager.UpdateAsync(patient);
 
             if (result.Succeeded)
             {
-                return Ok(entity);
+                return Ok(patient);
             }
             else
             {

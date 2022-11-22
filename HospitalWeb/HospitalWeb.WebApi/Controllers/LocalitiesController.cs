@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalWeb.WebApi.Controllers
 {
@@ -15,11 +17,11 @@ namespace HospitalWeb.WebApi.Controllers
     public class LocalitiesController : ControllerBase
     {
         private readonly ILogger<LocalitiesController> _logger;
-        private readonly UnitOfWork _uow;
+        private readonly IUnitOfWork _uow;
 
         public LocalitiesController(
             ILogger<LocalitiesController> logger,
-            UnitOfWork uow)
+            IUnitOfWork uow)
         {
             _logger = logger;
             _uow = uow;
@@ -43,7 +45,10 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Locality>> Get(int id)
         {
-            var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id);
+            var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id,
+                include: l => l
+                .Include(l => l.Addresses)
+                    .ThenInclude(a => a.Patients));
 
             if (locality == null)
             {
@@ -61,7 +66,10 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Locality>> Get(string name)
         {
-            var locality = await _uow.Localities.GetAsync(l => l.LocalityName == name);
+            var locality = await _uow.Localities.GetAsync(l => l.LocalityName == name,
+                include: l => l
+                .Include(l => l.Addresses)
+                    .ThenInclude(a => a.Patients));
 
             if (locality == null)
             {
@@ -100,21 +108,16 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="locality">The Locality to update</param>
         /// <returns>The Locality object</returns>
         [HttpPut]
-        public async Task<ActionResult<Locality>> Put(LocalityResourceModel locality)
+        public async Task<ActionResult<Locality>> Put(Locality locality)
         {
             if (locality == null)
             {
                 return BadRequest();
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<LocalityResourceModel, Locality>());
-            var mapper = new Mapper(config);
+            await _uow.Localities.UpdateAsync(locality);
 
-            var entity = mapper.Map<LocalityResourceModel, Locality>(locality);
-
-            await _uow.Localities.UpdateAsync(entity);
-
-            return Ok(entity);
+            return Ok(locality);
         }
 
         /// <summary>
