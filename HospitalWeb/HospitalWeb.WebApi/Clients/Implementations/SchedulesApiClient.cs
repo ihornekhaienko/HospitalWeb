@@ -57,19 +57,9 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return Post(model);
         }
 
-        public override HttpResponseMessage Put(ScheduleResourceModel obj)
-        {
-            return _client.PutAsJsonAsync("Schedules", obj).Result;
-        }
-
         public override HttpResponseMessage Put(Schedule obj)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Schedule, ScheduleResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Schedule, ScheduleResourceModel>(obj);
-
-            return Put(model);
+            return _client.PutAsJsonAsync("Schedules", obj).Result;
         }
 
         public override HttpResponseMessage Delete(int identifier)

@@ -72,19 +72,9 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return Post(model);
         }
 
-        public override HttpResponseMessage Put(AppointmentResourceModel obj)
-        {
-            return _client.PutAsJsonAsync("Appointments", obj).Result;
-        }
-
         public override HttpResponseMessage Put(Appointment obj)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Appointment, AppointmentResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Appointment, AppointmentResourceModel>(obj);
-
-            return Put(model);
+            return _client.PutAsJsonAsync("Appointments", obj).Result;
         }
 
         public override HttpResponseMessage Delete(int identifier)
@@ -125,12 +115,7 @@ namespace HospitalWeb.WebApi.Clients.Implementations
                     {
                         appointment.State = State.Missed;
 
-                        var config = new MapperConfiguration(cfg => cfg.CreateMap<Appointment, AppointmentResourceModel>());
-                        var mapper = new Mapper(config);
-
-                        var model = mapper.Map<Appointment, AppointmentResourceModel>(appointment);
-
-                        Put(model);
+                        Put(appointment);
                     }    
                 }
             }

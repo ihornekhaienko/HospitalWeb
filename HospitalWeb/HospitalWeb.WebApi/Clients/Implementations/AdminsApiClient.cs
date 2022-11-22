@@ -68,19 +68,9 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return Post(model);
         }
 
-        public override HttpResponseMessage Put(AdminResourceModel obj)
-        {
-            return _client.PutAsJsonAsync("Admins", obj).Result;
-        }
-
         public override HttpResponseMessage Put(Admin obj)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Admin, AdminResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Admin, AdminResourceModel>(obj);
-
-            return Put(model);
+            return _client.PutAsJsonAsync("Admins", obj).Result;
         }
 
         public override HttpResponseMessage Delete(string identifier)

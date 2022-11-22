@@ -46,15 +46,15 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             }
         }
 
-        public override Address Read(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<Address>().Result;
-        }
-
         public override Address Read(int identifier)
         {
             var response = Get(identifier);
             return Read(response);
+        }
+
+        public override Address Read(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<Address>().Result;
         }
 
         public override IEnumerable<Address> ReadMany(HttpResponseMessage response)
@@ -77,19 +77,9 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return Post(model);
         }
 
-        public override HttpResponseMessage Put(AddressResourceModel obj)
-        {
-            return _client.PutAsJsonAsync("Addresses", obj).Result;
-        }
-
         public override HttpResponseMessage Put(Address obj)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Address, AddressResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Address, AddressResourceModel>(obj);
-
-            return Put(model);
+            return _client.PutAsJsonAsync("Addresses", obj).Result;
         }
 
         public override HttpResponseMessage Delete(int identifier)

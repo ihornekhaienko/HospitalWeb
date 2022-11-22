@@ -2,24 +2,22 @@
 {
     public interface IApiClient<TEntity, TResource, TIdentifier>
     {
-        public HttpResponseMessage Get();
+        HttpResponseMessage Get();
 
-        public HttpResponseMessage Get(TIdentifier identifier);
+        HttpResponseMessage Get(TIdentifier identifier);
 
-        public TEntity Read(HttpResponseMessage response);
+        TEntity Read(HttpResponseMessage response);
 
-        public TEntity Read(TIdentifier identifier);
+        TEntity Read(TIdentifier identifier);
 
-        public IEnumerable<TEntity> ReadMany(HttpResponseMessage response);
+        IEnumerable<TEntity> ReadMany(HttpResponseMessage response);
 
-        public HttpResponseMessage Post(TResource obj);
+        HttpResponseMessage Post(TResource obj);
 
-        public HttpResponseMessage Post(TEntity obj);
+        HttpResponseMessage Post(TEntity obj);
 
-        public HttpResponseMessage Put(TResource obj);
+        HttpResponseMessage Put(TEntity obj);
 
-        public HttpResponseMessage Put(TEntity obj);
-
-        public HttpResponseMessage Delete(TIdentifier identifier);
+        HttpResponseMessage Delete(TIdentifier identifier);
     }
 }

@@ -45,21 +45,15 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             }
         }
 
-        public Specialty Read(string name)
+        public override Specialty Read(HttpResponseMessage response)
         {
-            var response = Get(name);
-            return Read(response);
+            return response.Content.ReadAsAsync<Specialty>().Result;
         }
 
         public override Specialty Read(int identifier)
         {
             var response = Get(identifier);
             return Read(response);
-        }
-
-        public override Specialty Read(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<Specialty>().Result;
         }
 
         public override IEnumerable<Specialty> ReadMany(HttpResponseMessage response)
@@ -82,19 +76,9 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return Post(model);
         }
 
-        public override HttpResponseMessage Put(SpecialtyResourceModel obj)
-        {
-            return _client.PutAsJsonAsync("Specialties", obj).Result;
-        }
-
         public override HttpResponseMessage Put(Specialty obj)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Specialty, SpecialtyResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Specialty, SpecialtyResourceModel>(obj);
-
-            return Put(model);
+            return _client.PutAsJsonAsync("Specialties", obj).Result;
         }
 
         public override HttpResponseMessage Delete(int identifier)

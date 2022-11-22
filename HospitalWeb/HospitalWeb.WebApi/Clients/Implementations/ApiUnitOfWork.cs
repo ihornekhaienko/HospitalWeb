@@ -1,4 +1,6 @@
-﻿namespace HospitalWeb.WebApi.Clients.Implementations
+﻿using HospitalWeb.DAL.Services.Interfaces;
+
+namespace HospitalWeb.WebApi.Clients.Implementations
 {
     public class ApiUnitOfWork
     {
