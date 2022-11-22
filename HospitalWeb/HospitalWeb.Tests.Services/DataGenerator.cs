@@ -4,9 +4,9 @@ using HospitalWeb.DAL.Entities.Identity;
 
 namespace HospitalWeb.WebApi.Tests
 {
-    internal static class DataGenerator
+    public static class DataGenerator
     {
-        internal static List<Address> GetTestAddresses(int count = 100)
+        public static List<Address> GetTestAddresses(int count = 100)
         {
             int id = 1;
 
@@ -19,7 +19,7 @@ namespace HospitalWeb.WebApi.Tests
             return testAddresses;
         }
 
-        internal static List<Address> GetTestAddresses(IEnumerable<Locality> localities, int count = 100)
+        public static List<Address> GetTestAddresses(IEnumerable<Locality> localities, int count = 100)
         {
             int id = 1;
 
@@ -33,7 +33,7 @@ namespace HospitalWeb.WebApi.Tests
             return testAddresses;
         }
 
-        internal static List<Appointment> GetTestAppointments(int count = 100)
+        public static List<Appointment> GetTestAppointments(int count = 100)
         {
             int id = 1;
             var states = new[] { State.Completed, State.Missed, State.Planned, State.Canceled };
@@ -48,7 +48,7 @@ namespace HospitalWeb.WebApi.Tests
             return testAppointments;
         }
 
-        internal static List<Appointment> GetTestAppointments(
+        public static List<Appointment> GetTestAppointments(
             IEnumerable<Diagnosis> diagnoses, 
             IEnumerable<Doctor> doctors, 
             IEnumerable<Patient> patients,
@@ -70,7 +70,7 @@ namespace HospitalWeb.WebApi.Tests
             return testAppointments;
         }
 
-        internal static List<Diagnosis> GetTestDiagnoses()
+        public static List<Diagnosis> GetTestDiagnoses()
         {
             var diagnoses = new[] { "Survey", "SARS", "Gastritis", "Ulcer", "Pancreatitis", "Twist" };
 
@@ -85,7 +85,7 @@ namespace HospitalWeb.WebApi.Tests
             return testDiagnoses;
         }
 
-        internal static List<Locality> GetTestLocalities(int count = 100)
+        public static List<Locality> GetTestLocalities(int count = 100)
         {
             int id = 1;
 
@@ -98,7 +98,7 @@ namespace HospitalWeb.WebApi.Tests
             return testLocalities;
         }
 
-        internal static List<Schedule> GetTestSchedules(int count = 100)
+        public static List<Schedule> GetTestSchedules(int count = 100)
         {
             int id = 1;
 
@@ -119,7 +119,7 @@ namespace HospitalWeb.WebApi.Tests
             return testSchedules;
         }
 
-        internal static List<Schedule> GetTestSchedules(IEnumerable<Doctor> doctors, int count = 100)
+        public static List<Schedule> GetTestSchedules(IEnumerable<Doctor> doctors, int count = 100)
         {
             int id = 1;
 
@@ -141,7 +141,7 @@ namespace HospitalWeb.WebApi.Tests
             return testSchedules;
         }
 
-        internal static List<Specialty> GetTestSpecialties()
+        public static List<Specialty> GetTestSpecialties()
         {
             var specialties = new[] { "Therapist", "Surgeon", "Gastroenterologist", "Dentist", "Neurologist", "Dermatologist" };
 
@@ -156,7 +156,7 @@ namespace HospitalWeb.WebApi.Tests
             return testSpecialties;
         }
 
-        internal static List<AppUser> GetTestAppUsers(int count = 100)
+        public static List<AppUser> GetTestAppUsers(int count = 100)
         {
             var levels = new[] { true, false };
 
@@ -173,7 +173,7 @@ namespace HospitalWeb.WebApi.Tests
             return testUsers;
         }
 
-        internal static List<Admin> GetTestAdmins(int count = 100)
+        public static List<Admin> GetTestAdmins(int count = 100)
         {
             var levels = new[] { true, false };
 
@@ -191,7 +191,7 @@ namespace HospitalWeb.WebApi.Tests
             return testAdmins;
         }
 
-        internal static List<Doctor> GetTestDoctors(int count = 100)
+        public static List<Doctor> GetTestDoctors(int count = 100)
         {
             var faker = new Faker<Doctor>()
                 .RuleFor(u => u.Id, f => f.UniqueIndex.ToString())
@@ -206,7 +206,7 @@ namespace HospitalWeb.WebApi.Tests
             return testDoctors;
         }
 
-        internal static List<Doctor> GetTestDoctors(IEnumerable<Specialty> specialties, int count = 100)
+        public static List<Doctor> GetTestDoctors(IEnumerable<Specialty> specialties, int count = 100)
         {
             var faker = new Faker<Doctor>()
                 .RuleFor(u => u.Id, f => f.UniqueIndex.ToString())
@@ -222,7 +222,7 @@ namespace HospitalWeb.WebApi.Tests
             return testDoctors;
         }
 
-        internal static List<Patient> GetTestPatients(int count = 100)
+        public static List<Patient> GetTestPatients(int count = 100)
         {
             var sexes = new[] { Sex.Male, Sex.Female };
 
@@ -241,7 +241,7 @@ namespace HospitalWeb.WebApi.Tests
             return testPatients;
         }
 
-        internal static List<Patient> GetTestPatients(IEnumerable<Address> addresses, int count = 100)
+        public static List<Patient> GetTestPatients(IEnumerable<Address> addresses, int count = 100)
         {
             var sexes = new[] { Sex.Male, Sex.Female };
 
