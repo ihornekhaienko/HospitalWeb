@@ -1,17 +1,14 @@
 ﻿using AutoMapper;
 using FluentAssertions;
 using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Controllers;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Linq.Expressions;
-using System.Net;
 using Xunit;
 
 namespace HospitalWeb.WebApi.Tests
