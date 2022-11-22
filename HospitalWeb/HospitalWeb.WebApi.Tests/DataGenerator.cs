@@ -6,7 +6,7 @@ namespace HospitalWeb.WebApi.Tests
 {
     internal static class DataGenerator
     {
-        internal static List<Address> GetTestAddresses()
+        internal static List<Address> GetTestAddresses(int count = 100)
         {
             int id = 1;
 
@@ -14,12 +14,12 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(a => a.AddressId, f => id++)
                 .RuleFor(a => a.FullAddress, f => f.Address.StreetAddress());
 
-            var testAddresses = faker.Generate(100);
+            var testAddresses = faker.Generate(count);
 
             return testAddresses;
         }
 
-        internal static List<Address> GetTestAddresses(IEnumerable<Locality> localities)
+        internal static List<Address> GetTestAddresses(IEnumerable<Locality> localities, int count = 100)
         {
             int id = 1;
 
@@ -28,12 +28,12 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(a => a.FullAddress, f => f.Address.StreetAddress())
                 .RuleFor(a => a.Locality, f => f.PickRandom(localities));
 
-            var testAddresses = faker.Generate(100);
+            var testAddresses = faker.Generate(count);
 
             return testAddresses;
         }
 
-        internal static List<Appointment> GetTestAppointments()
+        internal static List<Appointment> GetTestAppointments(int count = 100)
         {
             int id = 1;
             var states = new[] { State.Completed, State.Missed, State.Planned, State.Canceled };
@@ -43,12 +43,16 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(a => a.State, f => f.PickRandom(states[1..2]))
                 .RuleFor(a => a.Prescription, f => f.Lorem.Text());
 
-            var testAppointments = faker.Generate(50);
+            var testAppointments = faker.Generate(count);
 
             return testAppointments;
         }
 
-        internal static List<Appointment> GetTestAppointments(IEnumerable<Diagnosis> diagnoses, IEnumerable<Doctor> doctors, IEnumerable<Patient> patients)
+        internal static List<Appointment> GetTestAppointments(
+            IEnumerable<Diagnosis> diagnoses, 
+            IEnumerable<Doctor> doctors, 
+            IEnumerable<Patient> patients,
+            int count = 100)
         {
             int id = 1;
             var states = new[] { State.Completed, State.Missed, State.Planned, State.Canceled };
@@ -61,7 +65,7 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(a => a.Doctor, f => f.PickRandom(doctors))
                 .RuleFor(a => a.Patient, f => f.PickRandom(patients));
 
-            var testAppointments = faker.Generate(50);
+            var testAppointments = faker.Generate(count);
 
             return testAppointments;
         }
@@ -81,7 +85,7 @@ namespace HospitalWeb.WebApi.Tests
             return testDiagnoses;
         }
 
-        internal static List<Locality> GetTestLocalities()
+        internal static List<Locality> GetTestLocalities(int count = 100)
         {
             int id = 1;
 
@@ -89,12 +93,12 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(l => l.LocalityId, f => id++)
                 .RuleFor(l => l.LocalityName, f => f.Address.City());
 
-            var testLocalities = faker.Generate(100);
+            var testLocalities = faker.Generate(count);
 
             return testLocalities;
         }
 
-        internal static List<Schedule> GetTestSchedules()
+        internal static List<Schedule> GetTestSchedules(int count = 100)
         {
             int id = 1;
 
@@ -110,12 +114,12 @@ namespace HospitalWeb.WebApi.Tests
                     return day;
                 });
 
-            var testSchedules = faker.Generate(100);
+            var testSchedules = faker.Generate(count);
 
             return testSchedules;
         }
 
-        internal static List<Schedule> GetTestSchedules(IEnumerable<Doctor> doctors)
+        internal static List<Schedule> GetTestSchedules(IEnumerable<Doctor> doctors, int count = 100)
         {
             int id = 1;
 
@@ -132,7 +136,7 @@ namespace HospitalWeb.WebApi.Tests
                 })
                 .RuleFor(s => s.Doctor, f => f.PickRandom(doctors));
 
-            var testSchedules = faker.Generate(100);
+            var testSchedules = faker.Generate(count);
 
             return testSchedules;
         }
@@ -152,7 +156,7 @@ namespace HospitalWeb.WebApi.Tests
             return testSpecialties;
         }
 
-        internal static List<AppUser> GetTestAppUsers()
+        internal static List<AppUser> GetTestAppUsers(int count = 100)
         {
             var levels = new[] { true, false };
 
@@ -164,12 +168,12 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(u => u.Name, f => f.Name.FirstName())
                 .RuleFor(u => u.Surname, f => f.Name.LastName());
 
-            var testUsers = faker.Generate(100);
+            var testUsers = faker.Generate(count);
 
             return testUsers;
         }
 
-        internal static List<Admin> GetTestAdmins()
+        internal static List<Admin> GetTestAdmins(int count = 100)
         {
             var levels = new[] { true, false };
 
@@ -182,12 +186,12 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(u => u.Surname, f => f.Name.LastName())
                 .RuleFor(a => a.IsSuperAdmin, f => f.PickRandom(levels));
 
-            var testAdmins = faker.Generate(100);
+            var testAdmins = faker.Generate(count);
 
             return testAdmins;
         }
 
-        internal static List<Doctor> GetTestDoctors()
+        internal static List<Doctor> GetTestDoctors(int count = 100)
         {
             var faker = new Faker<Doctor>()
                 .RuleFor(u => u.Id, f => f.UniqueIndex.ToString())
@@ -197,12 +201,12 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(u => u.Name, f => f.Name.FirstName())
                 .RuleFor(u => u.Surname, f => f.Name.LastName());
 
-            var testDoctors = faker.Generate(100);
+            var testDoctors = faker.Generate(count);
 
             return testDoctors;
         }
 
-        internal static List<Doctor> GetTestDoctors(IEnumerable<Specialty> specialties)
+        internal static List<Doctor> GetTestDoctors(IEnumerable<Specialty> specialties, int count = 100)
         {
             var faker = new Faker<Doctor>()
                 .RuleFor(u => u.Id, f => f.UniqueIndex.ToString())
@@ -213,12 +217,12 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(u => u.Surname, f => f.Name.LastName())
                 .RuleFor(d => d.Specialty, f => f.PickRandom(specialties));
 
-            var testDoctors = faker.Generate(100);
+            var testDoctors = faker.Generate(count);
 
             return testDoctors;
         }
 
-        internal static List<Patient> GetTestPatients()
+        internal static List<Patient> GetTestPatients(int count = 100)
         {
             var sexes = new[] { Sex.Male, Sex.Female };
 
@@ -232,12 +236,12 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(p => p.Sex, f => f.PickRandom(sexes))
                 .RuleFor(p => p.BirthDate, f => f.Date.Past(70, new DateTime(2000, 1, 1)));
 
-            var testPatients = faker.Generate(100);
+            var testPatients = faker.Generate(count);
 
             return testPatients;
         }
 
-        internal static List<Patient> GetTestPatients(IEnumerable<Address> addresses)
+        internal static List<Patient> GetTestPatients(IEnumerable<Address> addresses, int count = 100)
         {
             var sexes = new[] { Sex.Male, Sex.Female };
 
@@ -252,7 +256,7 @@ namespace HospitalWeb.WebApi.Tests
                 .RuleFor(p => p.BirthDate, f => f.Date.Past(70, new DateTime(2000, 1, 1)))
                 .RuleFor(p => p.Address, f => f.PickRandom(addresses));
 
-            var testPatients = faker.Generate(100);
+            var testPatients = faker.Generate(count);
 
             return testPatients;
         }
