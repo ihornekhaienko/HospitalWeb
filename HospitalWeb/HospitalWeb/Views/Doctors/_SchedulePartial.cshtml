@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<ScheduleViewModel>
+@inject IViewLocalizer Localizer
 
 <div class="carousel-item active last">
     <div class="row seven-cols">
@@ -13,13 +14,14 @@
                         @if (slot.IsFree)
                         {
                             <a asp-controller="Doctors" asp-action="SignUpForAppointment" 
-                                asp-route-doctorId="@day.DoctorId" asp-route-date="@slot.Time" class="btn btn-primary date-free">
+                                asp-route-doctorId="@day.DoctorId" asp-route-date="@slot.Time" class="btn btn-primary" 
+                                onclick="confirmSignUp('@Localizer["AppointmentConfirmation"]'); notifySignUp('@day.DoctorId', '@Localizer["NewAppointmentTopic"]', '@Localizer["NewAppointmentMessage"] @slot.Time.ToString("MM/dd/yyyy hh:mm")');">
                                 @slot.ToString()
                             </a>
                         }
                         else
                         {
-                            <a href="#" class="btn btn-outline-primary date-taken">
+                            <a href="#" class="btn btn-outline-primary" onclick="alert('@Localizer["DateTaken"]')">
                                 @slot.ToString()
                             </a>
                         }

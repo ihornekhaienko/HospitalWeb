@@ -1,5 +1,4 @@
 ﻿@model DoctorDetailsViewModel
-@inject IViewLocalizer Localizer
 @{
     ViewBag.Title = Model.FullName;
 }
@@ -51,14 +50,6 @@
     <script>
         var date = new Date();
 
-        $('.date-free').click(function (e) {
-            return confirm('@Localizer["AppointmentConfirmation"]');
-        });
-
-        $('.date-taken').click(function () {
-            alert('@Localizer["DateTaken"]');
-        });
-
         function loadWeek() {
             $.ajax({
                 url: '@Url.Action("Schedule", "Doctors")',
@@ -80,7 +71,7 @@
         $('.carousel-control-next').click(function (e) {
             if ($('.active').hasClass('last')) {
                 date.setHours(0, 0, 0, 0);
-                date.setDate(date.getDate() + 8);
+                date.setDate(date.getDate() + 7);
                 loadWeek();
             }
             else

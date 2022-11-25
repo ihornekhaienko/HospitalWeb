@@ -76,11 +76,15 @@
             <i class="fa-solid fa-chart-simple"></i>
            @SharedLocalizer["Statistics"]
         </a>
-    </li>
+    </li> 
     <li class="nav-item">
-        <a class="nav-link" asp-controller="Manage" asp-action="Profile">
+        <a class="nav-link" asp-controller="Manage" asp-action="Profile"
+        data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content-id="notifications" data-bs-placement="bottom">
             <i class="fa-solid fa-user"></i>
-           @SharedLocalizer["Profile"]
+            @SharedLocalizer["Profile"]
+            <span id="notifications-count" class="badge badge-light" onclick="removeNotification()"></span>
+            <div id="notifications" class="d-none">
+            </div>
         </a>
     </li>
 }
