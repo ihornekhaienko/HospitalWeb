@@ -118,9 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppointmentConfirmation" xml:space="preserve">
-    <value>Are you sure you want to sign up for this time?</value>
+    <value>Ви впевнені, що хочете записатися на цей час?</value>
   </data>
   <data name="DateTaken" xml:space="preserve">
-    <value>This time is not free, try another one</value>
+    <value>Цей час зайнятий, спробуйте інший</value>
+  </data>
+  <data name="NewAppointmentMessage" xml:space="preserve">
+    <value>Ви маєте нову зустріч</value>
+  </data>
+  <data name="NewAppointmentTopic" xml:space="preserve">
+    <value>Нова зустріч</value>
   </data>
 </root>

@@ -441,4 +441,13 @@
   <data name="DiagnosisRequired" xml:space="preserve">
     <value>Необхідно вказати діагноз</value>
   </data>
+  <data name="CancelMessage" xml:space="preserve">
+    <value>була скасована</value>
+  </data>
+  <data name="CancelTopic" xml:space="preserve">
+    <value>Відміна зустрічі</value>
+  </data>
+  <data name="YourAppointment" xml:space="preserve">
+    <value>Ваша зустріч</value>
+  </data>
 </root>

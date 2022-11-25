@@ -438,4 +438,13 @@
   <data name="DiagnosisRequired" xml:space="preserve">
     <value>The diagnosis is required</value>
   </data>
+  <data name="CancelMessage" xml:space="preserve">
+    <value>has been canceled</value>
+  </data>
+  <data name="CancelTopic" xml:space="preserve">
+    <value>Appointment cancel</value>
+  </data>
+  <data name="YourAppointment" xml:space="preserve">
+    <value>Your appointment on</value>
+  </data>
 </root>
