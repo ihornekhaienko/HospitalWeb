@@ -1,3 +1,7 @@
+﻿function confirmSignUp(message) {
+    return confirm(message);
+}
+
 var interval = 1000 * 60 * 60;
 
 function updateAppoitmentsStates() {
