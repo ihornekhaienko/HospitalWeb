@@ -9,6 +9,9 @@ using HospitalWeb;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using HospitalWeb.WebApi.Clients.Extensions;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using HospitalWeb.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -30,6 +33,9 @@ builder.Services.AddEmailNotifier();
 builder.Services.AddPasswordGenerator();
 builder.Services.AddFileManager();
 builder.Services.AddScheduleGenerator();
+builder.Services.AddPdfPrinter();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddControllersWithViews()
@@ -50,16 +56,49 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedUICultures = supportedCultures;
 });
 
+//builder.Services.AddAuthentication()
+//    .AddGoogle(options =>
+//    {
+//        options.ClientId = configuration["Authentication:Google:ClientId"];
+//        options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+//        options.UsePkce = true;
+//        options.SaveTokens = true;
+//    })
+//    .AddFacebook(options =>
+//    {
+//        options.ClientId = configuration["Authentication:Facebook:ClientId"];
+//        options.ClientSecret = configuration["Authentication:Facebook:ClientSecret"];
+//        options.UsePkce = true;
+//        options.SaveTokens = true;
+//    });
+
 builder.Services.AddAuthentication()
-    .AddGoogle(options =>
+    .AddOpenIdConnect("Google", options =>
     {
+        options.Authority = "https://accounts.google.com/";
+        options.CallbackPath = "/signin-google";
         options.ClientId = configuration["Authentication:Google:ClientId"];
         options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+        options.ResponseType = OpenIdConnectResponseType.Code;
+
+        options.UsePkce = true;
+        options.SaveTokens = true;
+
+        options.Scope.Add(OpenIdConnectScope.OpenId);
+        options.Scope.Add(OpenIdConnectScope.Email);
     })
     .AddFacebook(options =>
     {
         options.ClientId = configuration["Authentication:Facebook:ClientId"];
         options.ClientSecret = configuration["Authentication:Facebook:ClientSecret"];
+        options.UsePkce = true;
+        options.SaveTokens = true;
+    })
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     });
 
 var app = builder.Build();
@@ -80,6 +119,11 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<NotificationHub>("/NotificationHub");
+});
 
 app.MapControllerRoute(
                 name: "default",
