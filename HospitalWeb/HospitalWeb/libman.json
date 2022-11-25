@@ -21,6 +21,11 @@
     {
       "library": "jquery-validate@1.19.5",
       "destination": "wwwroot/lib/jQuery-Validation/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@6.0.11",
+      "destination": "wwwroot/lib/microsoft/signalr/"
     }
   ]
 }
