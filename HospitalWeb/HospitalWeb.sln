@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HospitalWeb.WebApi", "Hospi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HospitalWeb.WebApi.Tests", "HospitalWeb.WebApi.Tests\HospitalWeb.WebApi.Tests.csproj", "{D925E3DB-AAC7-44F1-A705-815043417228}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HospitalWeb.Tests.Services", "HospitalWeb.Tests.Services\HospitalWeb.Tests.Services.csproj", "{F5E6C96D-0DD3-4766-BA04-47401E4D0098}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HospitalWeb.Tests.Services", "HospitalWeb.Tests.Services\HospitalWeb.Tests.Services.csproj", "{F5E6C96D-0DD3-4766-BA04-47401E4D0098}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
