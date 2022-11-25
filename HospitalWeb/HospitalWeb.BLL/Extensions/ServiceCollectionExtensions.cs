@@ -20,5 +20,10 @@ namespace HospitalWeb.Services.Extensions
         {
             services.AddScoped<IFileManager, FileManager>();
         }
+
+        public static void AddPdfPrinter(this IServiceCollection services)
+        {
+            services.AddScoped<IPdfPrinter, PdfPrinter>();
+        }
     }
 }
