@@ -16,18 +16,21 @@ namespace HospitalWeb.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly ApiUnitOfWork _api;
         private readonly IFileManager _fileManager;
+        private readonly IPdfPrinter _pdfPrinter;
 
         public AppointmentsController(
             ILogger<AppointmentsController> logger,
             IWebHostEnvironment environment,
             ApiUnitOfWork api,
-            IFileManager fileManager
+            IFileManager fileManager,
+            IPdfPrinter pdfPrinter
             )
         {
             _logger = logger;
             _environment = environment;
             _api = api;
             _fileManager = fileManager;
+            _pdfPrinter = pdfPrinter;
         }
 
         [Authorize(Roles = "Doctor, Patient")]
@@ -242,6 +245,22 @@ namespace HospitalWeb.Controllers
                 _logger.LogCritical(err.StackTrace);
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
+        }
+
+        [HttpGet]
+        public IActionResult Print(int id)
+        {
+            var response = _api.Appointments.Get(id);
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+            var appointment = _api.Appointments.Read(response);
+
+            string filePath = Path.Combine(_environment.WebRootPath, $"files/docs/{id}.pdf");
+            _pdfPrinter.PrintAppointment(appointment, filePath);
+
+            return PhysicalFile(filePath, "application/json", $"{id}.pdf");
         }
     }
 }
