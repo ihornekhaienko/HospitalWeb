@@ -10,7 +10,7 @@ namespace HospitalWeb.WebApi.Models.ResourceModels
 
         public State State { get; set; }
 
-        public int DiagnosisId { get; set; }
+        public int? DiagnosisId { get; set; }
 
         public string DoctorId { get; set; }
 
