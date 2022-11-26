@@ -205,7 +205,8 @@ namespace HospitalWeb.WebApi.Tests
             var logger = Mock.Of<ILogger<AdminsController>>();
 
             var entity = DataGenerator.GetTestAdmins().First();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Admin, AdminResourceModel>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Admin, AdminResourceModel>()
+                .ForMember(d => d.Image, o => o.Ignore()));
             var mapper = new Mapper(config);
             var model = mapper.Map<Admin, AdminResourceModel>(entity);
 

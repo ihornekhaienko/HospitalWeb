@@ -154,7 +154,8 @@ namespace HospitalWeb.WebApi.Tests
             var logger = Mock.Of<ILogger<PatientsController>>();
 
             var entity = DataGenerator.GetTestPatients().First();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Patient, PatientResourceModel>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Patient, PatientResourceModel>()
+                .ForMember(d => d.Image, o => o.Ignore()));
             var mapper = new Mapper(config);
             var model = mapper.Map<Patient, PatientResourceModel>(entity);
 
