@@ -8,6 +8,8 @@ namespace HospitalWeb.DAL.Entities.Identity
         public string Surname { get; set; }
         public byte[] Image { get; set; }
 
+        public ICollection<Notification> Notifications { get; set; }
+
         public override string ToString()
         {
             return $"{Name} {Surname}";
