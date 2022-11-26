@@ -35,7 +35,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
                         NotificationId = n.NotificationId,
                         Topic = n.Topic,
                         Message = n.Message,
-                        IsRead = n.IsRead
+                        IsRead = n.IsRead,
+                        Type = n.Type
                     });
 
                 _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());

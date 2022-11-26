@@ -1,4 +1,6 @@
-﻿namespace HospitalWeb.WebApi.Models.ResourceModels
+﻿using HospitalWeb.DAL.Entities;
+
+namespace HospitalWeb.WebApi.Models.ResourceModels
 {
     public class NotificationResourceModel
     {
@@ -9,6 +11,8 @@
         public string Message { get; set; }
 
         public bool IsRead { get; set; }
+
+        public NotificationType Type { get; set; }
 
 
         public string AppUserId { get; set; }

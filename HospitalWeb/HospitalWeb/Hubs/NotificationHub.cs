@@ -1,4 +1,5 @@
-﻿using HospitalWeb.WebApi.Clients.Implementations;
+﻿using HospitalWeb.DAL.Entities;
+using HospitalWeb.WebApi.Clients.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.SignalR;
 
@@ -27,7 +28,8 @@ namespace HospitalWeb.Hubs
                     Topic = topic,
                     Message = message,
                     IsRead = false,
-                    AppUserId = receiver
+                    AppUserId = receiver,
+                    Type = NotificationType.Primary
                 };
                 _api.Notifications.Post(notification);
 
@@ -54,7 +56,8 @@ namespace HospitalWeb.Hubs
                     Topic = topic,
                     Message = message,
                     IsRead = false,
-                    AppUserId = receiver
+                    AppUserId = receiver,
+                    Type = NotificationType.Danger
                 };
                 _api.Notifications.Post(notification);
 
@@ -81,7 +84,8 @@ namespace HospitalWeb.Hubs
                     Topic = topic,
                     Message = message,
                     IsRead = false,
-                    AppUserId = receiver
+                    AppUserId = receiver,
+                    Type = NotificationType.Success
                 };
                 _api.Notifications.Post(notification);
 
