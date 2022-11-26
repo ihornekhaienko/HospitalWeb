@@ -4,6 +4,7 @@ using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Appointments;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -183,7 +184,8 @@ namespace HospitalWeb.Controllers
                 DoctorId = appointment.Doctor.Id,
                 Doctor = appointment.Doctor.ToString(),
                 DoctorSpecialty = appointment.Doctor.Specialty.SpecialtyName,
-                Patient = appointment.Patient.ToString()
+                Patient = appointment.Patient.ToString(),
+                PatientId = appointment.PatientId
             };
 
             return View(model);
@@ -209,23 +211,9 @@ namespace HospitalWeb.Controllers
                     if (appointment.State == State.Planned)
                     {
                         response = _api.Diagnoses.Get(model.Diagnosis);
-                        Diagnosis diagnosis;
+                        var diagnosis = _api.Diagnoses.GetOrCreate(model.Diagnosis);
 
-                        if (response.IsSuccessStatusCode)
-                        {
-                            diagnosis = _api.Diagnoses.Read(response);
-                        }
-                        else
-                        {
-                            diagnosis = new Diagnosis
-                            {
-                                DiagnosisName = model.Diagnosis
-                            };
-
-                            _api.Diagnoses.Post(diagnosis);
-                        }
-
-                        appointment.Diagnosis = diagnosis;
+                        appointment.DiagnosisId = diagnosis.DiagnosisId;
                         appointment.Prescription = model.Prescription;
                         appointment.State = State.Completed;
                         _api.Appointments.Put(appointment);
