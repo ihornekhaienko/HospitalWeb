@@ -1,4 +1,5 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
+﻿using HospitalWeb.DAL.Entities;
+using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Services.Extensions;
@@ -373,6 +374,22 @@ namespace HospitalWeb.Controllers
                 _logger.LogCritical(err.StackTrace);
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
+        }
+
+        public IActionResult ReadNotification(int id)
+        {
+            var response = _api.Notifications.Get(id);
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+            var notification = _api.Notifications.Read(response);
+
+            notification.IsRead = true;
+            notification.Type = NotificationType.Secondary;
+            _api.Notifications.Put(notification);
+
+            return Ok();
         }
     }
 }
