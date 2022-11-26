@@ -76,7 +76,8 @@
                         @foreach (var notification in Model.Notifications.Notifications)
                         {
                             <div class="row">
-                                <div class="alert mb-1 p-1 alert-@(notification.Type.ToString().ToLower())">
+                                <div id="alert-@notification.NotificationId" class="alert mb-1 p-1 alert-@(notification.Type.ToString().ToLower())" 
+                                onclick="read(@notification.NotificationId)">
                                     <h6 class="alert-heading">@notification.Topic</h6>
                                     <p class="m-0">@notification.Message</p>
                                 </div>
@@ -103,5 +104,28 @@
         $('#uploader').change(function() {
             this.form.submit();
         });
+
+        function read(id) {
+            try {
+                $.ajax({
+                    url: '@Url.Action("ReadNotification", "Manage")',
+                    data: { "id": id.toString() },
+                    contentType: "application/json",
+                    success: function (response) {
+                        let div = document.getElementById('alert-' + id);
+                        console.log(div);
+                        div.classList.remove('alert-success');
+                        div.classList.remove('alert-danger');
+                        div.classList.remove('alert-primary');
+                        div.classList.add('alert-secondary');
+                    },
+                    error: function (err) {
+                        console.log(err.responseText);
+                    }
+                });
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
     </script>
 }
