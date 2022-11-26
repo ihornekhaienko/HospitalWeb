@@ -1,14 +1,20 @@
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;
+using HospitalWeb.WebApi;
+using HospitalWeb.WebApi.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(o =>
@@ -43,6 +49,69 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
 
 builder.Services.AddUnitOfWork();
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+    })
+    .AddJwtBearer("Google", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidAudience = configuration["Authentication:Google:ClientId"],
+
+            ValidateIssuer = true,
+            ValidIssuer = "https://accounts.google.com/",
+
+            ValidateIssuerSigningKey = true
+        };
+
+        options.SecurityTokenValidators.Clear();
+        options.SecurityTokenValidators.Add(new GoogleTokenValidator(configuration["Authentication:Google:ClientId"]));
+    });
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer("Google", async options =>
+//    {
+//        string authority = "https://accounts.google.com/";
+//        string validIssuer = authority;
+//        string validAudience = configuration["Authentication:Google:ClientId"];
+
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidAudience = validAudience,
+//            ValidIssuer = validIssuer,
+//            ValidateIssuerSigningKey = true,
+//            IssuerSigningKeys = await GetSignInKeys()
+//        };
+
+//        async Task<IEnumerable<SecurityKey>> GetSignInKeys()
+//        {
+//            var httpClient = new HttpClient();
+//            var metadataRequest = new HttpRequestMessage(HttpMethod.Get, $"{authority}.well-known/openid-configuration");
+//            var metadataResponse = await httpClient.SendAsync(metadataRequest);
+
+//            string content = await metadataResponse.Content.ReadAsStringAsync();
+//            var payload = JObject.Parse(content);
+//            string jwksUri = payload.Value<string>("jwks_uri");
+
+//            var keysRequest = new HttpRequestMessage(HttpMethod.Get, jwksUri);
+//            var keysResponse = await httpClient.SendAsync(keysRequest);
+//            var keysPayload = await keysResponse.Content.ReadAsStringAsync();
+//            var signinKeys = new JsonWebKeySet(keysPayload).Keys;
+
+//            return signinKeys;
+//        }
+
+//        options.Authority = authority;
+//    });
+
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(jwt => jwt.UseGoogle(
+//        clientId: configuration["Authentication:Google:ClientId"]));
 
 var app = builder.Build();
 
