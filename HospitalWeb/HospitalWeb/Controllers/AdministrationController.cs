@@ -256,7 +256,8 @@ namespace HospitalWeb.Controllers
                 if (ModelState.IsValid)
                 {
                     var specialty = _api.Specialties.GetOrCreate(model.Specialty);
-                    var password = _passwordGenerator.GeneratePassword(null);
+                    //var password = _passwordGenerator.GeneratePassword(null);
+                    var password = "Pass_1111";
 
                     var doctor = new DoctorResourceModel
                     {
@@ -288,6 +289,16 @@ namespace HospitalWeb.Controllers
                         }
                     }
                 }
+
+                var result = _api.Specialties.Get();
+                if (!result.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+                ViewBag.Specialties = _api.Specialties
+                    .ReadMany(result)
+                    .Select(s => s.SpecialtyName)
+                    .OrderBy(s => s);
 
                 return View(model);
             }
@@ -381,7 +392,10 @@ namespace HospitalWeb.Controllers
                 {
                     return NotFound();
                 }
-                ViewBag.Specialties = _api.Specialties.ReadMany(result);
+                ViewBag.Specialties = _api.Specialties
+                    .ReadMany(result)
+                    .Select(s => s.SpecialtyName)
+                    .OrderBy(s => s);
 
                 return View(model);
             }
