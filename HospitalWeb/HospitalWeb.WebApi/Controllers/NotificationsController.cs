@@ -39,12 +39,12 @@ namespace HospitalWeb.WebApi.Controllers
         /// <summary>
         /// Returns the Notifications by User
         /// </summary>
-        /// <param name="id">User's id</param>
+        /// <param name="owner">User's id</param>
         /// <returns>List of Notifications</returns>
         [HttpGet("details")]
-        public async Task<IEnumerable<Notification>> Get(string id)
+        public async Task<IEnumerable<Notification>> Get(string owner)
         {
-            return await _uow.Notifications.GetAllAsync(filter: n => n.AppUserId == id, include: n => n.Include(n => n.AppUser));
+            return await _uow.Notifications.GetAllAsync(filter: n => n.AppUserId == owner, include: n => n.Include(n => n.AppUser));
         }
 
         /// <summary>
