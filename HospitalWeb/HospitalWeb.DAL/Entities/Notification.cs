@@ -4,7 +4,7 @@ namespace HospitalWeb.DAL.Entities
 {
     public enum NotificationType
     {
-        Info,
+        Secondary,
         Danger,
         Success,
         Primary
