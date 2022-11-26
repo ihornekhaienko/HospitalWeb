@@ -39,5 +39,23 @@ namespace HospitalWeb.Hubs
                 throw;
             }
         }
+
+        public async Task NotifyFill(string receiver, string topic, string message)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(receiver))
+                {
+                    throw new ArgumentNullException(nameof(receiver));
+                }
+
+                await Clients.User(receiver).SendAsync("NotifyFill", topic, message);
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+                throw;
+            }
+        }
     }
 }

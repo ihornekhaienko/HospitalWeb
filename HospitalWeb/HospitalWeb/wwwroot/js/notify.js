@@ -100,10 +100,10 @@ function notifySignUp(receiver, topic, message) {
 
 hubConnection.on("NotifySignUp", function (topic, message) {
     try {
-        document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-success'));
+        document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-info'));
         let row = document.createElement('div');
         row.classList.add('row');
-        row.appendChild(createNotificationDiv(topic, message, 'alert-success'));
+        row.appendChild(createNotificationDiv(topic, message, 'alert-info'));
         document.getElementById("notifications-profile").appendChild(row);
 
         increment();
@@ -127,6 +127,29 @@ hubConnection.on("NotifyCancel", function (topic, message) {
         let row = document.createElement('div');
         row.classList.add('row');
         row.appendChild(createNotificationDiv(topic, message, 'alert-danger'));
+        document.getElementById("notifications-profile").appendChild(row);
+
+        increment();
+        updatePopover();
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+function notifyFill(receiver, topic, message) {
+    try {
+        hubConnection.invoke("NotifyFill", receiver, topic, message);
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
+hubConnection.on("NotifyFill", function (topic, message) {
+    try {
+        document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-success'));
+        let row = document.createElement('div');
+        row.classList.add('row');
+        row.appendChild(createNotificationDiv(topic, message, 'alert-success'));
         document.getElementById("notifications-profile").appendChild(row);
 
         increment();

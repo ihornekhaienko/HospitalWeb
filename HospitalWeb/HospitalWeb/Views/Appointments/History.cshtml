@@ -63,7 +63,7 @@
                                     </div>
                                     <div class="mb-1">
                                         <a asp-controller="Appointments" asp-action="Cancel" asp-route-id="@appointment.AppointmentId" 
-                                        onclick="notifyCancel('@appointment.PatientId', '@SharedLocalizer["CancelTopic"]', '@SharedLocalizer["YourAppointment"] @appointment.AppointmentDate.ToString("MM/dd/yyyy hh:mm") @SharedLocalizer["CancelMessage"]');"
+                                        onclick="notifyCancel('@appointment.PatientId', '@SharedLocalizer["CancelTopic"]', '@SharedLocalizer["YourAppointment"] @appointment.AppointmentDate.ToString("MM/dd/yyyy HH:mm") @SharedLocalizer["CancelMessage"]');"
                                         class="btn btn-danger btn-230 flex-grow-1">@SharedLocalizer["Cancel"]</a>
                                     </div>
                                 }

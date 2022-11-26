@@ -51,7 +51,10 @@
                     <textarea asp-for="Prescription" cols="100" rows="20"></textarea>
                 </p>
                 <p>
-                    <button class="btn btn-primary">@SharedLocalizer["Submit"]</button>
+                    <button class="btn btn-primary"
+                    onclick="notifyCancel('@Model.PatientId', '@Localizer["FillTopic"]', '@Localizer["FillMessage"] @Model.AppointmentDate.ToString("MM/dd/yyyy HH:mm")');">
+                        @SharedLocalizer["Submit"]
+                    </button>
                 </p>
             </form>
         </div>

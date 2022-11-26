@@ -15,7 +15,7 @@
                         {
                             <a asp-controller="Doctors" asp-action="SignUpForAppointment" 
                                 asp-route-doctorId="@day.DoctorId" asp-route-date="@slot.Time" class="btn btn-primary" 
-                                onclick="confirmSignUp('@Localizer["AppointmentConfirmation"]'); notifySignUp('@day.DoctorId', '@Localizer["NewAppointmentTopic"]', '@Localizer["NewAppointmentMessage"] @slot.Time.ToString("MM/dd/yyyy hh:mm")');">
+                                onclick="confirmSignUp('@Localizer["AppointmentConfirmation"]'); notifySignUp('@day.DoctorId', '@Localizer["NewAppointmentTopic"]', '@Localizer["NewAppointmentMessage"] @slot.Time.ToString("MM/dd/yyyy HH:mm")');">
                                 @slot.ToString()
                             </a>
                         }

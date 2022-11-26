@@ -20,6 +20,8 @@ namespace HospitalWeb.ViewModels.Appointments
 
         public string DoctorSpecialty { get; set; }
 
+        public string PatientId { get; set; }
+
         public string Patient { get; set; }
     }
 }
