@@ -75,7 +75,21 @@
                     <div class="row">
                         <h5>@SharedLocalizer["Notifications"]</h5>
                     </div>
-                    <partial name="_NotificationsPartial" />
+                    <div id="notifications-profile">
+                        @foreach (var notification in Model.Notifications.Notifications)
+                        {
+                            <div class="row">
+                                <div class="alert mb-1 p-1 alert-@(notification.Type.ToString().ToLower())">
+                                    <h6 class="alert-heading">@notification.Topic</h6>
+                                    <p class="m-0">@notification.Message</p>
+                                </div>
+                            </div>
+                        }
+                        </div>
+
+                    <div class="row">
+                        <page-link page-model="@(Model.Notifications.PageModel)" page-action="PatientProfile"></page-link>
+                    </div>
                 </div><br>
             </div>
         </div>
