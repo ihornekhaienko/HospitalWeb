@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HospitalWeb.Filters.Models.ViewModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace HospitalWeb.ViewModels.Manage
 {
@@ -31,5 +32,7 @@ namespace HospitalWeb.ViewModels.Manage
         [Required(ErrorMessage = "LocalityRequired")]
         [Display(Name = "Locality")]
         public string Locality { get; set; }
+
+        public NotificationsViewModel Notifications { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HospitalWeb.Filters.Models.ViewModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace HospitalWeb.ViewModels.Manage
 {
@@ -25,5 +26,7 @@ namespace HospitalWeb.ViewModels.Manage
         public byte[] Image { get; set; }
 
         public string Specialty { get; set; }
+
+        public NotificationsViewModel Notifications { get; set; }
     }
 }
