@@ -1,5 +1,6 @@
 ﻿using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Implementations;
+using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Services.Extensions;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
@@ -60,7 +61,7 @@ namespace HospitalWeb.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<IActionResult> AdminProfile()
+        public async Task<IActionResult> AdminProfile(int page = 1)
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
@@ -73,6 +74,11 @@ namespace HospitalWeb.Controllers
 
             var admin = _api.Admins.Read(response);
 
+            var builder = new NotificationsViewModelBuilder(_api, page, admin.Id);
+            var director = new ViewModelBuilderDirector();
+            director.MakeViewModel(builder);
+            var notifications = builder.GetViewModel();
+
             var model = new AdminProfileViewModel
             {
                 Name = admin.Name,
@@ -80,7 +86,8 @@ namespace HospitalWeb.Controllers
                 Email = admin.Email,
                 Phone = admin.PhoneNumber,
                 Image = admin.Image,
-                IsSuperAdmin = admin.IsSuperAdmin
+                IsSuperAdmin = admin.IsSuperAdmin,
+                Notifications = notifications
             };
 
             return View(model);
@@ -128,7 +135,7 @@ namespace HospitalWeb.Controllers
 
         [Authorize(Roles = "Doctor")]
         [HttpGet]
-        public async Task<IActionResult> DoctorProfile()
+        public async Task<IActionResult> DoctorProfile(int page = 1)
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
@@ -141,6 +148,11 @@ namespace HospitalWeb.Controllers
 
             var doctor = _api.Doctors.Read(response);
 
+            var builder = new NotificationsViewModelBuilder(_api, page, doctor.Id);
+            var director = new ViewModelBuilderDirector();
+            director.MakeViewModel(builder);
+            var notifications = builder.GetViewModel();
+
             var model = new DoctorProfileViewModel
             {
                 Name = doctor.Name,
@@ -148,7 +160,8 @@ namespace HospitalWeb.Controllers
                 Email = doctor.Email,
                 Phone = doctor.PhoneNumber,
                 Image = doctor.Image,
-                Specialty = doctor.Specialty.SpecialtyName
+                Specialty = doctor.Specialty.SpecialtyName,
+                Notifications = notifications
             };
 
             return View(model);
@@ -196,7 +209,7 @@ namespace HospitalWeb.Controllers
 
         [Authorize(Roles = "Patient")]
         [HttpGet]
-        public async Task<IActionResult> PatientProfile()
+        public async Task<IActionResult> PatientProfile(int page = 1)
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
@@ -209,6 +222,11 @@ namespace HospitalWeb.Controllers
 
             var patient = _api.Patients.Read(response);
 
+            var builder = new NotificationsViewModelBuilder(_api, page, patient.Id);
+            var director = new ViewModelBuilderDirector();
+            director.MakeViewModel(builder);
+            var notifications = builder.GetViewModel();
+
             var model = new PatientProfileViewModel
             {
                 Name = patient.Name,
@@ -217,7 +235,8 @@ namespace HospitalWeb.Controllers
                 Phone = patient.PhoneNumber,
                 Image = patient.Image,
                 Address = patient.Address.FullAddress,
-                Locality = patient.Address.Locality.LocalityName
+                Locality = patient.Address.Locality.LocalityName,
+                Notifications = notifications
             };
 
             return View(model);
