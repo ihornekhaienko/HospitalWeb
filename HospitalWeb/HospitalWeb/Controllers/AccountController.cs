@@ -185,6 +185,7 @@ namespace HospitalWeb.Controllers
 
             if (result.Succeeded)
             {
+                await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
                 return RedirectToLocal(returnUrl);
             }
             else
@@ -242,6 +243,7 @@ namespace HospitalWeb.Controllers
 
                         if (result.Succeeded)
                         {
+                            //await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
                             await _signInManager.SignInAsync(entity, false);
 
                             return RedirectToLocal(returnUrl);
@@ -334,7 +336,7 @@ namespace HospitalWeb.Controllers
 
                     if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                     {
-                        return RedirectToAction("ForgotPasswordConfirmation");
+                        return RedirectToAction("ForgotPasswordConfirm");
                     }
 
                     var code = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -346,7 +348,7 @@ namespace HospitalWeb.Controllers
                         );
                     await _notifier.SendResetPasswordLink(model.Email, callbackUrl);
 
-                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                    return RedirectToAction("ForgotPasswordConfirm", "Account");
                 }
 
                 return View(model);
@@ -360,7 +362,7 @@ namespace HospitalWeb.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult ForgotPasswordConfirmation()
+        public IActionResult ForgotPasswordConfirm()
         {
             return View();
         }
