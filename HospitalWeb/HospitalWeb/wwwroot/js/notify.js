@@ -101,10 +101,13 @@ function notifySignUp(receiver, topic, message) {
 hubConnection.on("NotifySignUp", function (topic, message) {
     try {
         document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-info'));
-        let row = document.createElement('div');
-        row.classList.add('row');
-        row.appendChild(createNotificationDiv(topic, message, 'alert-info'));
-        document.getElementById("notifications-profile").appendChild(row);
+        let np = document.getElementById("notifications-profile");
+        if (np) {
+            let row = document.createElement('div');
+            row.classList.add('row');
+            row.appendChild(createNotificationDiv(topic, message, 'alert-info'));
+            np.appendChild(row);
+        }
 
         increment();
         updatePopover();
@@ -124,10 +127,13 @@ function notifyCancel(receiver, topic, message) {
 hubConnection.on("NotifyCancel", function (topic, message) {
     try {
         document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-danger'));
-        let row = document.createElement('div');
-        row.classList.add('row');
-        row.appendChild(createNotificationDiv(topic, message, 'alert-danger'));
-        document.getElementById("notifications-profile").appendChild(row);
+        let np = document.getElementById("notifications-profile");
+        if (np) {
+            let row = document.createElement('div');
+            row.classList.add('row');
+            row.appendChild(createNotificationDiv(topic, message, 'alert-danger'));
+            np.appendChild(row);
+        }
 
         increment();
         updatePopover();
@@ -147,10 +153,13 @@ function notifyFill(receiver, topic, message) {
 hubConnection.on("NotifyFill", function (topic, message) {
     try {
         document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-success'));
-        let row = document.createElement('div');
-        row.classList.add('row');
-        row.appendChild(createNotificationDiv(topic, message, 'alert-success'));
-        document.getElementById("notifications-profile").appendChild(row);
+        let np = document.getElementById("notifications-profile");
+        if (np) {
+            let row = document.createElement('div');
+            row.classList.add('row');
+            row.appendChild(createNotificationDiv(topic, message, 'alert-success'));
+            np.appendChild(row);
+        }
 
         increment();
         updatePopover();
