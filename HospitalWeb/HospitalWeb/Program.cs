@@ -74,19 +74,19 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 builder.Services.AddAuthentication()
     .AddOpenIdConnect("Google", options =>
-    {
-        options.Authority = "https://accounts.google.com/";
-        options.CallbackPath = "/signin-google";
-        options.ClientId = configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-        options.ResponseType = OpenIdConnectResponseType.Code;
+     {
+         options.Authority = "https://accounts.google.com/";
+         options.CallbackPath = "/signin-google";
+         options.ClientId = configuration["Authentication:Google:ClientId"];
+         options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+         options.ResponseType = OpenIdConnectResponseType.Code;
 
-        options.UsePkce = true;
-        options.SaveTokens = true;
+         options.UsePkce = true;
+         options.SaveTokens = true;
 
-        options.Scope.Add(OpenIdConnectScope.OpenId);
-        options.Scope.Add(OpenIdConnectScope.Email);
-    })
+         options.Scope.Add(OpenIdConnectScope.OpenId);
+         options.Scope.Add(OpenIdConnectScope.Email);
+     })
     .AddFacebook(options =>
     {
         options.ClientId = configuration["Authentication:Facebook:ClientId"];
