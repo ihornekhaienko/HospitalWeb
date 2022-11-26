@@ -100,12 +100,12 @@ function notifySignUp(receiver, topic, message) {
 
 hubConnection.on("NotifySignUp", function (topic, message) {
     try {
-        document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-info'));
+        document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-primary'));
         let np = document.getElementById("notifications-profile");
         if (np) {
             let row = document.createElement('div');
             row.classList.add('row');
-            row.appendChild(createNotificationDiv(topic, message, 'alert-info'));
+            row.appendChild(createNotificationDiv(topic, message, 'alert-primary'));
             np.appendChild(row);
         }
 
