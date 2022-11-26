@@ -21,9 +21,9 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.GetAsync($"Notifications/{identifier}").Result;
         }
 
-        public HttpResponseMessage Get(string name)
+        public HttpResponseMessage Filter(string owner, int pageSize = 10, int pageNumber = 1)
         {
-            return _client.GetAsync($"Notifications/details?name={name}").Result;
+            return _client.GetAsync($"Notifications/details?owner={owner}&pageSize={pageSize}&pageNumber={pageNumber}").Result;
         }
 
         public override Notification Read(HttpResponseMessage response)

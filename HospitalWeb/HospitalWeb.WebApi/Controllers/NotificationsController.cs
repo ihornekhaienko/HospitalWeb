@@ -40,11 +40,40 @@ namespace HospitalWeb.WebApi.Controllers
         /// Returns the Notifications by User
         /// </summary>
         /// <param name="owner">User's id</param>
+        /// <param name="pageSize">Count of the result on one page</param>
+        /// <param name="pageNumber">Number of the page</param>
         /// <returns>List of Notifications</returns>
         [HttpGet("details")]
-        public async Task<IEnumerable<Notification>> Get(string owner)
+        public async Task<IEnumerable<Notification>> Get(string owner, int pageSize = 10, int pageNumber = 1)
         {
-            return await _uow.Notifications.GetAllAsync(filter: n => n.AppUserId == owner, include: n => n.Include(n => n.AppUser));
+            int totalCount = 0;
+
+            Func<Notification, bool> filter = (n) =>
+            {
+                return n.AppUserId == owner;
+            };
+
+            Func<IQueryable<Notification>, IOrderedQueryable<Notification>> orderBy = (notifications) =>
+            {
+                totalCount = notifications.Count();
+
+                return notifications.OrderByDescending(n => n.NotificationId);
+            };
+
+            var notifications = await _uow.Notifications.GetAllAsync(
+                filter: filter,
+                orderBy: orderBy,
+                first: pageSize,
+                offset: (pageNumber - 1) * pageSize,
+                include: n => n.Include(n => n.AppUser));
+
+            Response.Headers.Add("TotalCount", totalCount.ToString());
+            Response.Headers.Add("Count", notifications.Count().ToString());
+            Response.Headers.Add("PageSize", pageSize.ToString());
+            Response.Headers.Add("PageNumber", pageNumber.ToString());
+            Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
+
+            return notifications;
         }
 
         /// <summary>
