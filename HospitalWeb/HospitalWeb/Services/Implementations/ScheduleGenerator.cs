@@ -41,7 +41,7 @@ namespace HospitalWeb.Services.Implementations
             {
                 if (date.Date == _today.Date)
                 {
-                    if (time.Hour - _today.Hour >= 1)
+                    if (time.Hour - _today.Hour > 2)
                     {
                         slots.Add(new SlotViewModel { Time = time, IsFree = _api.Appointments.IsDateFree(doctor.Id, time) });
                     }
