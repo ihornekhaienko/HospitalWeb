@@ -118,10 +118,10 @@ namespace HospitalWeb.Controllers
                     AppointmentDate = date,
                     State = State.Planned,
                     DoctorId = doctor.Id,
-                    Patient = patient
+                    PatientId = patient.Id
                 };
 
-                _api.Appointments.Post(appointment);
+                response = _api.Appointments.Post(appointment);
 
                 return RedirectToAction("Details", "Doctors", new { id = doctorId });
             }
