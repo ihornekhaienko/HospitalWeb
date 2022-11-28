@@ -25,5 +25,10 @@ namespace HospitalWeb.Services.Extensions
         {
             services.AddScoped<IPdfPrinter, PdfPrinter>();
         }
+
+        public static void AddZoom(this IServiceCollection services)
+        {
+            services.AddScoped<IMeetingService, ZoomMeetingService>();
+        }
     }
 }
