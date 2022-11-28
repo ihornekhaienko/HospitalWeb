@@ -66,6 +66,9 @@
                                         onclick="notifyCancel('@appointment.PatientId', '@SharedLocalizer["CancelTopic"]', '@SharedLocalizer["YourAppointment"] @appointment.AppointmentDate.ToString("MM/dd/yyyy HH:mm") @SharedLocalizer["CancelMessage"]');"
                                         class="btn btn-danger btn-230 flex-grow-1">@SharedLocalizer["Cancel"]</a>
                                     </div>
+                                    <div class="mb-1">
+                                        <a href="@appointment.MeetingStartLink" target="_blank">@SharedLocalizer["Join"]</a>
+                                    </div>
                                 }
                             </div>
                             <div class="flex-grow-1 ms-3">
