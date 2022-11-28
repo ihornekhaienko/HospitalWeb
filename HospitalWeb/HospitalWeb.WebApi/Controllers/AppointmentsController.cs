@@ -130,6 +130,7 @@ namespace HospitalWeb.WebApi.Controllers
                 .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize,
                 include: a => a
                 .Include(a => a.Diagnosis)
+                .Include(a => a.Meeting)
                 .Include(a => a.Doctor)
                     .ThenInclude(d => d.Specialty)
                 .Include(a => a.Patient)
@@ -156,6 +157,7 @@ namespace HospitalWeb.WebApi.Controllers
             var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id,
                 include: a => a
                 .Include(a => a.Diagnosis)
+                .Include(a => a.Meeting)
                 .Include(a => a.Doctor)
                     .ThenInclude(d => d.Specialty)
                 .Include(a => a.Patient)
@@ -183,6 +185,7 @@ namespace HospitalWeb.WebApi.Controllers
                 .GetAsync(a => a.Doctor.Id == doctor && DateTime.Compare(a.AppointmentDate, date) == 0, 
                 include: a => a
                 .Include(a => a.Diagnosis)
+                .Include(a => a.Meeting)
                 .Include(a => a.Doctor)
                     .ThenInclude(d => d.Specialty)
                 .Include(a => a.Patient)
