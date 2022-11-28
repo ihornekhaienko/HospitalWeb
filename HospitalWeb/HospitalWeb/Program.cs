@@ -34,6 +34,7 @@ builder.Services.AddPasswordGenerator();
 builder.Services.AddFileManager();
 builder.Services.AddScheduleGenerator();
 builder.Services.AddPdfPrinter();
+builder.Services.AddZoom();
 
 builder.Services.AddSignalR();
 
