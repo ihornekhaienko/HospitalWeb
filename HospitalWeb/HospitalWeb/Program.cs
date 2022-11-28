@@ -59,15 +59,15 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 //builder.Services.AddAuthentication()
 //    .AddGoogle(options =>
 //    {
-//        options.ClientId = configuration["Authentication:Google:ClientId"];
-//        options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+//        options.ClientId = configuration["OAuth:Google:ClientId"];
+//        options.ClientSecret = configuration["OAuth:Google:ClientSecret"];
 //        options.UsePkce = true;
 //        options.SaveTokens = true;
 //    })
 //    .AddFacebook(options =>
 //    {
-//        options.ClientId = configuration["Authentication:Facebook:ClientId"];
-//        options.ClientSecret = configuration["Authentication:Facebook:ClientSecret"];
+//        options.ClientId = configuration["OAuth:Facebook:ClientId"];
+//        options.ClientSecret = configuration["OAuth:Facebook:ClientSecret"];
 //        options.UsePkce = true;
 //        options.SaveTokens = true;
 //    });
@@ -77,8 +77,8 @@ builder.Services.AddAuthentication()
      {
          options.Authority = "https://accounts.google.com/";
          options.CallbackPath = "/signin-google";
-         options.ClientId = configuration["Authentication:Google:ClientId"];
-         options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+         options.ClientId = configuration["OAuth:Google:ClientId"];
+         options.ClientSecret = configuration["OAuth:Google:ClientSecret"];
          options.ResponseType = OpenIdConnectResponseType.Code;
 
          options.UsePkce = true;
@@ -89,8 +89,8 @@ builder.Services.AddAuthentication()
      })
     .AddFacebook(options =>
     {
-        options.ClientId = configuration["Authentication:Facebook:ClientId"];
-        options.ClientSecret = configuration["Authentication:Facebook:ClientSecret"];
+        options.ClientId = configuration["OAuth:Facebook:ClientId"];
+        options.ClientSecret = configuration["OAuth:Facebook:ClientSecret"];
         options.UsePkce = true;
         options.SaveTokens = true;
     })
