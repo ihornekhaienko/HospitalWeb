@@ -36,5 +36,9 @@ namespace HospitalWeb.Filters.Models.DTO
         public string PatientBirthDate { get; set; }
 
         public byte[] PatientImage { get; set; }
+
+        public string MeetingStartLink { get; set; }
+
+        public string MeetingJoinLink { get; set; }
     }
 }

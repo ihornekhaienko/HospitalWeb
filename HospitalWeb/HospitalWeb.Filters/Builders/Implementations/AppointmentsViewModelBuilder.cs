@@ -66,7 +66,9 @@ namespace HospitalWeb.Filters.Builders.Implementations
                         Patient = a.Patient.ToString(),
                         PatientBirthDate = a.Patient.BirthDate.ToShortDateString(),
                         PatientSex = a.Patient.Sex.ToString(),
-                        PatientImage = a.Patient.Image
+                        PatientImage = a.Patient.Image,
+                        MeetingStartLink = a.Meetings.FirstOrDefault()?.StartLink,
+                        MeetingJoinLink = a.Meetings.FirstOrDefault()?.JoinLink,
                     });
 
                 _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());
