@@ -447,4 +447,7 @@
   <data name="YourAppointment" xml:space="preserve">
     <value>Your appointment on</value>
   </data>
+  <data name="Join" xml:space="preserve">
+    <value>Join the meeting</value>
+  </data>
 </root>
