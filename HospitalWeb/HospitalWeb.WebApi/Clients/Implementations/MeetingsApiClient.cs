@@ -21,6 +21,11 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return _client.GetAsync($"Meetings/{identifier}").Result;
         }
 
+        public HttpResponseMessage GetByAppointment(int appointmentId)
+        {
+            return _client.GetAsync($"Meetings/details?{appointmentId}").Result;
+        }
+
         public override Meeting Read(HttpResponseMessage response)
         {
             return response.Content.ReadAsAsync<Meeting>().Result;

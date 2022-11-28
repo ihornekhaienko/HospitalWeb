@@ -44,7 +44,25 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Meeting>> Get(int id)
         {
-            var meeting = await _uow.Meetings.GetAsync(s => s.MeetingId == id, include: m => m.Include(m => m.Appointment));
+            var meeting = await _uow.Meetings.GetAsync(m => m.MeetingId == id, include: m => m.Include(m => m.Appointment));
+
+            if (meeting == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(meeting);
+        }
+
+        /// <summary>
+        /// Returns the Meeting found by AppointmentId
+        /// </summary>
+        /// <param name="appointmentId">Appointment's id</param>
+        /// <returns>The Meeting object</returns>
+        [HttpGet("details")]
+        public async Task<ActionResult<Meeting>> GetByAppointment(int appointmentId)
+        {
+            var meeting = await _uow.Meetings.GetAsync(m => m.AppointmentId == appointmentId, include: m => m.Include(m => m.Appointment));
 
             if (meeting == null)
             {
@@ -103,7 +121,7 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Meeting>> Delete(int id)
         {
-            var meeting = await _uow.Meetings.GetAsync(s => s.MeetingId == id);
+            var meeting = await _uow.Meetings.GetAsync(m => m.MeetingId == id);
 
             if (meeting == null)
             {

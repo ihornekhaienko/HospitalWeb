@@ -1,6 +1,6 @@
-﻿namespace HospitalWeb.DAL.Entities
+﻿namespace HospitalWeb.WebApi.Models.ResourceModels
 {
-    public class Meeting
+    public class MeetingResourceModel
     {
         public int MeetingId { get; set; }
 
@@ -13,7 +13,5 @@
         public string JoinLink { get; set; }
 
         public int AppointmentId { get; set; }
-
-        public Appointment Appointment { get; set; }
     }
 }
