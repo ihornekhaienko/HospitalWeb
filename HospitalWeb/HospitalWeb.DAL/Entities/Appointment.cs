@@ -26,6 +26,9 @@ namespace HospitalWeb.DAL.Entities
         public int? DiagnosisId { get; set; }
         public Diagnosis Diagnosis { get; set; }
 
+        public int? MeetingId { get; set; }
+        public Meeting Meeting { get; set; }
+
         public string DoctorId { get; set; }
         public Doctor Doctor { get; set; }
 
