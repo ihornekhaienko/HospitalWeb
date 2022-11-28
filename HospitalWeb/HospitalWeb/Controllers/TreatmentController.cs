@@ -77,6 +77,12 @@ namespace HospitalWeb.Controllers
                     appointment.State = State.Canceled;
                     _api.Appointments.Put(appointment);
 
+                    var meeting = appointment.Meetings.FirstOrDefault();
+                    if (meeting != null)
+                    {
+                        _api.Meetings.Delete(meeting.MeetingId);
+                    }
+
                     return RedirectToAction("History", "Treatment");
                 }
                 else

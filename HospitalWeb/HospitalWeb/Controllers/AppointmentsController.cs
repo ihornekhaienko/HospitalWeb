@@ -143,6 +143,12 @@ namespace HospitalWeb.Controllers
                     appointment.State = State.Canceled;
                     _api.Appointments.Put(appointment);
 
+                    var meeting = appointment.Meetings.FirstOrDefault();
+                    if (meeting != null)
+                    {
+                        _api.Meetings.Delete(meeting.MeetingId);
+                    }
+
                     return RedirectToAction("History", "Appointments");
                 }
                 else
@@ -217,6 +223,12 @@ namespace HospitalWeb.Controllers
                         appointment.Prescription = model.Prescription;
                         appointment.State = State.Completed;
                         _api.Appointments.Put(appointment);
+
+                        var meeting = appointment.Meetings.FirstOrDefault();
+                        if (meeting != null)
+                        {
+                            _api.Meetings.Delete(meeting.MeetingId);
+                        }
 
                         return RedirectToAction("Today", "Appointments");
                     }

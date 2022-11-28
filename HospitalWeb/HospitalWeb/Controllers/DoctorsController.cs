@@ -4,6 +4,7 @@ using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Doctors;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +18,15 @@ namespace HospitalWeb.Controllers
         private readonly ApiUnitOfWork _api;
         private readonly IFileManager _fileManager;
         private readonly IScheduleGenerator _scheduleGenerator;
+        private readonly IMeetingService _meetingService;
 
         public DoctorsController(
             ILogger<DoctorsController> logger,
             IWebHostEnvironment environment,
             ApiUnitOfWork api,
             IFileManager fileManager,
-            IScheduleGenerator scheduleGenerator
+            IScheduleGenerator scheduleGenerator,
+            IMeetingService meetingService
             )
         {
             _logger = logger;
@@ -31,6 +34,7 @@ namespace HospitalWeb.Controllers
             _api = api;
             _fileManager = fileManager;
             _scheduleGenerator = scheduleGenerator;
+            _meetingService = meetingService;
         }
 
         [HttpGet]
@@ -111,9 +115,9 @@ namespace HospitalWeb.Controllers
                 {
                     return null;
                 }
-               var doctor = _api.Doctors.Read(response);
+                var doctor = _api.Doctors.Read(response);
 
-               var appointment = new Appointment
+                var appointment = new AppointmentResourceModel
                 {
                     AppointmentDate = date,
                     State = State.Planned,
@@ -122,6 +126,16 @@ namespace HospitalWeb.Controllers
                 };
 
                 response = _api.Appointments.Post(appointment);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return BadRequest();
+                }
+
+                var meeting = _meetingService.CreateMeeting(_api.Appointments.Read(response));
+
+                response = _api.Meetings.Post(meeting);
+                var res = _api.Meetings.Read(response);
 
                 return RedirectToAction("Details", "Doctors", new { id = doctorId });
             }
