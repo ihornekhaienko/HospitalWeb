@@ -2,11 +2,15 @@ using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;
 using HospitalWeb.WebApi;
+using HospitalWeb.WebApi.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -47,18 +51,56 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
 
 builder.Services.AddUnitOfWork();
 
-builder.Services.AddAuthentication(authenticationOptions =>
+builder.Services.AddAuthentication()
+    .AddJwtBearer("Google", o =>
+    {
+        o.IncludeErrorDetails = true;
+        o.SecurityTokenValidators.Clear();
+        o.SecurityTokenValidators.Add(new GoogleTokenValidator(config["OAuth:Google:ClientId"]));
+        o.SaveToken = true;
+    })
+    .AddJwtBearer("Internal", o =>
+    {
+        var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config["JWT:Key"]));
+
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = config["JWT:Issuer"],
+
+            ValidateAudience = true,
+            ValidAudience = config["JWT:Audience"],
+
+            ValidateLifetime = true,
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = securityKey
+        };
+    })
+    .AddPolicyScheme("Default", "Default", o =>
+    {
+        o.ForwardDefaultSelector = context =>
+        {
+            
+            var provider = context.Request.Headers["Provider"].First().ToString();
+
+            if (provider == "Google")
+            {
+                return "Google";
+            }
+            else
+            {
+                return "Internal";
+            }
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
 {
-    authenticationOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    authenticationOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    authenticationOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(jwtBearerOptions =>
-{
-    jwtBearerOptions.IncludeErrorDetails = true;
-    jwtBearerOptions.SecurityTokenValidators.Clear();
-    jwtBearerOptions.SecurityTokenValidators.Add(new GoogleTokenValidator(config["OAuth:Google:ClientId"]));
-    jwtBearerOptions.SaveToken = true;
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .AddAuthenticationSchemes("Default")
+        .Build();
 });
 
 var app = builder.Build();
