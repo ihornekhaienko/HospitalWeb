@@ -3,25 +3,45 @@ using HospitalWeb.Services.Interfaces;
 using HospitalWeb.Services.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace HospitalWeb.Services.Implementations
 {
-    public class GoogleApiHelper : IGoogleApiHelper
+    public class GoogleTokenProvider : ITokenProvider
     {
-        private readonly ILogger<GoogleApiHelper> _logger;
         private readonly IConfiguration _config;
         private readonly UserManager<AppUser> _userManager;
 
-        public GoogleApiHelper(ILogger<GoogleApiHelper> logger, IConfiguration config, UserManager<AppUser> userManager)
+        private ITokenProvider _successor;
+
+        public ITokenProvider Successor { get => _successor; set => _successor = value; }
+
+        public GoogleTokenProvider(
+            IConfiguration config, 
+            UserManager<AppUser> userManager)
         {
-            _logger = logger;
             _config = config;
             _userManager = userManager;
         }
 
-        public async Task<string> RefreshToken(AppUser user)
+        public async Task<TokenResult> GetToken(AppUser user)
+        {
+            var token = await RefreshToken(user);
+
+            if (token != null)
+            {
+                return new TokenResult { Token = token, Provider = "Google" };
+            }
+
+            if (Successor != null)
+            {
+                return await Successor.GetToken(user);
+            }
+
+            return null;
+        }
+
+        public  async Task<string> RefreshToken(AppUser user)
         {
             var refreshToken = await _userManager.GetAuthenticationTokenAsync(user, "Google", "refresh_token");
 
