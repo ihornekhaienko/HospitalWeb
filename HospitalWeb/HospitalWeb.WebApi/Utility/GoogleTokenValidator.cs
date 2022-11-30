@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Google.Apis.Auth;
 
-namespace HospitalWeb.WebApi
+namespace HospitalWeb.WebApi.Utility
 {
     public class GoogleTokenValidator : ISecurityTokenValidator
     {
@@ -35,15 +35,10 @@ namespace HospitalWeb.WebApi
                 var payload = GoogleJsonWebSignature.ValidateAsync(securityToken, new GoogleJsonWebSignature.ValidationSettings() { Audience = new[] { _clientId } }).Result; // here is where I delegate to Google to validate
 
                 var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, payload.Name),
-                        new Claim(ClaimTypes.Name, payload.Name),
-                        new Claim(JwtRegisteredClaimNames.FamilyName, payload.FamilyName),
-                        new Claim(JwtRegisteredClaimNames.GivenName, payload.GivenName),
-                        new Claim(JwtRegisteredClaimNames.Email, payload.Email),
-                        new Claim(JwtRegisteredClaimNames.Sub, payload.Subject),
-                        new Claim(JwtRegisteredClaimNames.Iss, payload.Issuer),
-                    };
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, payload.Email),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, "Patient"),
+                };
 
                 var principle = new ClaimsPrincipal();
                 principle.AddIdentity(new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme));
