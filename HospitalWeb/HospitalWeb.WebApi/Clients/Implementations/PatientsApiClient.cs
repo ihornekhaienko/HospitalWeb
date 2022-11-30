@@ -1,21 +1,15 @@
-﻿using AutoMapper;
-using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.WebApi.Clients.Interfaces;
+﻿using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Identity;
+using System.Net.Http.Headers;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class PatientsApiClient : ApiClient<Patient, PatientResourceModel, string>
+    public class PatientsApiClient : GenericApiClient<Patient, PatientResourceModel, string>
     {
-        public PatientsApiClient(IConfiguration config) : base(config)
+        public PatientsApiClient(IConfiguration config) : base(config, "Patients")
         {
-        }
-
-        public override HttpResponseMessage Get()
-        {
-            return _client.GetAsync("Patients").Result;
         }
 
         public HttpResponseMessage Filter(
@@ -23,61 +17,23 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             int? locality,
             PatientSortState sortOrder = PatientSortState.Id,
             int pageSize = 10,
-            int pageNumber = 1)
+            int pageNumber = 1,
+            string token = null,
+            string provider = null)
         {
-            return _client.GetAsync($"Patients?searchString={searchString}&locality={locality}&sortOrder={sortOrder}" +
-                $"&pageSize={pageSize}&pageNumber={pageNumber}").Result;
-        }
+            string query = $"?searchString={searchString}&locality={locality}&sortOrder={sortOrder}" +
+                $"&pageSize={pageSize}&pageNumber={pageNumber}";
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}{query}");
 
-        public override HttpResponseMessage Get(string identifier)
-        {
-            return _client.GetAsync($"Patients/{identifier}").Result;
-        }
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
 
-        public override Patient Read(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<Patient>().Result;
-        }
-
-        public override Patient Read(string identifier)
-        {
-            var response = Get(identifier);
-            return Read(response);
-        }
-
-        public override IEnumerable<Patient> ReadMany(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<IEnumerable<Patient>>().Result;
+            return _client.SendAsync(request).Result;
         }
 
         public IEnumerable<IdentityError> ReadErrors(HttpResponseMessage response)
         {
             return response.Content.ReadAsAsync<IEnumerable<IdentityError>>().Result;
-        }
-
-        public override HttpResponseMessage Post(PatientResourceModel obj)
-        {
-            return _client.PostAsJsonAsync("Patients", obj).Result;
-        }
-
-        public override HttpResponseMessage Post(Patient obj)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Patient, PatientResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Patient, PatientResourceModel>(obj);
-
-            return Post(model);
-        }
-
-        public override HttpResponseMessage Put(Patient obj)
-        {
-            return _client.PutAsJsonAsync("Patients", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(string identifier)
-        {
-            return _client.DeleteAsync($"Patients/{identifier}").Result;
         }
     }
 }

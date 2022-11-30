@@ -1,34 +1,28 @@
-﻿using AutoMapper;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.WebApi.Clients.Interfaces;
+﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using System.Net.Http.Headers;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class LocalitiesApiClient : ApiClient<Locality, LocalityResourceModel, int>
+    public class LocalitiesApiClient : GenericApiClient<Locality, LocalityResourceModel, int>
     {
-        public LocalitiesApiClient(IConfiguration config) : base(config)
+        public LocalitiesApiClient(IConfiguration config) : base(config, "Localities")
         {
         }
 
-        public override HttpResponseMessage Get()
+        public HttpResponseMessage Get(string name, string token = null, string provider = null)
         {
-            return _client.GetAsync("Localities").Result;
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}/details?name={name}");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
         }
 
-        public override HttpResponseMessage Get(int identifier)
+        public Locality GetOrCreate(string name, string token = null, string provider = null)
         {
-            return _client.GetAsync($"Localities/{identifier}").Result;
-        }
-
-        public HttpResponseMessage Get(string name)
-        {
-            return _client.GetAsync($"Localities/details?name={name}").Result;
-        }
-
-        public Locality GetOrCreate(string name)
-        {
-            var response = Get(name);
+            var response = Get(name, token, provider);
 
             if (response.IsSuccessStatusCode)
             {
@@ -41,49 +35,8 @@ namespace HospitalWeb.WebApi.Clients.Implementations
                     LocalityName = name
                 };
 
-                return Read(Post(locality));
+                return Read(Post(locality, token, provider));
             }
-        }
-
-        public override Locality Read(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<Locality>().Result;
-        }
-
-        public override Locality Read(int identifier)
-        {
-            var response = Get(identifier);
-            return Read(response);
-        }
-
-        public override IEnumerable<Locality> ReadMany(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<IEnumerable<Locality>>().Result;
-        }
-
-        public override HttpResponseMessage Post(LocalityResourceModel obj)
-        {
-            return _client.PostAsJsonAsync("Localities", obj).Result;
-        }
-
-        public override HttpResponseMessage Post(Locality obj)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Locality, LocalityResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Locality, LocalityResourceModel>(obj);
-
-            return Post(model);
-        }
-
-        public override HttpResponseMessage Put(Locality obj)
-        {
-            return _client.PutAsJsonAsync("Localities", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(int identifier)
-        {
-            return _client.DeleteAsync($"Localities/{identifier}").Result;
         }
     }
 }

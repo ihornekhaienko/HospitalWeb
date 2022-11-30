@@ -1,30 +1,24 @@
-﻿using AutoMapper;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.WebApi.Clients.Interfaces;
+﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
+using System.Net.Http.Headers;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class AppointmentsApiClient : ApiClient<Appointment, AppointmentResourceModel, int>
+    public class AppointmentsApiClient : GenericApiClient<Appointment, AppointmentResourceModel, int>
     {
-        public AppointmentsApiClient(IConfiguration config) : base(config)
+        public AppointmentsApiClient(IConfiguration config) : base(config, "Appointments")
         {
         }
 
-        public override HttpResponseMessage Get()
+        public HttpResponseMessage Get(string doctor, DateTime date, string token = null, string provider = null)
         {
-            return _client.GetAsync("Appointments").Result;
-        }
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}/details?doctor={doctor}&date={date}");
 
-        public override HttpResponseMessage Get(int identifier)
-        {
-            return _client.GetAsync($"Appointments/{identifier}").Result;
-        }
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
 
-        public HttpResponseMessage Get(string doctor, DateTime date)
-        {
-            return _client.GetAsync($"Appointments/details?doctor={doctor}&date={date}").Result;
+            return _client.SendAsync(request).Result;
         }
 
         public HttpResponseMessage Filter(
@@ -35,56 +29,24 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             DateTime? toDate = null,
             AppointmentSortState sortOrder = AppointmentSortState.DateAsc,
             int pageSize = 10,
-            int pageNumber = 1)
+            int pageNumber = 1,
+            string token = null,
+            string provider = null)
         {
-            return _client.GetAsync($"Appointments?searchString={searchString}&userId={userId}&state={state}&fromDate={fromDate}&toDate={toDate}" +
-                $"&sortOrder={sortOrder}&pageSize={pageSize}&pageNumber={pageNumber}").Result;
+            string query = $"?searchString={searchString}&userId={userId}&state={state}&fromDate={fromDate}&toDate={toDate}" +
+                $"&sortOrder={sortOrder}&pageSize={pageSize}&pageNumber={pageNumber}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}{query}");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
         }
 
-        public override Appointment Read(HttpResponseMessage response)
+        public bool IsDateFree(string doctor, DateTime date, string token = null, string provider = null)
         {
-            return response.Content.ReadAsAsync<Appointment>().Result;
-        }
-
-        public override Appointment Read(int identifier)
-        {
-            var response = Get(identifier);
-            return Read(response);
-        }
-
-        public override IEnumerable<Appointment> ReadMany(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<IEnumerable<Appointment>>().Result;
-        }
-
-        public override HttpResponseMessage Post(AppointmentResourceModel obj)
-        {
-            return _client.PostAsJsonAsync("Appointments", obj).Result;
-        }
-
-        public override HttpResponseMessage Post(Appointment obj)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Appointment, AppointmentResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Appointment, AppointmentResourceModel>(obj);
-
-            return Post(model);
-        }
-
-        public override HttpResponseMessage Put(Appointment obj)
-        {
-            return _client.PutAsJsonAsync("Appointments", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(int identifier)
-        {
-            return _client.DeleteAsync($"Appointments/{identifier}").Result;
-        }
-
-        public bool IsDateFree(string doctor, DateTime date)
-        {
-            var response = Get(doctor, date);
+            var response = Get(doctor, date, token, provider);
 
             if (response.IsSuccessStatusCode)
             {
@@ -99,11 +61,11 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return true;
         }
 
-        public void UpdateStates()
+        public void UpdateStates(string token = null, string provider = null)
         {
             var date = DateTime.Today.AddDays(-1);
 
-            var response = Filter(toDate: date);
+            var response = Filter(toDate: date, token: token, provider: provider);
 
             if (response.IsSuccessStatusCode)
             {
@@ -115,7 +77,7 @@ namespace HospitalWeb.WebApi.Clients.Implementations
                     {
                         appointment.State = State.Missed;
 
-                        Put(appointment);
+                        Put(appointment, token, provider);
                     }    
                 }
             }

@@ -1,34 +1,28 @@
-﻿using AutoMapper;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.WebApi.Clients.Interfaces;
+﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using System.Net.Http.Headers;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class AddressesApiClient : ApiClient<Address, AddressResourceModel, int>
+    public class AddressesApiClient : GenericApiClient<Address, AddressResourceModel, int>
     {
-        public AddressesApiClient(IConfiguration config) : base(config)
+        public AddressesApiClient(IConfiguration config) : base(config, "Addresses")
         {
         }
 
-        public override HttpResponseMessage Get()
+        public HttpResponseMessage Get(string address, string locality, string token = null, string provider = null)
         {
-            return _client.GetAsync("Addresses").Result;
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}/details?address={address}&locality={locality}");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
         }
 
-        public override HttpResponseMessage Get(int identifier)
+        public Address GetOrCreate(string address, Locality locality, string token = null, string provider = null)
         {
-            return _client.GetAsync($"Addresses/{identifier}").Result;
-        }
-
-        public HttpResponseMessage Get(string address, string locality)
-        {
-            return _client.GetAsync($"Addresses/details?address={address}&locality={locality}").Result;
-        }
-
-        public Address GetOrCreate(string address, Locality locality)
-        {
-            var response = Get(address, locality.LocalityName);
+            var response = Get(address, locality.LocalityName, token, provider);
 
             if (response.IsSuccessStatusCode)
             {
@@ -42,49 +36,8 @@ namespace HospitalWeb.WebApi.Clients.Implementations
                     LocalityId = locality.LocalityId
                 };
 
-                return Read(Post(obj));
+                return Read(Post(obj, token, provider));
             }
-        }
-
-        public override Address Read(int identifier)
-        {
-            var response = Get(identifier);
-            return Read(response);
-        }
-
-        public override Address Read(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<Address>().Result;
-        }
-
-        public override IEnumerable<Address> ReadMany(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<IEnumerable<Address>>().Result;
-        }
-
-        public override HttpResponseMessage Post(AddressResourceModel obj)
-        {
-            return _client.PostAsJsonAsync("Addresses", obj).Result;
-        }
-
-        public override HttpResponseMessage Post(Address obj)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Address, AddressResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Address, AddressResourceModel>(obj);
-
-            return Post(model);
-        }
-
-        public override HttpResponseMessage Put(Address obj)
-        {
-            return _client.PutAsJsonAsync("Addresses", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(int identifier)
-        {
-            return _client.DeleteAsync($"Addresses/{identifier}").Result;
         }
     }
 }

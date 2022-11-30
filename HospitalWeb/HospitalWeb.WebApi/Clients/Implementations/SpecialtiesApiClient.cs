@@ -1,34 +1,28 @@
-﻿using AutoMapper;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.WebApi.Clients.Interfaces;
+﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using System.Net.Http.Headers;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class SpecialtiesApiClient : ApiClient<Specialty, SpecialtyResourceModel, int>
+    public class SpecialtiesApiClient : GenericApiClient<Specialty, SpecialtyResourceModel, int>
     {
-        public SpecialtiesApiClient(IConfiguration config) : base(config)
+        public SpecialtiesApiClient(IConfiguration config) : base(config, "Specialties")
         {
         }
 
-        public override HttpResponseMessage Get()
+        public HttpResponseMessage Get(string name, string token = null, string provider = null)
         {
-            return _client.GetAsync("Specialties").Result;
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}/details?name={name}");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
         }
 
-        public override HttpResponseMessage Get(int identifier)
+        public Specialty GetOrCreate(string name, string token = null, string provider = null)
         {
-            return _client.GetAsync($"Specialties/{identifier}").Result;
-        }
-
-        public HttpResponseMessage Get(string name)
-        {
-            return _client.GetAsync($"Specialties/details?name={name}").Result;
-        }
-
-        public Specialty GetOrCreate(string name)
-        {
-            var response = Get(name);
+            var response = Get(name, token, provider);
 
             if (response.IsSuccessStatusCode)
             {
@@ -41,49 +35,8 @@ namespace HospitalWeb.WebApi.Clients.Implementations
                     SpecialtyName = name
                 };
 
-                return Read(Post(specialty));
+                return Read(Post(specialty, token, provider));
             }
-        }
-
-        public override Specialty Read(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<Specialty>().Result;
-        }
-
-        public override Specialty Read(int identifier)
-        {
-            var response = Get(identifier);
-            return Read(response);
-        }
-
-        public override IEnumerable<Specialty> ReadMany(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<IEnumerable<Specialty>>().Result;
-        }
-
-        public override HttpResponseMessage Post(SpecialtyResourceModel obj)
-        {
-            return _client.PostAsJsonAsync("Specialties", obj).Result;
-        }
-
-        public override HttpResponseMessage Post(Specialty obj)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Specialty, SpecialtyResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Specialty, SpecialtyResourceModel>(obj);
-
-            return Post(model);
-        }
-
-        public override HttpResponseMessage Put(Specialty obj)
-        {
-            return _client.PutAsJsonAsync("Specialties", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(int identifier)
-        {
-            return _client.DeleteAsync($"Specialties/{identifier}").Result;
         }
     }
 }

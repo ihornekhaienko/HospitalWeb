@@ -1,0 +1,102 @@
+﻿using AutoMapper;
+using HospitalWeb.WebApi.Clients.Interfaces;
+using System.Net.Http.Headers;
+
+namespace HospitalWeb.WebApi.Clients.Implementations
+{
+    public class GenericApiClient<TEntity, TResource, TIdentifier> : ApiClient<TEntity, TResource, TIdentifier>
+    {
+        protected readonly string _addressSuffix;
+
+        public GenericApiClient(IConfiguration config, string addressSuffix) : base(config)
+        {
+            _addressSuffix = addressSuffix;
+        }
+
+        public override HttpResponseMessage Get(string token = null, string provider = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
+        }
+
+        public override HttpResponseMessage Get(TIdentifier identifier, string token = null, string provider = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}/{identifier}");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
+        }
+
+        public override HttpResponseMessage Post(TResource obj, string token = null, string provider = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, $"{_client.BaseAddress}{_addressSuffix}");
+            HttpContent httpContent = JsonContent.Create(obj);
+
+            request.Content = httpContent;
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
+        }
+
+        public override HttpResponseMessage Post(TEntity obj, string token = null, string provider = null)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<TEntity, TResource>());
+            var mapper = new Mapper(config);
+            var model = mapper.Map<TEntity, TResource>(obj);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, $"{_client.BaseAddress}{_addressSuffix}");
+            HttpContent httpContent = JsonContent.Create(obj);
+
+            request.Content = httpContent;
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
+        }
+
+        public override HttpResponseMessage Put(TEntity obj, string token = null, string provider = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, $"{_client.BaseAddress}{_addressSuffix}");
+            HttpContent httpContent = JsonContent.Create(obj);
+
+            request.Content = httpContent;
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
+        }
+
+        public override HttpResponseMessage Delete(TIdentifier identifier, string token = null, string provider = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"{_client.BaseAddress}{_addressSuffix}/{identifier}");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
+        }
+
+        public override TEntity Read(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<TEntity>().Result;
+        }
+
+        public override TEntity Read(TIdentifier identifier)
+        {
+            var response = Get(identifier);
+            return Read(response);
+        }
+
+        public override IEnumerable<TEntity> ReadMany(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<IEnumerable<TEntity>>().Result;
+        }
+    }
+}

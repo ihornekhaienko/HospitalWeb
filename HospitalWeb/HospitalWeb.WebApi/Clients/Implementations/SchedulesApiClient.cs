@@ -1,70 +1,23 @@
-﻿using AutoMapper;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.WebApi.Clients.Interfaces;
+﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using System.Net.Http.Headers;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class SchedulesApiClient : ApiClient<Schedule, ScheduleResourceModel, int>
+    public class SchedulesApiClient : GenericApiClient<Schedule, ScheduleResourceModel, int>
     {
-        public SchedulesApiClient(IConfiguration config) : base(config)
+        public SchedulesApiClient(IConfiguration config) : base(config, "Schedules")
         {
         }
 
-        public override HttpResponseMessage Get()
+        public HttpResponseMessage Get(string doctor, string day, string token = null, string provider = null)
         {
-            return _client.GetAsync("Schedules").Result;
-        }
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}/details?doctor={doctor}&day={day}");
 
-        public override HttpResponseMessage Get(int identifier)
-        {
-            return _client.GetAsync($"Schedules/{identifier}").Result;
-        }
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
 
-        public HttpResponseMessage Get(string doctor, string day)
-        {
-            return _client.GetAsync($"Schedules/details?doctor={doctor}&day={day}").Result;
-        }
-
-        public override Schedule Read(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<Schedule>().Result;
-        }
-
-        public override Schedule Read(int identifier)
-        {
-            var response = Get(identifier);
-            return Read(response);
-        }
-
-        public override IEnumerable<Schedule> ReadMany(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<IEnumerable<Schedule>>().Result;
-        }
-
-        public override HttpResponseMessage Post(ScheduleResourceModel obj)
-        {
-            return _client.PostAsJsonAsync("Schedules", obj).Result;
-        }
-
-        public override HttpResponseMessage Post(Schedule obj)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Schedule, ScheduleResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Schedule, ScheduleResourceModel>(obj);
-
-            return Post(model);
-        }
-
-        public override HttpResponseMessage Put(Schedule obj)
-        {
-            return _client.PutAsJsonAsync("Schedules", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(int identifier)
-        {
-            return _client.DeleteAsync($"Schedules/{identifier}").Result;
+            return _client.SendAsync(request).Result;
         }
     }
 }

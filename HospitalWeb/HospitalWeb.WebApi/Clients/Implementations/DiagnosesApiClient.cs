@@ -1,34 +1,28 @@
-﻿using AutoMapper;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.WebApi.Clients.Interfaces;
+﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using System.Net.Http.Headers;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
 {
-    public class DiagnosesApiClient : ApiClient<Diagnosis, DiagnosisResourceModel, int>
+    public class DiagnosesApiClient : GenericApiClient<Diagnosis, DiagnosisResourceModel, int>
     {
-        public DiagnosesApiClient(IConfiguration config) : base(config)
+        public DiagnosesApiClient(IConfiguration config) : base(config, "Diagnoses")
         {
         }
 
-        public override HttpResponseMessage Get()
+        public HttpResponseMessage Get(string name, string token = null, string provider = null)
         {
-            return _client.GetAsync("Diagnoses").Result;
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}/details?name={name}");
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
         }
 
-        public override HttpResponseMessage Get(int identifier)
+        public Diagnosis GetOrCreate(string name, string token = null, string provider = null)
         {
-            return _client.GetAsync($"Diagnoses/{identifier}").Result;
-        }
-
-        public HttpResponseMessage Get(string name)
-        {
-            return _client.GetAsync($"Diagnoses/details?name={name}").Result;
-        }
-
-        public Diagnosis GetOrCreate(string name)
-        {
-            var response = Get(name);
+            var response = Get(name, token, provider);
 
             if (response.IsSuccessStatusCode)
             {
@@ -41,49 +35,8 @@ namespace HospitalWeb.WebApi.Clients.Implementations
                     DiagnosisName = name
                 };
 
-                return Read(Post(diagnosis));
+                return Read(Post(diagnosis, token, provider));
             }
-        }
-
-        public override Diagnosis Read(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<Diagnosis>().Result;
-        }
-
-        public override Diagnosis Read(int identifier)
-        {
-            var response = Get(identifier);
-            return Read(response);
-        }
-
-        public override IEnumerable<Diagnosis> ReadMany(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<IEnumerable<Diagnosis>>().Result;
-        }
-
-        public override HttpResponseMessage Post(DiagnosisResourceModel obj)
-        {
-            return _client.PostAsJsonAsync("Diagnoses", obj).Result;
-        }
-
-        public override HttpResponseMessage Post(Diagnosis obj)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Diagnosis, DiagnosisResourceModel>());
-            var mapper = new Mapper(config);
-
-            var model = mapper.Map<Diagnosis, DiagnosisResourceModel>(obj);
-
-            return Post(model);
-        }
-
-        public override HttpResponseMessage Put(Diagnosis obj)
-        {
-            return _client.PutAsJsonAsync("Diagnoses", obj).Result;
-        }
-
-        public override HttpResponseMessage Delete(int identifier)
-        {
-            return _client.DeleteAsync($"Diagnoses/{identifier}").Result;
         }
     }
 }

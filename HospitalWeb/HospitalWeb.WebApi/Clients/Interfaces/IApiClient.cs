@@ -2,9 +2,9 @@
 {
     public interface IApiClient<TEntity, TResource, TIdentifier>
     {
-        HttpResponseMessage Get();
+        HttpResponseMessage Get(string token = null, string provider = null);
 
-        HttpResponseMessage Get(TIdentifier identifier);
+        HttpResponseMessage Get(TIdentifier identifier, string token = null, string provider = null);
 
         TEntity Read(HttpResponseMessage response);
 
@@ -12,12 +12,12 @@
 
         IEnumerable<TEntity> ReadMany(HttpResponseMessage response);
 
-        HttpResponseMessage Post(TResource obj);
+        HttpResponseMessage Post(TResource obj, string token = null, string provider = null);
 
-        HttpResponseMessage Post(TEntity obj);
+        HttpResponseMessage Post(TEntity obj, string token = null, string provider = null);
 
-        HttpResponseMessage Put(TEntity obj);
+        HttpResponseMessage Put(TEntity obj, string token = null, string provider = null);
 
-        HttpResponseMessage Delete(TIdentifier identifier);
+        HttpResponseMessage Delete(TIdentifier identifier, string token = null, string provider = null);
     }
 }
