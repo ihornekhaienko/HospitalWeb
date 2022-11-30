@@ -31,9 +31,14 @@ namespace HospitalWeb.Services.Extensions
             services.AddScoped<IMeetingService, ZoomMeetingService>();
         }
 
-        public static void AddGoogleApi(this IServiceCollection services)
+        public static void AddGoogleTokenProvider(this IServiceCollection services)
         {
-            services.AddScoped<IGoogleApiHelper, GoogleApiHelper>();
+            services.AddScoped<ITokenProvider, GoogleTokenProvider>();
+        }
+
+        public static void AddInternalGoogleProvider(this IServiceCollection services)
+        {
+            services.AddScoped<ITokenProvider, InternalTokenProvider>();
         }
 
         public static void AddTokenManager(this IServiceCollection services)

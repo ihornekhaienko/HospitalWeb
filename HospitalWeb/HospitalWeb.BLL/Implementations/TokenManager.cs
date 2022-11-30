@@ -1,80 +1,29 @@
 ﻿using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using HospitalWeb.Services.Utility;
 
 namespace HospitalWeb.Services.Implementations
 {
     public class TokenManager : ITokenManager
     {
-        private readonly ILogger<TokenManager> _logger;
-        private readonly IConfiguration _config;
-        private readonly UserManager<AppUser> _userManager;
+        private readonly IList<ITokenProvider> _tokenProviders;
 
-        public TokenManager(
-            ILogger<TokenManager> logger, 
-            IConfiguration config, 
-            UserManager<AppUser> userManager)
+        public TokenManager(IEnumerable<ITokenProvider> tokenProviders)
         {
-            _logger = logger;
-            _config = config;
-            _userManager = userManager;
-        }
+            _tokenProviders = new List<ITokenProvider>(tokenProviders);
 
-        private async Task<ClaimsIdentity> GetIdentity(AppUser user)
-        {
-            if (user != null)
+            for (int i = 0; i < _tokenProviders.Count; i++)
             {
-                var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-
-                var claims = new List<Claim>
+                if (i != _tokenProviders.Count - 1)
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
-                };
-
-                ClaimsIdentity claimsIdentity =
-                    new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
-                    ClaimsIdentity.DefaultRoleClaimType);
-
-                return claimsIdentity;
+                    _tokenProviders[i].Successor = _tokenProviders[i + 1];
+                }
             }
-
-            return null;
         }
 
-        public async Task<string> GenerateToken(AppUser user)
+        public async Task<TokenResult> GetToken(AppUser user)
         {
-            var identity = await GetIdentity(user);
-
-            if (identity == null)
-            {
-                throw new Exception("User not found");
-            }
-
-            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config["JWT:Key"]));
-            var now = DateTime.UtcNow;
-
-            var jwt = new JwtSecurityToken(
-                issuer: _config["JWT:Issuer"],
-                audience: _config["JWT:Audience"],
-                claims: identity.Claims,
-                notBefore: now,
-                expires: now.AddMinutes(Convert.ToDouble(_config["JWT:Lifetime"])),
-                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256)
-                );
-
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            await _userManager.RemoveAuthenticationTokenAsync(user, "Custom", "access_token");
-            await _userManager.SetAuthenticationTokenAsync(user, "Custom", "access_token", encodedJwt);
-
-            return encodedJwt;
+            return await _tokenProviders.FirstOrDefault()?.GetToken(user);
         }
     }
 }
