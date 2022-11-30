@@ -1,6 +1,8 @@
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;
+using HospitalWeb.WebApi;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -9,6 +11,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(o =>
@@ -44,6 +47,20 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
 
 builder.Services.AddUnitOfWork();
 
+builder.Services.AddAuthentication(authenticationOptions =>
+{
+    authenticationOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    authenticationOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    authenticationOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(jwtBearerOptions =>
+{
+    jwtBearerOptions.IncludeErrorDetails = true;
+    jwtBearerOptions.SecurityTokenValidators.Clear();
+    jwtBearerOptions.SecurityTokenValidators.Add(new GoogleTokenValidator(config["OAuth:Google:ClientId"]));
+    jwtBearerOptions.SaveToken = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -55,6 +72,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
