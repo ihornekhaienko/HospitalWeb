@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using HospitalWeb.WebApi.Models.SortStates;
 using HospitalWeb.WebApi.Clients.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using HospitalWeb.DAL.Entities.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace HospitalWeb.Controllers
 {
@@ -15,17 +17,23 @@ namespace HospitalWeb.Controllers
     {
         private readonly ILogger<AdministrationController> _logger;
         private readonly ApiUnitOfWork _api;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly ITokenManager _tokenManager;
         private readonly IPasswordGenerator _passwordGenerator;
         private readonly INotifier _notifier;
 
         public AdministrationController(
             ILogger<AdministrationController> logger,
             ApiUnitOfWork api,
+            UserManager<AppUser> userManager,
+            ITokenManager tokenManager,
             IPasswordGenerator passwordGenerator,
             INotifier notifier)
         {
             _logger = logger;
             _api = api;
+            _userManager = userManager;
+            _tokenManager = tokenManager;
             _passwordGenerator = passwordGenerator;
             _notifier = notifier;
         }
@@ -36,7 +44,7 @@ namespace HospitalWeb.Controllers
             int page = 1,
             AdminSortState sortOrder = AdminSortState.Id)
         {
-            var response = _api.Admins.Get(User.Identity.Name);
+            var response = _api.Admins.Get(User.Identity.Name, null, null);
             ViewBag.CurrentAdmin = _api.Admins.Read(response);
 
             var builder = new AdminsViewModelBuilder(_api, page, searchString, sortOrder);
@@ -110,7 +118,7 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            var response = _api.Admins.Get(id);
+            var response = _api.Admins.Get(id, null, null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -138,7 +146,7 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var response = _api.Admins.Get(model.Email);
+                    var response = _api.Admins.Get(model.Email, null, null);
 
                     if (!response.IsSuccessStatusCode)
                     {
@@ -154,7 +162,9 @@ namespace HospitalWeb.Controllers
                     admin.PhoneNumber = model.Phone;
                     admin.IsSuperAdmin = model.IsSuperAdmin;
 
-                    response = _api.Admins.Put(admin);
+                    var tokenResult = await _tokenManager.GetToken(admin);
+
+                    response = _api.Admins.Put(admin, tokenResult.Token, tokenResult.Provider);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -191,7 +201,7 @@ namespace HospitalWeb.Controllers
                     return NotFound();
                 }
 
-                var response = _api.Admins.Get(id);
+                var response = _api.Admins.Get(id, null, null);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -199,7 +209,11 @@ namespace HospitalWeb.Controllers
                 }
 
                 var admin = _api.Admins.Read(response);
-                var result = _api.Admins.Delete(id);
+
+                var user = await _userManager.GetUserAsync(User);
+                var tokenResult = await _tokenManager.GetToken(user);
+
+                var result = _api.Admins.Delete(id, tokenResult.Token, tokenResult.Provider);
 
                 if (result.IsSuccessStatusCode)
                 {
@@ -255,7 +269,10 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var specialty = _api.Specialties.GetOrCreate(model.Specialty);
+                    var user = await _userManager.GetUserAsync(User);
+                    var tokenResult = await _tokenManager.GetToken(user);
+
+                    var specialty = _api.Specialties.GetOrCreate(model.Specialty, tokenResult.Token, tokenResult.Provider);
                     //var password = _passwordGenerator.GeneratePassword(null);
                     var password = "Pass_1111";
 
@@ -271,7 +288,7 @@ namespace HospitalWeb.Controllers
                         Password = password
                     };
 
-                    var response = _api.Doctors.Post(doctor);
+                    var response = _api.Doctors.Post(doctor, tokenResult.Token, tokenResult.Provider);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -324,7 +341,7 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            response = _api.Doctors.Get(id);
+            response = _api.Doctors.Get(id, null, null);
             if (!response.IsSuccessStatusCode)
             {
                 return NotFound();
@@ -350,9 +367,12 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var specialty = _api.Specialties.GetOrCreate(model.Specialty);
+                    var user = await _userManager.GetUserAsync(User);
+                    var tokenResult = await _tokenManager.GetToken(user);
 
-                    var response = _api.Doctors.Get(model.Email);
+                    var specialty = _api.Specialties.GetOrCreate(model.Specialty, tokenResult.Token, tokenResult.Provider);
+
+                    var response = _api.Doctors.Get(model.Email, null, null);
 
                     if (!response.IsSuccessStatusCode)
                     {
@@ -368,7 +388,7 @@ namespace HospitalWeb.Controllers
                     doctor.PhoneNumber = model.Phone;
                     doctor.SpecialtyId = specialty.SpecialtyId;
 
-                    response = _api.Doctors.Put(doctor);
+                    response = _api.Doctors.Put(doctor, tokenResult.Token, tokenResult.Provider);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -415,7 +435,7 @@ namespace HospitalWeb.Controllers
                     return NotFound();
                 }
 
-                var response = _api.Doctors.Get(id);
+                var response = _api.Doctors.Get(id, null, null);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -424,7 +444,10 @@ namespace HospitalWeb.Controllers
 
                 var doctor = _api.Doctors.Read(response);
 
-                response = _api.Doctors.Delete(doctor.Id);
+                var user = await _userManager.GetUserAsync(User);
+                var tokenResult = await _tokenManager.GetToken(user);
+
+                response = _api.Doctors.Delete(doctor.Id, tokenResult.Token, tokenResult.Provider);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -464,14 +487,17 @@ namespace HospitalWeb.Controllers
                     return NotFound();
                 }
 
-                var response = _api.Patients.Get(id);
+                var response = _api.Patients.Get(id, null, null);
                 if (!response.IsSuccessStatusCode)
                 {
                     return NotFound();
                 }
                 var patient = _api.Patients.Read(response);
 
-                response = _api.Patients.Delete(patient.Id);
+                var user = await _userManager.GetUserAsync(User);
+                var tokenResult = await _tokenManager.GetToken(user);
+
+                response = _api.Patients.Delete(patient.Id, tokenResult.Token, tokenResult.Provider);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -504,7 +530,7 @@ namespace HospitalWeb.Controllers
         {
             DoctorSlotViewModel model;
 
-            var response = _api.Doctors.Get(id);
+            var response = _api.Doctors.Get(id, null, null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -524,11 +550,11 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddDoctorSchedule(DoctorSlotViewModel model)
+        public async Task<IActionResult> AddDoctorSchedule(DoctorSlotViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var response = _api.Doctors.Get(model.DoctorId);
+                var response = _api.Doctors.Get(model.DoctorId, null, null);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -548,7 +574,10 @@ namespace HospitalWeb.Controllers
                     EndTime = model.EndTime
                 };
 
-                _api.Schedules.Post(schedule);
+                var user = await _userManager.GetUserAsync(User);
+                var tokenResult = await _tokenManager.GetToken(user);
+
+                _api.Schedules.Post(schedule, tokenResult.Token, tokenResult.Provider);
 
                 return RedirectToAction("DoctorSchedule", "Administration", new { id = model.DoctorId, day = model.DayOfWeek });
             }
@@ -583,7 +612,7 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditDoctorSchedule(DoctorSlotViewModel model)
+        public async Task<IActionResult> EditDoctorSchedule(DoctorSlotViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -604,7 +633,10 @@ namespace HospitalWeb.Controllers
                 schedule.StartTime = model.StartTime;
                 schedule.EndTime = model.EndTime;
 
-                _api.Schedules.Put(schedule);
+                var user = await _userManager.GetUserAsync(User);
+                var tokenResult = await _tokenManager.GetToken(user);
+
+                _api.Schedules.Put(schedule, tokenResult.Token, tokenResult.Provider);
 
                 return RedirectToAction("DoctorSchedule", "Administration", new { id = model.DoctorId, day = model.DayOfWeek });
             }
@@ -612,7 +644,7 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteDoctorSchedule(DoctorSlotViewModel model)
+        public async Task<IActionResult> DeleteDoctorSchedule(DoctorSlotViewModel model)
         {
             if (model.ScheduleId == null)
             {
@@ -628,7 +660,10 @@ namespace HospitalWeb.Controllers
 
             var schedule = _api.Schedules.Read(response);
 
-            _api.Schedules.Delete(schedule.ScheduleId);
+            var user = await _userManager.GetUserAsync(User);
+            var tokenResult = await _tokenManager.GetToken(user);
+
+            _api.Schedules.Delete(schedule.ScheduleId, tokenResult.Token, tokenResult.Provider);
 
             return RedirectToAction("Doctors", "Administration");
         }

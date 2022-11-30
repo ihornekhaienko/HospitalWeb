@@ -288,7 +288,7 @@ namespace HospitalWeb.Controllers
                     return RedirectToAction(nameof(HomeController.Index), "Home");
                 }
 
-                var response = _api.AppUsers.Get(userId);
+                var response = _api.AppUsers.Get(userId, null, null);
                 if (!response.IsSuccessStatusCode)
                 {
                     return NotFound();
@@ -327,7 +327,7 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var response = _api.AppUsers.Get(model.Email);
+                    var response = _api.AppUsers.Get(model.Email, null, null);
                     if (!response.IsSuccessStatusCode)
                     {
                         return NotFound();

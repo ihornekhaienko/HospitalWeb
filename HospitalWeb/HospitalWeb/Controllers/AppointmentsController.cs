@@ -1,12 +1,13 @@
 ﻿using HospitalWeb.DAL.Entities;
+using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Appointments;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.WebApi.Clients.Implementations;
-using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.Controllers
@@ -16,6 +17,8 @@ namespace HospitalWeb.Controllers
         private readonly ILogger<AppointmentsController> _logger;
         private readonly IWebHostEnvironment _environment;
         private readonly ApiUnitOfWork _api;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly ITokenManager _tokenManager;
         private readonly IFileManager _fileManager;
         private readonly IPdfPrinter _pdfPrinter;
 
@@ -23,6 +26,8 @@ namespace HospitalWeb.Controllers
             ILogger<AppointmentsController> logger,
             IWebHostEnvironment environment,
             ApiUnitOfWork api,
+            UserManager<AppUser> userManager,
+            ITokenManager tokenManager,
             IFileManager fileManager,
             IPdfPrinter pdfPrinter
             )
@@ -30,6 +35,8 @@ namespace HospitalWeb.Controllers
             _logger = logger;
             _environment = environment;
             _api = api;
+            _userManager = userManager;
+            _tokenManager = tokenManager;
             _fileManager = fileManager;
             _pdfPrinter = pdfPrinter;
         }
@@ -74,7 +81,7 @@ namespace HospitalWeb.Controllers
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
-            var response = _api.Doctors.Get(User.Identity.Name);
+            var response = _api.Doctors.Get(User.Identity.Name, null, null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -102,7 +109,7 @@ namespace HospitalWeb.Controllers
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
-            var response = _api.Doctors.Get(User.Identity.Name);
+            var response = _api.Doctors.Get(User.Identity.Name, null, null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -125,7 +132,7 @@ namespace HospitalWeb.Controllers
 
         [Authorize(Roles = "Doctor")]
         [HttpGet]
-        public IActionResult Cancel(int id)
+        public async Task<IActionResult> Cancel(int id)
         {
             try
             {
@@ -140,13 +147,17 @@ namespace HospitalWeb.Controllers
 
                 if (appointment.State == State.Planned)
                 {
+                    var user = await _userManager.GetUserAsync(User);
+                    var tokenResult = await _tokenManager.GetToken(user);
+
                     appointment.State = State.Canceled;
-                    _api.Appointments.Put(appointment);
+
+                    _api.Appointments.Put(appointment, tokenResult.Token, tokenResult.Provider);
 
                     var meeting = appointment.Meetings.FirstOrDefault();
                     if (meeting != null)
                     {
-                        _api.Meetings.Delete(meeting.MeetingId);
+                        _api.Meetings.Delete(meeting.MeetingId, tokenResult.Token, tokenResult.Provider);
                     }
 
                     return RedirectToAction("History", "Appointments");
@@ -199,7 +210,7 @@ namespace HospitalWeb.Controllers
 
         [Authorize(Roles = "Doctor")]
         [HttpPost]
-        public IActionResult Fill(AppointmentViewModel model)
+        public async Task<IActionResult> Fill(AppointmentViewModel model)
         {
             try
             {
@@ -217,17 +228,21 @@ namespace HospitalWeb.Controllers
                     if (appointment.State == State.Planned)
                     {
                         response = _api.Diagnoses.Get(model.Diagnosis);
-                        var diagnosis = _api.Diagnoses.GetOrCreate(model.Diagnosis);
+
+                        var user = await _userManager.GetUserAsync(User);
+                        var tokenResult = await _tokenManager.GetToken(user);
+
+                        var diagnosis = _api.Diagnoses.GetOrCreate(model.Diagnosis, tokenResult.Token, tokenResult.Provider);
 
                         appointment.DiagnosisId = diagnosis.DiagnosisId;
                         appointment.Prescription = model.Prescription;
                         appointment.State = State.Completed;
-                        _api.Appointments.Put(appointment);
+                        _api.Appointments.Put(appointment, tokenResult.Token, tokenResult.Provider);
 
                         var meeting = appointment.Meetings.FirstOrDefault();
                         if (meeting != null)
                         {
-                            _api.Meetings.Delete(meeting.MeetingId);
+                            _api.Meetings.Delete(meeting.MeetingId, tokenResult.Token, tokenResult.Provider);
                         }
 
                         return RedirectToAction("Today", "Appointments");

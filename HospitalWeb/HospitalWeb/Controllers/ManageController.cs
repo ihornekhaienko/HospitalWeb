@@ -22,6 +22,7 @@ namespace HospitalWeb.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly ApiUnitOfWork _api;
         private readonly UserManager<AppUser> _userManager;
+        private readonly ITokenManager _tokenManager;
         private readonly IFileManager _fileManager;
         private readonly INotifier _notifier;
 
@@ -30,6 +31,7 @@ namespace HospitalWeb.Controllers
             IWebHostEnvironment environment,
             ApiUnitOfWork api,
             UserManager<AppUser> userManager,
+            ITokenManager tokenManager,
             IFileManager fileManager,
             INotifier notifier)
         {
@@ -37,6 +39,7 @@ namespace HospitalWeb.Controllers
             _environment = environment;
             _api = api;
             _userManager = userManager;
+            _tokenManager = tokenManager;
             _fileManager = fileManager;
             _notifier = notifier;
         }
@@ -66,7 +69,7 @@ namespace HospitalWeb.Controllers
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
-            var response = _api.Admins.Get(User.Identity.Name);
+            var response = _api.Admins.Get(User.Identity.Name, null, null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -95,11 +98,11 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult AdminProfile(AdminProfileViewModel model)
+        public async Task<IActionResult> AdminProfile(AdminProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var response = _api.Admins.Get(User.Identity.Name);
+                var response = _api.Admins.Get(User.Identity.Name, null, null);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -114,7 +117,9 @@ namespace HospitalWeb.Controllers
                 admin.Name = model.Name;
                 admin.PhoneNumber = model.Phone;
 
-                response = _api.Admins.Put(admin);
+                var tokenResult = await _tokenManager.GetToken(admin);
+
+                response = _api.Admins.Put(admin, tokenResult.Token, tokenResult.Provider);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -140,7 +145,7 @@ namespace HospitalWeb.Controllers
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
-            var response = _api.Doctors.Get(User.Identity.Name);
+            var response = _api.Doctors.Get(User.Identity.Name, null, null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -169,11 +174,11 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult DoctorProfile(DoctorProfileViewModel model)
+        public async Task<IActionResult> DoctorProfile(DoctorProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var response = _api.Doctors.Get(User.Identity.Name);
+                var response = _api.Doctors.Get(User.Identity.Name, null, null);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -188,7 +193,9 @@ namespace HospitalWeb.Controllers
                 doctor.Name = model.Name;
                 doctor.PhoneNumber = model.Phone;
 
-                response = _api.Doctors.Put(doctor);
+                var tokenResult = await _tokenManager.GetToken(doctor);
+
+                response = _api.Doctors.Put(doctor, tokenResult.Token, tokenResult.Provider);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -214,7 +221,7 @@ namespace HospitalWeb.Controllers
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
-            var response = _api.Patients.Get(User.Identity.Name);
+            var response = _api.Patients.Get(User.Identity.Name, null, null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -244,14 +251,14 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult PatientProfile(PatientProfileViewModel model)
+        public async Task<IActionResult> PatientProfile(PatientProfileViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var locality = _api.Localities.GetOrCreate(model.Locality);
                 var address = _api.Addresses.GetOrCreate(model.Address, locality);
 
-                var response = _api.Patients.Get(User.Identity.Name);
+                var response = _api.Patients.Get(User.Identity.Name, null, null);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -267,7 +274,9 @@ namespace HospitalWeb.Controllers
                 patient.PhoneNumber = model.Phone;
                 patient.Address = address;
 
-                response = _api.Patients.Put(patient);
+                var tokenResult = await _tokenManager.GetToken(patient);
+
+                response = _api.Patients.Put(patient, tokenResult.Token, tokenResult.Provider);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -298,7 +307,7 @@ namespace HospitalWeb.Controllers
 
                     if (bytes != null && bytes.IsImage())
                     {
-                        var response = _api.AppUsers.Get(User.Identity.Name);
+                        var response = _api.AppUsers.Get(User.Identity.Name, null, null);
 
                         if (!response.IsSuccessStatusCode)
                         {
@@ -308,8 +317,10 @@ namespace HospitalWeb.Controllers
                         var user = _api.AppUsers.Read(response);
 
                         user.Image = bytes;
-                        
-                        _api.AppUsers.Put(user);
+
+                        var tokenResult = await _tokenManager.GetToken(user);
+
+                        _api.AppUsers.Put(user, tokenResult.Token, tokenResult.Provider);
 
                         return RedirectToAction("Profile", "Manage");
                     }
@@ -344,7 +355,7 @@ namespace HospitalWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var response = _api.AppUsers.Get(User.Identity.Name);
+                    var response = _api.AppUsers.Get(User.Identity.Name, null, null);
                     if (!response.IsSuccessStatusCode)
                     {
                         return NotFound();
@@ -376,7 +387,7 @@ namespace HospitalWeb.Controllers
             }
         }
 
-        public IActionResult ReadNotification(int id)
+        public async Task<IActionResult> ReadNotification(int id)
         {
             var response = _api.Notifications.Get(id);
             if (!response.IsSuccessStatusCode)
@@ -387,7 +398,11 @@ namespace HospitalWeb.Controllers
 
             notification.IsRead = true;
             notification.Type = NotificationType.Secondary;
-            _api.Notifications.Put(notification);
+
+            var user = await _userManager.GetUserAsync(User);
+            var tokenResult = await _tokenManager.GetToken(user);
+
+            _api.Notifications.Put(notification, tokenResult.Token, tokenResult.Provider);
 
             return Ok();
         }

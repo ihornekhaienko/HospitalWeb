@@ -1,4 +1,5 @@
 ﻿using HospitalWeb.DAL.Entities;
+using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Doctors;
@@ -7,6 +8,7 @@ using HospitalWeb.WebApi.Clients.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.Controllers
@@ -16,6 +18,8 @@ namespace HospitalWeb.Controllers
         private readonly ILogger<DoctorsController> _logger;
         private readonly IWebHostEnvironment _environment;
         private readonly ApiUnitOfWork _api;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly ITokenManager _tokenManager;
         private readonly IFileManager _fileManager;
         private readonly IScheduleGenerator _scheduleGenerator;
         private readonly IMeetingService _meetingService;
@@ -24,6 +28,8 @@ namespace HospitalWeb.Controllers
             ILogger<DoctorsController> logger,
             IWebHostEnvironment environment,
             ApiUnitOfWork api,
+            UserManager<AppUser> userManager,
+            ITokenManager tokenManager,
             IFileManager fileManager,
             IScheduleGenerator scheduleGenerator,
             IMeetingService meetingService
@@ -32,6 +38,8 @@ namespace HospitalWeb.Controllers
             _logger = logger;
             _environment = environment;
             _api = api;
+            _userManager = userManager;
+            _tokenManager = tokenManager;
             _fileManager = fileManager;
             _scheduleGenerator = scheduleGenerator;
             _meetingService = meetingService;
@@ -59,7 +67,7 @@ namespace HospitalWeb.Controllers
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
-            var response = _api.Doctors.Get(id);
+            var response = _api.Doctors.Get(id, null, null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -84,7 +92,7 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult Schedule(string id, DateTime date)
         {
-            var response = _api.Doctors.Get(id);
+            var response = _api.Doctors.Get(id, null, null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -99,18 +107,18 @@ namespace HospitalWeb.Controllers
         }
 
         [Authorize(Roles = "Patient")]
-        public IActionResult SignUpForAppointment(string doctorId, DateTime date)
+        public async Task<IActionResult> SignUpForAppointment(string doctorId, DateTime date)
         {
             try
             {
-                var response = _api.Patients.Get(User.Identity.Name);
+                var response = _api.Patients.Get(User.Identity.Name, null, null);
                 if (!response.IsSuccessStatusCode)
                 {
                     return null;
                 }
                 var patient = _api.Patients.Read(response);
 
-                response = _api.Doctors.Get(doctorId);
+                response = _api.Doctors.Get(doctorId, null, null);
                 if (!response.IsSuccessStatusCode)
                 {
                     return null;
@@ -125,7 +133,9 @@ namespace HospitalWeb.Controllers
                     PatientId = patient.Id
                 };
 
-                response = _api.Appointments.Post(appointment);
+                var tokenResult = await _tokenManager.GetToken(patient);
+
+                response = _api.Appointments.Post(appointment, tokenResult.Token, tokenResult.Provider);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -134,8 +144,7 @@ namespace HospitalWeb.Controllers
 
                 var meeting = _meetingService.CreateMeeting(_api.Appointments.Read(response));
 
-                response = _api.Meetings.Post(meeting);
-                var res = _api.Meetings.Read(response);
+                response = _api.Meetings.Post(meeting, tokenResult.Token, tokenResult.Provider);
 
                 return RedirectToAction("Details", "Doctors", new { id = doctorId });
             }
