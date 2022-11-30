@@ -3,6 +3,7 @@ using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -218,6 +219,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="patient">The Patient to update</param>
         /// <returns>The Patient object</returns>
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<Patient>> Put(Patient patient)
         {
             if (patient == null)
@@ -243,6 +245,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="searchString">Patient's id or Email</param>
         /// <returns>The Patient object</returns>
         [HttpDelete("{searchString}")]
+        [Authorize]
         public async Task<ActionResult<Patient>> Delete(string searchString)
         {
             var patient = await _uow.Patients.GetAsync(p => p.Id == searchString || p.Email == searchString);

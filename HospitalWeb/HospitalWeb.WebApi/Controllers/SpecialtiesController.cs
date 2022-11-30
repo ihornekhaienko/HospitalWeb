@@ -2,6 +2,7 @@
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -78,6 +79,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="specialty">Specialty to create</param>
         /// <returns>The Specialty object</returns>
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Specialty>> Post(SpecialtyResourceModel specialty)
         {
             if (specialty == null)
@@ -101,6 +103,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="specialty">The Specialty to update</param>
         /// <returns>The Specialty object</returns>
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<Specialty>> Put(Specialty specialty)
         {
             if (specialty == null)
@@ -119,6 +122,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Specialty's id</param>
         /// <returns>The Specialty object</returns>
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<Specialty>> Delete(int id)
         {
             var specialty = await _uow.Specialties.GetAsync(s => s.SpecialtyId == id);

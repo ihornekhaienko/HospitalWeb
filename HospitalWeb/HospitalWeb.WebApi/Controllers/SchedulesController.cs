@@ -3,6 +3,7 @@ using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -90,6 +91,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="schedule">Schedule to create</param>
         /// <returns>The Schedule object</returns>
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Schedule>> Post(ScheduleResourceModel schedule)
         {
             if (schedule == null)
@@ -113,6 +115,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="schedule">The Schedule to update</param>
         /// <returns>The Schedule object</returns>
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<Schedule>> Put(Schedule schedule)
         {
             if (schedule == null)
@@ -131,6 +134,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Schedule's id</param>
         /// <returns>The Schedule object</returns>
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<Schedule>> Delete(int id)
         {
             var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id);

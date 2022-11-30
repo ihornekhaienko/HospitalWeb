@@ -31,8 +31,4 @@
     <ProjectReference Include="..\HospitalWeb.DAL\HospitalWeb.DAL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Utility\" />
-  </ItemGroup>
-
 </Project>

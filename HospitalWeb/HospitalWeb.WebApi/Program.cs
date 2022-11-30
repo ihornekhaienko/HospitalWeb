@@ -2,7 +2,7 @@ using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;
 using HospitalWeb.WebApi;
-using HospitalWeb.WebApi.Validators;
+using HospitalWeb.WebApi.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

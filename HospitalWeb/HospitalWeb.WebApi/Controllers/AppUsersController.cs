@@ -2,6 +2,7 @@
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,6 +64,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="user">User to create</param>
         /// <returns>The User object</returns>
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<AppUser>> Post(AppUserResourceModel user)
         {
             if (user == null)
@@ -103,6 +105,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="user">The User to update</param>
         /// <returns>The User object</returns>
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<AppUser>> Put(AppUser user)
         {
             if (user == null)
@@ -128,6 +131,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="searchString">User's id or Email</param>
         /// <returns>The User object</returns>
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<AppUser>> Delete(string searchString)
         {
             var user = await _uow.AppUsers.GetAsync(a => a.Id == searchString || a.Email == searchString);

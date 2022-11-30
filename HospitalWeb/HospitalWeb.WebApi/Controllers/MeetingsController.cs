@@ -2,6 +2,7 @@
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -78,6 +79,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="Meeting">Meeting to create</param>
         /// <returns>The Meeting object</returns>
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Meeting>> Post(MeetingResourceModel Meeting)
         {
             if (Meeting == null)
@@ -101,6 +103,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="meeting">The Meeting to update</param>
         /// <returns>The Meeting object</returns>
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<Meeting>> Put(Meeting meeting)
         {
             if (meeting == null)
@@ -119,6 +122,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Meeting's id</param>
         /// <returns>The Meeting object</returns>
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<Meeting>> Delete(int id)
         {
             var meeting = await _uow.Meetings.GetAsync(m => m.MeetingId == id);

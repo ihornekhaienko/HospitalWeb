@@ -2,6 +2,7 @@
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,6 +45,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="pageNumber">Number of the page</param>
         /// <returns>List of Notifications</returns>
         [HttpGet("details")]
+        [Authorize]
         public async Task<IEnumerable<Notification>> Get(string owner, int pageSize = 10, int pageNumber = 1)
         {
             int totalCount = 0;
@@ -82,6 +84,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Notification's id</param>
         /// <returns>The Notification object</returns>
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Notification>> Get(int id)
         {
             var notification = await _uow.Notifications.GetAsync(s => s.NotificationId == id, include: n => n.Include(n => n.AppUser));
@@ -100,6 +103,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="Notification">Notification to create</param>
         /// <returns>The Notification object</returns>
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Notification>> Post(NotificationResourceModel Notification)
         {
             if (Notification == null)
@@ -123,6 +127,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="notification">The Notification to update</param>
         /// <returns>The Notification object</returns>
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<Notification>> Put(Notification notification)
         {
             if (notification == null)
@@ -141,6 +146,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Notification's id</param>
         /// <returns>The Notification object</returns>
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<Notification>> Delete(int id)
         {
             var notification = await _uow.Notifications.GetAsync(s => s.NotificationId == id);
