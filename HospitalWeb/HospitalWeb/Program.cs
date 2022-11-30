@@ -12,6 +12,7 @@ using HospitalWeb.WebApi.Clients.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using HospitalWeb.Hubs;
+using Google.Apis.Auth.AspNetCore3;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -35,6 +36,7 @@ builder.Services.AddFileManager();
 builder.Services.AddScheduleGenerator();
 builder.Services.AddPdfPrinter();
 builder.Services.AddZoom();
+builder.Services.AddGoogleApi();
 
 builder.Services.AddSignalR();
 
@@ -57,27 +59,17 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedUICultures = supportedCultures;
 });
 
-//builder.Services.AddAuthentication()
-//    .AddGoogle(options =>
-//    {
-//        options.ClientId = configuration["OAuth:Google:ClientId"];
-//        options.ClientSecret = configuration["OAuth:Google:ClientSecret"];
-//        options.UsePkce = true;
-//        options.SaveTokens = true;
-//    })
-//    .AddFacebook(options =>
-//    {
-//        options.ClientId = configuration["OAuth:Facebook:ClientId"];
-//        options.ClientSecret = configuration["OAuth:Facebook:ClientSecret"];
-//        options.UsePkce = true;
-//        options.SaveTokens = true;
-//    });
 
-builder.Services.AddAuthentication()
-    .AddOpenIdConnect("Google", options =>
+builder.Services.AddAuthentication(o =>
+{
+    o.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+    o.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+    o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+    .AddGoogleOpenIdConnect("Google", options =>   
      {
-         options.Authority = "https://accounts.google.com/";
-         options.CallbackPath = "/signin-google";
+         options.Authority = configuration["OAuth:Google:Authority"];
+         options.CallbackPath = configuration["OAuth:Google:CallbackPath"];
          options.ClientId = configuration["OAuth:Google:ClientId"];
          options.ClientSecret = configuration["OAuth:Google:ClientSecret"];
          options.ResponseType = OpenIdConnectResponseType.Code;
@@ -87,8 +79,14 @@ builder.Services.AddAuthentication()
 
          options.Scope.Add(OpenIdConnectScope.OpenId);
          options.Scope.Add(OpenIdConnectScope.Email);
+
+         options.Events.OnRedirectToIdentityProvider = context =>
+         {
+             context.ProtocolMessage.SetParameter("access_type", "offline");
+             return Task.CompletedTask;
+         };
      })
-    .AddFacebook(options =>
+    .AddFacebook("Facebook", options =>
     {
         options.ClientId = configuration["OAuth:Facebook:ClientId"];
         options.ClientSecret = configuration["OAuth:Facebook:ClientSecret"];
