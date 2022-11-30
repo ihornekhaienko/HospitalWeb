@@ -36,7 +36,8 @@ builder.Services.AddFileManager();
 builder.Services.AddScheduleGenerator();
 builder.Services.AddPdfPrinter();
 builder.Services.AddZoom();
-builder.Services.AddGoogleApi();
+builder.Services.AddGoogleTokenProvider();
+builder.Services.AddInternalGoogleProvider();
 builder.Services.AddTokenManager();
 
 builder.Services.AddSignalR();
