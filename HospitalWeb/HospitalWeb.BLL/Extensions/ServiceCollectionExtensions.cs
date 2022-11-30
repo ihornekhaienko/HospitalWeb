@@ -30,5 +30,10 @@ namespace HospitalWeb.Services.Extensions
         {
             services.AddScoped<IMeetingService, ZoomMeetingService>();
         }
+
+        public static void AddGoogleApi(this IServiceCollection services)
+        {
+            services.AddScoped<IGoogleApiHelper, GoogleApiHelper>();
+        }
     }
 }
