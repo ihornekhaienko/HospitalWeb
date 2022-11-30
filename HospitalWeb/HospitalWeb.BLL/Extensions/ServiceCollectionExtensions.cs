@@ -35,5 +35,10 @@ namespace HospitalWeb.Services.Extensions
         {
             services.AddScoped<IGoogleApiHelper, GoogleApiHelper>();
         }
+
+        public static void AddTokenManager(this IServiceCollection services)
+        {
+            services.AddScoped<ITokenManager, TokenManager>();
+        }
     }
 }
