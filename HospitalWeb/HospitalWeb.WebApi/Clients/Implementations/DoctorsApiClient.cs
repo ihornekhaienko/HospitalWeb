@@ -1,6 +1,7 @@
 ﻿using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
+using Microsoft.AspNetCore.Identity;
 using System.Net.Http.Headers;
 
 namespace HospitalWeb.WebApi.Clients.Implementations
@@ -29,6 +30,11 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             request.Headers.Add("Provider", provider);
 
             return _client.SendAsync(request).Result;
+        }
+
+        public IEnumerable<IdentityError> ReadErrors(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<IEnumerable<IdentityError>>().Result;
         }
     }
 }
