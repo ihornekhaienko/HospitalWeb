@@ -7,6 +7,7 @@ namespace HospitalWeb.DAL.Entities.Identity
         public string Name { get; set; }
         public string Surname { get; set; }
         public byte[] Image { get; set; }
+        public string CalendarId { get; set; }
 
         public ICollection<Notification> Notifications { get; set; }
 

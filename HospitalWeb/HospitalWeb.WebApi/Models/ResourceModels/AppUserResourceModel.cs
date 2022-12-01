@@ -19,5 +19,7 @@
         public bool EmailConfirmed { get; set; }
 
         public byte[] Image { get; set; }
+
+        public string CalendarId { get; set; }
     }
 }
