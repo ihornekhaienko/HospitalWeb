@@ -33,21 +33,20 @@ namespace HospitalWeb.Services.Implementations
             });
         }
 
-        public async Task CreateCalendar(AppUser user)
+        public async Task<string> CreateCalendar(AppUser user)
         {
             var calendar = new Calendar()
             {
-                Id = user.Id,
                 Summary = "Appointments",
                 Description = user.ToString() + " appointments"
             };
 
-            await _service.Calendars.Insert(calendar).ExecuteAsync();
+            return (await _service.Calendars.Insert(calendar).ExecuteAsync()).Id;
         }
 
         public string GetCalendar(AppUser user)
         {
-            return _config["Calendar:CalendarUrl"] + "calendar_" + user.Id;
+            return _config["Calendar:CalendarUrl"] + user.CalendarId + _config["Calendar:TimeZone"];
         }
 
         public async Task CreateEvent(AppUser user, Appointment appointment)
