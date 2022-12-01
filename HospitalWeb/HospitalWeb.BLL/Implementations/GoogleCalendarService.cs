@@ -33,12 +33,12 @@ namespace HospitalWeb.Services.Implementations
             });
         }
 
-        public async Task<string> CreateCalendar(AppUser user)
+        public async Task<string> CreateCalendar()
         {
             var calendar = new Calendar()
             {
                 Summary = "Appointments",
-                Description = user.ToString() + " appointments"
+                Description = "Your appointments in HospitalDb"
             };
 
             return (await _service.Calendars.Insert(calendar).ExecuteAsync()).Id;
@@ -51,7 +51,7 @@ namespace HospitalWeb.Services.Implementations
 
         public async Task CreateEvent(AppUser user, Appointment appointment)
         {
-            var calendarId = "calendar_" + user.Id;
+            var calendarId = user.CalendarId;
 
             var calendarEvent = new Event()
             {
@@ -82,7 +82,7 @@ namespace HospitalWeb.Services.Implementations
 
         public async Task ConfirmEvent(AppUser user, Appointment appointment)
         {
-            var calendarId = "calendar_" + user.Id;
+            var calendarId = user.CalendarId;
             var eventId = "event_" + appointment.AppointmentId.ToString();
             var calendarEvent = await _service.Events.Get(calendarId, eventId).ExecuteAsync();
 
@@ -98,7 +98,7 @@ namespace HospitalWeb.Services.Implementations
 
         public async Task CancelEvent(AppUser user, Appointment appointment)
         {
-            var calendarId = "calendar_" + user.Id;
+            var calendarId = user.CalendarId;
             var eventId = "event" + appointment.AppointmentId.ToString();
             var calendarEvent = await _service.Events.Get(calendarId, eventId).ExecuteAsync();
             
@@ -114,7 +114,7 @@ namespace HospitalWeb.Services.Implementations
 
         public async Task DeleteCalendar(AppUser user)
         {
-            var calendarId = "calendar_" + user.Id;
+            var calendarId = user.CalendarId;
             await _service.Calendars.Delete(calendarId).ExecuteAsync();
         }
     }
