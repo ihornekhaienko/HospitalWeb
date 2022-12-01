@@ -20,6 +20,7 @@ namespace HospitalWeb.Controllers
         private readonly ApiUnitOfWork _api;
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenManager _tokenManager;
+        private readonly ICalendarService _calendar;
         private readonly IFileManager _fileManager;
         private readonly IScheduleGenerator _scheduleGenerator;
         private readonly IMeetingService _meetingService;
@@ -30,6 +31,7 @@ namespace HospitalWeb.Controllers
             ApiUnitOfWork api,
             UserManager<AppUser> userManager,
             ITokenManager tokenManager,
+            ICalendarService calendar,
             IFileManager fileManager,
             IScheduleGenerator scheduleGenerator,
             IMeetingService meetingService
@@ -40,6 +42,7 @@ namespace HospitalWeb.Controllers
             _api = api;
             _userManager = userManager;
             _tokenManager = tokenManager;
+            _calendar = calendar;
             _fileManager = fileManager;
             _scheduleGenerator = scheduleGenerator;
             _meetingService = meetingService;
@@ -142,9 +145,12 @@ namespace HospitalWeb.Controllers
                     return BadRequest();
                 }
 
+                var entity = _api.Appointments.Read(response);
                 var meeting = _meetingService.CreateMeeting(_api.Appointments.Read(response));
+                _api.Meetings.Post(meeting, tokenResult.Token, tokenResult.Provider);
 
-                response = _api.Meetings.Post(meeting, tokenResult.Token, tokenResult.Provider);
+                await _calendar.CreateEvent(doctor, entity);
+                await _calendar.CreateEvent(patient, entity);
 
                 return RedirectToAction("Details", "Doctors", new { id = doctorId });
             }

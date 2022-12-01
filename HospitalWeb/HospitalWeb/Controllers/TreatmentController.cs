@@ -18,6 +18,7 @@ namespace HospitalWeb.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly UserManager<AppUser> _userManager;
         private readonly ApiUnitOfWork _api;
+        private readonly ICalendarService _calendar;
         private readonly IFileManager _fileManager;
         private readonly ITokenManager _tokenManager;
 
@@ -26,6 +27,7 @@ namespace HospitalWeb.Controllers
             IWebHostEnvironment environment,
             UserManager<AppUser> userManager,
             ApiUnitOfWork api,
+            ICalendarService calendar,
             IFileManager fileManager,
             ITokenManager tokenManager)
         {
@@ -33,6 +35,7 @@ namespace HospitalWeb.Controllers
             _environment = environment;
             _userManager = userManager;
             _api = api;
+            _calendar = calendar;
             _fileManager = fileManager;
             _tokenManager = tokenManager;
         }
@@ -47,6 +50,7 @@ namespace HospitalWeb.Controllers
             AppointmentSortState sortOrder = AppointmentSortState.DateDesc)
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+
             var response = _api.Patients.Get(User.Identity.Name, null, null);
 
             if (!response.IsSuccessStatusCode)
@@ -54,10 +58,12 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            var userId = _api.Patients.Read(response).Id;
+            var user = _api.Patients.Read(response);
+
+            ViewBag.Calendar = _calendar.GetCalendar(user);
 
             var builder = new AppointmentsViewModelBuilder(_api, 
-                page, searchString, sortOrder, userId, state: state, fromTime: fromDate, toTime: toDate);
+                page, searchString, sortOrder, user.Id, state: state, fromTime: fromDate, toTime: toDate);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
@@ -92,6 +98,9 @@ namespace HospitalWeb.Controllers
                     {
                         _api.Meetings.Delete(meeting.MeetingId, tokenResult.Token, tokenResult.Provider);
                     }
+
+                    await _calendar.CancelEvent(appointment.Doctor, appointment);
+                    await _calendar.CancelEvent(appointment.Patient, appointment);
 
                     return RedirectToAction("History", "Treatment");
                 }

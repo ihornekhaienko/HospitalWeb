@@ -19,6 +19,7 @@ namespace HospitalWeb.Controllers
         private readonly ApiUnitOfWork _api;
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenManager _tokenManager;
+        private readonly ICalendarService _calendar;
         private readonly IPasswordGenerator _passwordGenerator;
         private readonly INotifier _notifier;
 
@@ -27,6 +28,7 @@ namespace HospitalWeb.Controllers
             ApiUnitOfWork api,
             UserManager<AppUser> userManager,
             ITokenManager tokenManager,
+            ICalendarService calendar,
             IPasswordGenerator passwordGenerator,
             INotifier notifier)
         {
@@ -34,6 +36,7 @@ namespace HospitalWeb.Controllers
             _api = api;
             _userManager = userManager;
             _tokenManager = tokenManager;
+            _calendar = calendar;
             _passwordGenerator = passwordGenerator;
             _notifier = notifier;
         }
@@ -292,7 +295,10 @@ namespace HospitalWeb.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        await _notifier.NotifyAdd(doctor.Email, doctor.Email, password);
+                        var entity = _api.Doctors.Read(response);
+
+                        await _calendar.CreateCalendar(entity);
+                        await _notifier.NotifyAdd(entity.Email, entity.Email, password);
 
                         return RedirectToAction("Doctors", "Administration");
                     }
@@ -451,6 +457,7 @@ namespace HospitalWeb.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
+                    await _calendar.DeleteCalendar(doctor);
                     await _notifier.NotifyDelete(doctor.Email, doctor.Email);
                 }
 
@@ -501,6 +508,7 @@ namespace HospitalWeb.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
+                    await _calendar.DeleteCalendar(patient);
                     await _notifier.NotifyDelete(patient.Email, patient.Email);
                 }
 

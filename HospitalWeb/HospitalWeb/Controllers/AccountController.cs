@@ -21,6 +21,7 @@ namespace HospitalWeb.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ApiUnitOfWork _api;
+        private readonly ICalendarService _calendar;
         private readonly IFileManager _fileManager;
         private readonly INotifier _notifier;
 
@@ -30,6 +31,7 @@ namespace HospitalWeb.Controllers
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             ApiUnitOfWork api,
+            ICalendarService calendar,
             IFileManager fileManager,
             INotifier notifier
             )
@@ -39,6 +41,7 @@ namespace HospitalWeb.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
             _api = api;
+            _calendar = calendar;
             _fileManager = fileManager;
             _notifier = notifier;
         }
@@ -82,6 +85,8 @@ namespace HospitalWeb.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var patient = _api.Patients.Read(response);
+
+                    await _calendar.CreateCalendar(patient);
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(patient);
                     var callbackUrl = Url.Action(
@@ -239,6 +244,9 @@ namespace HospitalWeb.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var entity = _api.Patients.Read(response);
+
+                        await _calendar.CreateCalendar(entity);
+
                         var result = await _userManager.AddLoginAsync(entity, info);
 
                         if (result.Succeeded)

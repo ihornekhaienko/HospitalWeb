@@ -19,6 +19,7 @@ namespace HospitalWeb.Controllers
         private readonly ApiUnitOfWork _api;
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenManager _tokenManager;
+        private readonly ICalendarService _calendar;
         private readonly IFileManager _fileManager;
         private readonly IPdfPrinter _pdfPrinter;
 
@@ -28,6 +29,7 @@ namespace HospitalWeb.Controllers
             ApiUnitOfWork api,
             UserManager<AppUser> userManager,
             ITokenManager tokenManager,
+            ICalendarService calendar,
             IFileManager fileManager,
             IPdfPrinter pdfPrinter
             )
@@ -37,6 +39,7 @@ namespace HospitalWeb.Controllers
             _api = api;
             _userManager = userManager;
             _tokenManager = tokenManager;
+            _calendar = calendar;
             _fileManager = fileManager;
             _pdfPrinter = pdfPrinter;
         }
@@ -88,10 +91,12 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            var userId = _api.Doctors.Read(response).Id;
+            var user = _api.Doctors.Read(response);
+
+            ViewBag.Calendar = _calendar.GetCalendar(user);
 
             var builder = new AppointmentsViewModelBuilder(_api,
-                page, searchString, sortOrder, userId, state: state, fromTime: fromDate, toTime: toDate);
+                page, searchString, sortOrder, user.Id, state: state, fromTime: fromDate, toTime: toDate);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
@@ -116,13 +121,15 @@ namespace HospitalWeb.Controllers
                 return NotFound();
             }
 
-            var userId = _api.Doctors.Read(response).Id;
+            var user = _api.Doctors.Read(response);
+
+            ViewBag.Calendar = _calendar.GetCalendar(user);
 
             var start = DateTime.Today;
             var end = start.AddDays(1).AddTicks(-1);
 
             var builder = new AppointmentsViewModelBuilder(_api,
-                page, searchString, sortOrder, userId, state: state, fromTime: start, toTime: end);
+                page, searchString, sortOrder, user.Id, state: state, fromTime: start, toTime: end);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
@@ -159,6 +166,9 @@ namespace HospitalWeb.Controllers
                     {
                         _api.Meetings.Delete(meeting.MeetingId, tokenResult.Token, tokenResult.Provider);
                     }
+
+                    await _calendar.CancelEvent(appointment.Doctor, appointment);
+                    await _calendar.CancelEvent(appointment.Patient, appointment);
 
                     return RedirectToAction("History", "Appointments");
                 }
@@ -244,6 +254,9 @@ namespace HospitalWeb.Controllers
                         {
                             _api.Meetings.Delete(meeting.MeetingId, tokenResult.Token, tokenResult.Provider);
                         }
+
+                        await _calendar.ConfirmEvent(appointment.Doctor, appointment);
+                        await _calendar.ConfirmEvent(appointment.Patient, appointment);
 
                         return RedirectToAction("Today", "Appointments");
                     }
