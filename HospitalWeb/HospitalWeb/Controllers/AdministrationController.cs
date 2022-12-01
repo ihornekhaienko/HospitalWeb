@@ -279,6 +279,8 @@ namespace HospitalWeb.Controllers
                     //var password = _passwordGenerator.GeneratePassword(null);
                     var password = "Pass_1111";
 
+                    var calendarId = await _calendar.CreateCalendar();
+
                     var doctor = new DoctorResourceModel
                     {
                         Name = model.Name,
@@ -288,6 +290,7 @@ namespace HospitalWeb.Controllers
                         PhoneNumber = model.Phone,
                         SpecialtyId = specialty.SpecialtyId,
                         EmailConfirmed = true,
+                        CalendarId = calendarId,
                         Password = password
                     };
 
@@ -296,8 +299,6 @@ namespace HospitalWeb.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var entity = _api.Doctors.Read(response);
-
-                        await _calendar.CreateCalendar(entity);
                         await _notifier.NotifyAdd(entity.Email, entity.Email, password);
 
                         return RedirectToAction("Doctors", "Administration");

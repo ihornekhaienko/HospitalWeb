@@ -67,6 +67,8 @@ namespace HospitalWeb.Controllers
                 Sex sex;
                 Enum.TryParse(model.Sex, out sex);
 
+                var calendarId = await _calendar.CreateCalendar();
+
                 var resource = new PatientResourceModel
                 {
                     Name = model.Name,
@@ -77,6 +79,7 @@ namespace HospitalWeb.Controllers
                     AddressId = address.AddressId,
                     BirthDate = model.BirthDate,
                     Sex = sex,
+                    CalendarId = calendarId,
                     Password = model.Password
                 };
 
@@ -85,8 +88,6 @@ namespace HospitalWeb.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var patient = _api.Patients.Read(response);
-
-                    await _calendar.CreateCalendar(patient);
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(patient);
                     var callbackUrl = Url.Action(
@@ -227,6 +228,8 @@ namespace HospitalWeb.Controllers
                     Sex sex;
                     Enum.TryParse(model.Sex, out sex);
 
+                    var calendarId = await _calendar.CreateCalendar();
+
                     var patient = new PatientResourceModel
                     {
                         Name = model.Name,
@@ -236,7 +239,8 @@ namespace HospitalWeb.Controllers
                         PhoneNumber = model.Phone,
                         AddressId = address.AddressId,
                         BirthDate = model.BirthDate,
-                        Sex = sex
+                        Sex = sex,
+                        CalendarId = calendarId
                     };
 
                     var response = _api.Patients.Post(patient);
@@ -244,9 +248,6 @@ namespace HospitalWeb.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var entity = _api.Patients.Read(response);
-
-                        await _calendar.CreateCalendar(entity);
-
                         var result = await _userManager.AddLoginAsync(entity, info);
 
                         if (result.Succeeded)
