@@ -45,5 +45,10 @@ namespace HospitalWeb.Services.Extensions
         {
             services.AddScoped<ITokenManager, TokenManager>();
         }
+
+        public static void AddGoogleCalendar(this IServiceCollection services)
+        {
+            services.AddScoped<ICalendarService, GoogleCalendarService>();
+        }
     }
 }
