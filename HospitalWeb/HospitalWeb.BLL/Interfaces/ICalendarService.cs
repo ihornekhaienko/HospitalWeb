@@ -5,7 +5,7 @@ namespace HospitalWeb.Services.Interfaces
 {
     public interface ICalendarService
     {
-        public Task<string> CreateCalendar();
+        public Task<string> CreateCalendar(string email);
         public string GetCalendar(AppUser user);
         public Task DeleteCalendar(AppUser user);
         public Task CreateEvent(AppUser user, Appointment appointment);

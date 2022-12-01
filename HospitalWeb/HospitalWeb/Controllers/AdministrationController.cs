@@ -279,7 +279,7 @@ namespace HospitalWeb.Controllers
                     //var password = _passwordGenerator.GeneratePassword(null);
                     var password = "Pass_1111";
 
-                    var calendarId = await _calendar.CreateCalendar();
+                    var calendarId = await _calendar.CreateCalendar(model.Email);
 
                     var doctor = new DoctorResourceModel
                     {

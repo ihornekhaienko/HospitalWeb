@@ -146,7 +146,7 @@ namespace HospitalWeb.Controllers
                 }
 
                 var entity = _api.Appointments.Read(response);
-                var meeting = _meetingService.CreateMeeting(_api.Appointments.Read(response));
+                var meeting = _meetingService.CreateMeeting(entity);
                 _api.Meetings.Post(meeting, tokenResult.Token, tokenResult.Provider);
 
                 await _calendar.CreateEvent(doctor, entity);

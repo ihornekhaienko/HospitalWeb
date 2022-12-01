@@ -67,7 +67,7 @@ namespace HospitalWeb.Controllers
                 Sex sex;
                 Enum.TryParse(model.Sex, out sex);
 
-                var calendarId = await _calendar.CreateCalendar();
+                var calendarId = await _calendar.CreateCalendar(model.Email);
 
                 var resource = new PatientResourceModel
                 {
@@ -228,7 +228,7 @@ namespace HospitalWeb.Controllers
                     Sex sex;
                     Enum.TryParse(model.Sex, out sex);
 
-                    var calendarId = await _calendar.CreateCalendar();
+                    var calendarId = await _calendar.CreateCalendar(model.Email);
 
                     var patient = new PatientResourceModel
                     {

@@ -33,15 +33,28 @@ namespace HospitalWeb.Services.Implementations
             });
         }
 
-        public async Task<string> CreateCalendar()
+        public async Task<string> CreateCalendar(string email)
         {
+            var rule = new AclRule
+            {
+                Scope = new AclRule.ScopeData
+                {
+                    Type = "user",
+                    Value = email
+                },
+                Role = "reader"
+            };
+
             var calendar = new Calendar()
             {
                 Summary = "Appointments",
                 Description = "Your appointments in HospitalDb"
             };
 
-            return (await _service.Calendars.Insert(calendar).ExecuteAsync()).Id;
+            var calendarId = (await _service.Calendars.Insert(calendar).ExecuteAsync()).Id;
+            await _service.Acl.Insert(rule, calendarId).ExecuteAsync();
+
+            return calendarId;
         }
 
         public string GetCalendar(AppUser user)
@@ -56,9 +69,7 @@ namespace HospitalWeb.Services.Implementations
             var calendarEvent = new Event()
             {
                 Id = "event" + appointment.AppointmentId.ToString(),
-                Summary = $"Appointment with {appointment.Doctor.Specialty.SpecialtyName}",
-                Description = $"Appointment with Dr. {appointment.Doctor} ({appointment.Doctor.Specialty.SpecialtyName}) " +
-                    $"on {appointment.AppointmentDate.ToString("MM/dd/yyyy HH:mm")}",
+                Summary = $"Appointment on {appointment.AppointmentDate.ToString("MM/dd/yyyy HH:mm")}",
                 Start = new EventDateTime
                 {
                     DateTime = appointment.AppointmentDate,
@@ -68,11 +79,6 @@ namespace HospitalWeb.Services.Implementations
                 {
                     DateTime = appointment.AppointmentDate.AddHours(1),
                     TimeZone = "Europe/Kyiv"
-                },
-                Attendees = new List<EventAttendee>
-                {
-                    new EventAttendee { Email = appointment.Doctor.Email },
-                    new EventAttendee { Email = appointment.Patient.Email }
                 },
                 Status = "tentative"
             };
@@ -101,7 +107,7 @@ namespace HospitalWeb.Services.Implementations
             var calendarId = user.CalendarId;
             var eventId = "event" + appointment.AppointmentId.ToString();
             var calendarEvent = await _service.Events.Get(calendarId, eventId).ExecuteAsync();
-            
+
             if (calendarEvent == null)
             {
                 throw new Exception("Event not found");
