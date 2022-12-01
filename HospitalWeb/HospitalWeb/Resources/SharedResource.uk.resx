@@ -453,4 +453,7 @@
   <data name="Join" xml:space="preserve">
     <value>Приєднатися до зустрічі</value>
   </data>
+  <data name="Calendar" xml:space="preserve">
+    <value>Переглянути в Google Calendar</value>
+  </data>
 </root>

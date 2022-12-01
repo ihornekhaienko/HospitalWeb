@@ -450,4 +450,7 @@
   <data name="Join" xml:space="preserve">
     <value>Join the meeting</value>
   </data>
+  <data name="Calendar" xml:space="preserve">
+    <value>Open in Google Calendar</value>
+  </data>
 </root>
