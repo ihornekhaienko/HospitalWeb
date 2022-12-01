@@ -50,9 +50,9 @@ namespace HospitalWeb.Services.Implementations
             return _config["Calendar:CalendarUrl"] + "calendar_" + user.Id;
         }
 
-        public async Task CreateEvent(Appointment appointment)
+        public async Task CreateEvent(AppUser user, Appointment appointment)
         {
-            var calendarId = "calendar_" + appointment.PatientId;
+            var calendarId = "calendar_" + user.Id;
 
             var calendarEvent = new Event()
             {
@@ -81,9 +81,9 @@ namespace HospitalWeb.Services.Implementations
             await _service.Events.Insert(calendarEvent, calendarId).ExecuteAsync();
         }
 
-        public async Task ConfirmEvent(Appointment appointment)
+        public async Task ConfirmEvent(AppUser user, Appointment appointment)
         {
-            var calendarId = "calendar_" + appointment.PatientId;
+            var calendarId = "calendar_" + user.Id;
             var eventId = "event_" + appointment.AppointmentId.ToString();
             var calendarEvent = await _service.Events.Get(calendarId, eventId).ExecuteAsync();
 
@@ -97,9 +97,9 @@ namespace HospitalWeb.Services.Implementations
             await _service.Events.Update(calendarEvent, calendarId, eventId).ExecuteAsync();
         }
 
-        public async Task CancelEvent(Appointment appointment)
+        public async Task CancelEvent(AppUser user, Appointment appointment)
         {
-            var calendarId = "calendar_" + appointment.PatientId;
+            var calendarId = "calendar_" + user.Id;
             var eventId = "event" + appointment.AppointmentId.ToString();
             var calendarEvent = await _service.Events.Get(calendarId, eventId).ExecuteAsync();
             
