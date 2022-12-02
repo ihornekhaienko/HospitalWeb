@@ -245,7 +245,6 @@ namespace HospitalWeb.WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize]
         public async Task<ActionResult<Appointment>> Put(IEnumerable<Appointment> appointments)
         {
             if (appointments == null)
