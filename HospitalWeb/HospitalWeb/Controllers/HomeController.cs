@@ -42,12 +42,5 @@ namespace HospitalWeb.Controllers
 
             return LocalRedirect(returnUrl);
         }
-
-        public IActionResult UpdateAppointmentStates()
-        {
-            _api.Appointments.UpdateStates();
-
-            return Ok();
-        }
     }
 }

@@ -174,14 +174,15 @@ function confirmSignUp(message) {
     return confirm(message);
 }
 
-var interval = 1000 * 60 * 60;
-
 function updateAppoitmentsStates() {
     $.ajax({
-        url: '@Url.Action("UpdateAppointmentStates", "Home")',
-        dataType: "html",
-        type: "GET",
-        contentType: "application/json",
+        url: 'https://localhost:7271/jobs/updateStates',
+        type: "POST",
+        crossDomain: true,
+        headers: {
+            "accept": "application/json",
+            "Access-Control-Allow-Origin": "*"
+        },
         success: function (response) {
             console.log('states update');
         },
@@ -191,4 +192,4 @@ function updateAppoitmentsStates() {
     });
 }
 
-setInterval(updateAppoitmentsStates, interval);
+updateAppoitmentsStates();
