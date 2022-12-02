@@ -17,6 +17,7 @@ using Google.Apis.Auth.AspNetCore3;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+#region DB
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -27,28 +28,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
+#endregion
 
-builder.Services.AddUnitOfWork();
-builder.Services.AddApi();
-builder.Services.AddEmailNotifier();
-builder.Services.AddPasswordGenerator();
-builder.Services.AddFileManager();
-builder.Services.AddScheduleGenerator();
-builder.Services.AddPdfPrinter();
-builder.Services.AddZoom();
-builder.Services.AddGoogleTokenProvider();
-builder.Services.AddInternalGoogleProvider();
-builder.Services.AddTokenManager();
-builder.Services.AddGoogleCalendar();
-
+#region SIGNALR
 builder.Services.AddSignalR();
+#endregion
 
+#region LOCALIZATION
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 builder.Services.AddControllersWithViews()
     .AddDataAnnotationsLocalization(options =>
         options.DataAnnotationLocalizerProvider = (type, factory) =>
             factory.Create(typeof(SharedResource)))
     .AddViewLocalization();
+
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var supportedCultures = new[]
@@ -61,8 +55,9 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
 });
+#endregion
 
-
+#region AUTHORIZATION
 builder.Services.AddAuthentication(o =>
 {
     o.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
@@ -102,6 +97,21 @@ builder.Services.AddAuthentication(o =>
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     });
+
+#endregion
+
+builder.Services.AddUnitOfWork();
+builder.Services.AddApi();
+builder.Services.AddEmailNotifier();
+builder.Services.AddPasswordGenerator();
+builder.Services.AddFileManager();
+builder.Services.AddScheduleGenerator();
+builder.Services.AddPdfPrinter();
+builder.Services.AddZoom();
+builder.Services.AddGoogleTokenProvider();
+builder.Services.AddInternalGoogleProvider();
+builder.Services.AddTokenManager();
+builder.Services.AddGoogleCalendar();
 
 var app = builder.Build();
 
