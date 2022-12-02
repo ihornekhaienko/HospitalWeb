@@ -244,19 +244,6 @@ namespace HospitalWeb.WebApi.Controllers
             return Ok(appointment);
         }
 
-        [HttpPut]
-        public async Task<ActionResult<Appointment>> Put(IEnumerable<Appointment> appointments)
-        {
-            if (appointments == null)
-            {
-                return BadRequest();
-            }
-
-            await _uow.Appointments.UpdateManyAsync(appointments);
-
-            return Ok(appointments);
-        }
-
         /// <summary>
         /// Deletes Appointment
         /// </summary>

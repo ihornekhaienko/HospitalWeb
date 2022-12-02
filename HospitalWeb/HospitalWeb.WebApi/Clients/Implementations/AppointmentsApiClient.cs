@@ -72,27 +72,5 @@ namespace HospitalWeb.WebApi.Clients.Implementations
 
             return _client.SendAsync(request).Result;
         }
-
-        public void UpdateStates(string token = null, string provider = null)
-        {
-            var date = DateTime.Today.AddDays(-1);
-
-            var response = Filter(toDate: date, token: token, provider: provider);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var appointments = ReadMany(response);
-
-                foreach (var appointment in appointments)
-                {
-                    if (appointment.State == State.Planned)
-                    {
-                        appointment.State = State.Missed;
-                    }    
-                }
-
-                PutMany(appointments);
-            }
-        }
     }
 }
