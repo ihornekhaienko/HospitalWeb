@@ -39,6 +39,18 @@ namespace HospitalWeb.DAL.Services.Implementations
             await _db.SaveChangesAsync();
         }
 
+        public void CreateMany(IEnumerable<T> items)
+        {
+            _db.AddRange(items);
+            _db.SaveChanges();
+        }
+
+        public async Task CreateManyAsync(IEnumerable<T> items)
+        {
+            _db.AddRange(items);
+            await _db.SaveChangesAsync();
+        }
+
         public void Delete(T item)
         {
             _db.Remove(item);
@@ -166,6 +178,18 @@ namespace HospitalWeb.DAL.Services.Implementations
         {
             Attach(item);
             _db.Entry(item).State = EntityState.Modified;
+            await _db.SaveChangesAsync();
+        }
+
+        public void UpdateMany(IEnumerable<T> items)
+        {
+            _db.Entry(items).State = EntityState.Modified;
+            _db.SaveChanges();
+        }
+
+        public async Task UpdateManyAsync(IEnumerable<T> items)
+        {
+            _db.Entry(items).State = EntityState.Modified;
             await _db.SaveChangesAsync();
         }
 

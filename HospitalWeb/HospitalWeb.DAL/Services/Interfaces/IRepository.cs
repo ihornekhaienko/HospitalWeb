@@ -13,8 +13,12 @@ namespace HospitalWeb.DAL.Services.Interfaces
         Task<bool> ContainsAsync(Expression<Func<T, bool>> query);
         void Create(T item);
         Task CreateAsync(T item);
+        void CreateMany(IEnumerable<T> items);
+        Task CreateManyAsync(IEnumerable<T> items);
         void Update(T item);
         Task UpdateAsync(T item);
+        void UpdateMany(IEnumerable<T> items);
+        Task UpdateManyAsync(IEnumerable<T> items);
         void Delete(T item);
         Task DeleteAsync(T item);
         void Attach(T item);
