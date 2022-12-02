@@ -19,10 +19,12 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
+#region NEWTONSOFT
 builder.Services.AddControllers().AddNewtonsoftJson(o =>
 {
     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 });
+#endregion
 
 #region SWAGGER
 builder.Services.AddEndpointsApiExplorer();
@@ -113,6 +115,22 @@ builder.Services.AddHangfire(x => x.UseSqlServerStorage(config["ConnectionString
 builder.Services.AddHangfireServer();
 #endregion
 
+#region CORS
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:7007")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                      });
+});
+#endregion
+
+
 builder.Services.AddUnitOfWork();
 builder.Services.AddApi();
 
@@ -126,6 +144,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
