@@ -1,7 +1,9 @@
+using Hangfire;
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;
 using HospitalWeb.WebApi;
+using HospitalWeb.WebApi.Clients.Extensions;
 using HospitalWeb.WebApi.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -17,12 +19,12 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
-// Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson(o =>
 {
     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+#region SWAGGER
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(s =>
 {
@@ -37,7 +39,9 @@ builder.Services.AddSwaggerGen(s =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     s.IncludeXmlComments(xmlPath);
 });
+#endregion
 
+#region DB
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -48,9 +52,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
+#endregion
 
-builder.Services.AddUnitOfWork();
-
+#region AUTHORIZATION
 builder.Services.AddAuthentication()
     .AddJwtBearer("Google", o =>
     {
@@ -102,6 +106,15 @@ builder.Services.AddAuthorization(options =>
         .AddAuthenticationSchemes("Default")
         .Build();
 });
+#endregion
+
+#region HANGFIRE
+builder.Services.AddHangfire(x => x.UseSqlServerStorage(config["ConnectionStrings:Hangfire"]));
+builder.Services.AddHangfireServer();
+#endregion
+
+builder.Services.AddUnitOfWork();
+builder.Services.AddApi();
 
 var app = builder.Build();
 
@@ -116,6 +129,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHangfireDashboard("/dashboard");
 
 app.MapControllers();
 
