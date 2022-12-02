@@ -61,6 +61,18 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             return true;
         }
 
+        public HttpResponseMessage PutMany(IEnumerable<Appointment> items, string token = null, string provider = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Put, $"{_client.BaseAddress}{_addressSuffix}");
+            HttpContent httpContent = JsonContent.Create(items);
+
+            request.Content = httpContent;
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Add("Provider", provider);
+
+            return _client.SendAsync(request).Result;
+        }
+
         public void UpdateStates(string token = null, string provider = null)
         {
             var date = DateTime.Today.AddDays(-1);
@@ -76,10 +88,10 @@ namespace HospitalWeb.WebApi.Clients.Implementations
                     if (appointment.State == State.Planned)
                     {
                         appointment.State = State.Missed;
-
-                        Put(appointment, token, provider);
                     }    
                 }
+
+                PutMany(appointments);
             }
         }
     }
