@@ -130,9 +130,7 @@ builder.Services.AddCors(options =>
 });
 #endregion
 
-
 builder.Services.AddUnitOfWork();
-builder.Services.AddApi();
 
 var app = builder.Build();
 
