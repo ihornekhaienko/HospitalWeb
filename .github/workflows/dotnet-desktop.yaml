@@ -12,13 +12,13 @@ jobs:
   
     strategy:
         matrix:
-          configuration: [Debug, Release]
+          configuration: [Debug]
 
     runs-on: ubuntu-latest  
 
     env:
-      Solution_Name: HospitalWeb.sln
-      Test_Project_Path: HospitalWeb.WebApi.Tests\HospitalWeb.WebApi.Tests.csproj             
+      Solution_Name: HospitalWeb\HospitalWeb.sln
+      Test_Project_Path: HospitalWeb\HospitalWeb.WebApi.Tests\HospitalWeb.WebApi.Tests.csproj             
 
     steps:
     - name: Checkout
