@@ -1,0 +1,31 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "Develope" ]
+  pull_request:
+    branches: [ "Develope" ]
+
+jobs:
+
+  build:
+  
+    runs-on: ubuntu-latest  
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore
+      run: dotnet restore ./HospitalWeb/HospitalWeb.sln
+      
+    - name: Build
+      run: dotnet build ./HospitalWeb/HospitalWeb.sln --no-restore
+    
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
