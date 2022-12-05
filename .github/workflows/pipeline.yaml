@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest  
     
     env:
-      Solution: ./HospitalWeb/HospitalWeb.sln
+      Solution: HospitalWeb/HospitalWeb.sln
     
     steps:
     - name: Checkout
