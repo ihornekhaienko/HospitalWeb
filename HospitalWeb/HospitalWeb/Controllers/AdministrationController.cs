@@ -9,6 +9,8 @@ using HospitalWeb.WebApi.Clients.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.DAL.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
+using HospitalWeb.Services.Extensions;
+using HospitalWeb.ViewModels.Error;
 
 namespace HospitalWeb.Controllers
 {
@@ -257,6 +259,18 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult CreateHospital()
         {
+            var response = _api.Localities.Get();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Localities = _api.Localities
+                .ReadMany(response)
+                .Select(l => l.LocalityName)
+                .OrderBy(l => l);
+
             return View();
         }
 
@@ -297,11 +311,11 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditHospital(string id)
+        public async Task<IActionResult> EditHospital(int id)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/hospital.jpg"));
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/hospital-icon.png"));
 
-            if (string.IsNullOrWhiteSpace(id))
+            if (id < 0)
             {
                 return NotFound();
             }
@@ -314,6 +328,18 @@ namespace HospitalWeb.Controllers
             }
 
             var hospital = _api.Hospitals.Read(response);
+
+            response = _api.Localities.Get();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Localities = _api.Localities
+                .ReadMany(response)
+                .Select(l => l.LocalityName)
+                .OrderBy(l => l);
 
             var model = new HospitalViewModel
             {
@@ -330,7 +356,7 @@ namespace HospitalWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> EditHospital(HospitalViewModel model)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/hospital.jpg"));
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/hospital-icon.png"));
 
             try
             {
@@ -362,6 +388,18 @@ namespace HospitalWeb.Controllers
                     }
                 }
 
+                var result = _api.Localities.Get();
+
+                if (!result.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                ViewBag.Localities = _api.Localities
+                    .ReadMany(result)
+                    .Select(l => l.LocalityName)
+                    .OrderBy(l => l);
+
                 return View(model);
             }
             catch (Exception err)
@@ -371,13 +409,59 @@ namespace HospitalWeb.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UploadPhoto(IFormFile file, int id)
+        {
+            try
+            {
+                if (file != null)
+                {
+                    var bytes = await _fileManager.GetBytes(file);
+
+                    if (bytes != null && bytes.IsImage())
+                    {
+                        var response = _api.Hospitals.Get(id, null, null);
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            return NotFound();
+                        }
+
+                        var hospital = _api.Hospitals.Read(response);
+
+                        hospital.Image = bytes;
+
+                        var user = await _userManager.GetUserAsync(User);
+                        var tokenResult = await _tokenManager.GetToken(user);
+
+                        _api.Hospitals.Put(hospital, tokenResult.Token, tokenResult.Provider);
+
+                        return RedirectToAction("EditHospital", "Administration", new { id = id });
+                    }
+                    else
+                    {
+                        throw new Exception("Your file is not an image");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed loading file");
+                }
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
+        }
+
         public async Task<IActionResult> DeleteHospital(int id)
         {
             try
             {
                 if (id < 0)
                 {
-                    return NotFound();
+                    return NotFound(); 
                 }
 
                 var response = _api.Hospitals.Get(id, null, null);
@@ -407,10 +491,12 @@ namespace HospitalWeb.Controllers
         public IActionResult Doctors(
             string searchString,
             int? specialty,
+            int? hospital,
+            int? locality,
             int page = 1,
             DoctorSortState sortOrder = DoctorSortState.Id)
         {
-            var builder = new DoctorsViewModelBuilder(_api, page, searchString, sortOrder, specialty);
+            var builder = new DoctorsViewModelBuilder(_api, page, searchString, sortOrder, specialty, hospital, locality);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
@@ -432,6 +518,18 @@ namespace HospitalWeb.Controllers
                 .ReadMany(response)
                 .Select(s => s.SpecialtyName)
                 .OrderBy(s => s);
+
+            response = _api.Hospitals.Get();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Hospitals = _api.Hospitals
+                .ReadMany(response)
+                .Select(h => new { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
+                .OrderBy(h => h.HospitalName);
 
             return View();
         }
@@ -460,9 +558,10 @@ namespace HospitalWeb.Controllers
                         UserName = model.Email,
                         PhoneNumber = model.Phone,
                         SpecialtyId = specialty.SpecialtyId,
+                        HospitalId = model.Hospital,
                         EmailConfirmed = true,
                         CalendarId = calendarId,
-                        Password = password
+                        Password = password,
                     };
 
                     var response = _api.Doctors.Post(doctor, tokenResult.Token, tokenResult.Provider);
@@ -495,6 +594,16 @@ namespace HospitalWeb.Controllers
                     .Select(s => s.SpecialtyName)
                     .OrderBy(s => s);
 
+                result = _api.Hospitals.Get();
+                if (!result.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+                ViewBag.Hospitals = _api.Hospitals
+                    .ReadMany(result)
+                    .Select(h => new { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
+                    .OrderBy(h => h.HospitalName);
+
                 return View(model);
             }
             catch (Exception err)
@@ -512,8 +621,23 @@ namespace HospitalWeb.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Specialties = _api.Specialties.ReadMany(response);
-            
+            ViewBag.Specialties = _api.Specialties
+                    .ReadMany(response)
+                    .Select(s => s.SpecialtyName)
+                    .OrderBy(s => s);
+
+            response = _api.Hospitals.Get();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Hospitals = _api.Hospitals
+                .ReadMany(response)
+                .Select(h => new { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
+                .OrderBy(h => h.HospitalName);
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
@@ -532,7 +656,8 @@ namespace HospitalWeb.Controllers
                 Surname = doctor.Surname,
                 Email = doctor.Email,
                 Phone = doctor.PhoneNumber,
-                Specialty = doctor.Specialty.SpecialtyName
+                Specialty = doctor.Specialty.SpecialtyName,
+                Hospital = doctor.HospitalId
             };
 
             return View(model);
@@ -565,6 +690,7 @@ namespace HospitalWeb.Controllers
                     doctor.Surname = model.Surname;
                     doctor.PhoneNumber = model.Phone;
                     doctor.SpecialtyId = specialty.SpecialtyId;
+                    doctor.HospitalId = model.Hospital;
 
                     response = _api.Doctors.Put(doctor, tokenResult.Token, tokenResult.Provider);
 
@@ -594,6 +720,16 @@ namespace HospitalWeb.Controllers
                     .ReadMany(result)
                     .Select(s => s.SpecialtyName)
                     .OrderBy(s => s);
+
+                result = _api.Hospitals.Get();
+                if (!result.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+                ViewBag.Hospitals = _api.Hospitals
+                    .ReadMany(result)
+                    .Select(h => new { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
+                    .OrderBy(h => h.HospitalName);
 
                 return View(model);
             }
