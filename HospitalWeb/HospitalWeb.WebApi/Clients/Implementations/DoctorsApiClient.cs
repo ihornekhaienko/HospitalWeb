@@ -15,14 +15,16 @@ namespace HospitalWeb.WebApi.Clients.Implementations
         public HttpResponseMessage Filter(
             string searchString,
             int? specialty,
+            int? hospital,
+            int? locality,
             DoctorSortState sortOrder = DoctorSortState.Id,
             int pageSize = 10,
             int pageNumber = 1,
             string token = null,
             string provider = null)
         {
-            string query = $"?searchString={searchString}&specialty={specialty}&sortOrder={sortOrder}" +
-                $"&pageSize={pageSize}&pageNumber={pageNumber}";
+            string query = $"?searchString={searchString}&specialty={specialty}&hospital={hospital}&locality={locality}" +
+                $"&sortOrder={sortOrder}&pageSize={pageSize}&pageNumber={pageNumber}";
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}{query}");
 

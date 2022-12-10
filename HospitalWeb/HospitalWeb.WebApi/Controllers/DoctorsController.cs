@@ -37,6 +37,8 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <param name="searchString">Search string that identifies Admin</param>
         /// <param name="specialty">Doctor's specialty Id</param>
+        /// <param name="hospital">Doctor's hospital Id</param>
+        /// <param name="locality">Doctor's locality Id</param>
         /// <param name="sortOrder">Sorting order of the filtered list</param>
         /// <param name="pageSize">Count of the result on one page</param>
         /// <param name="pageNumber">Number of the page</param>
@@ -45,6 +47,8 @@ namespace HospitalWeb.WebApi.Controllers
         public async Task<IEnumerable<Doctor>> Get(
             string searchString = null,
             int? specialty = null,
+            int? hospital = null,
+            int? locality = null,
             DoctorSortState sortOrder = DoctorSortState.Id,
             int pageSize = 10,
             int pageNumber = 1)
@@ -66,6 +70,16 @@ namespace HospitalWeb.WebApi.Controllers
                 if (specialty != null && specialty != 0)
                 {
                     result = result && d.Specialty.SpecialtyId == specialty;
+                }
+
+                if (hospital != null && hospital != 0)
+                {
+                    result = result && d.Hospital.HospitalId == hospital;
+                }
+
+                if (locality != null && locality != 0)
+                {
+                    result = result && d.Hospital.Address.Locality.LocalityId == locality;
                 }
 
                 return result;
@@ -122,6 +136,8 @@ namespace HospitalWeb.WebApi.Controllers
                     .ThenInclude(a => a.Diagnosis)
                 .Include(d => d.Schedules)
                 .Include(d => d.Hospital)
+                    .ThenInclude(h => h.Address)
+                            .ThenInclude(a => a.Locality)
                 .Include(d => d.Specialty));
 
             Response.Headers.Add("TotalCount", totalCount.ToString());
@@ -147,6 +163,8 @@ namespace HospitalWeb.WebApi.Controllers
                     .ThenInclude(a => a.Diagnosis)
                 .Include(d => d.Schedules)
                 .Include(d => d.Hospital)
+                    .ThenInclude(h => h.Address)
+                            .ThenInclude(a => a.Locality)
                 .Include(d => d.Specialty));
 
             if (doctor == null)

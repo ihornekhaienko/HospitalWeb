@@ -14,6 +14,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
     {
         private readonly ApiUnitOfWork _api;
         private readonly int? _specialty;
+        private readonly int? _hospital;
+        private readonly int? _locality;
         private readonly DoctorSortState _sortOrder;
         private IEnumerable<DoctorDTO> _doctors;
         private PageModel _pageModel;
@@ -26,18 +28,22 @@ namespace HospitalWeb.Filters.Builders.Implementations
             int pageNumber, 
             string searchString,
             DoctorSortState sortOrder, 
-            int? specialty = null, 
+            int? specialty = null,
+            int? hospital = null,
+            int? locality = null,
             int pageSize = 10
             ) : base(pageNumber, pageSize, searchString)
         {
             _api = api;
             _sortOrder = sortOrder;
             _specialty = specialty;
+            _hospital = hospital;
+            _locality = locality;
         }
 
         public override void BuildEntityModel()
         {
-            var response = _api.Doctors.Filter(_searchString, _specialty, _sortOrder, _pageSize, _pageNumber);
+            var response = _api.Doctors.Filter(_searchString, _specialty, _hospital, _locality, _sortOrder, _pageSize, _pageNumber);
 
             if (response.IsSuccessStatusCode)
             {
@@ -50,7 +56,9 @@ namespace HospitalWeb.Filters.Builders.Implementations
                         Email = d.Email,
                         PhoneNumber = d.PhoneNumber,
                         Image = d.Image,
-                        Specialty = d.Specialty.SpecialtyName
+                        Specialty = d.Specialty.SpecialtyName,
+                        Hospital = d.Hospital.HospitalName,
+                        Locality = d.Hospital.Address.Locality.LocalityName
                     });
 
                 _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());
@@ -64,13 +72,26 @@ namespace HospitalWeb.Filters.Builders.Implementations
         public override void BuildFilterModel()
         {
             var response = _api.Specialties.Get();
+
             var specialties = _api.Specialties
                 .ReadMany(response)
                 .OrderBy(s => s.SpecialtyName)
                 .Select(s => new SpecialtyDTO { SpecialtyId = s.SpecialtyId, SpecialtyName = s.SpecialtyName })
                 .ToList();
 
-            _filterModel = new DoctorFilterModel(_searchString, specialties, _specialty);
+            var hospitals = _api.Hospitals
+               .ReadMany(response)
+               .OrderBy(h => h.HospitalName)
+               .Select(h => new HospitalDTO { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
+               .ToList();
+
+            var localities = _api.Localities
+               .ReadMany(response)
+               .OrderBy(l => l.LocalityName)
+               .Select(l => new LocalityDTO { LocalityId = l.LocalityId, LocalityName = l.LocalityName })
+               .ToList();
+
+            _filterModel = new DoctorFilterModel(_searchString, specialties, _specialty, hospitals, _hospital, localities, _locality);
         }
 
         public override void BuildPageModel()
