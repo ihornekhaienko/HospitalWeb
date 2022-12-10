@@ -31,6 +31,7 @@ namespace HospitalWeb.DAL.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Surname = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    CalendarId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -49,6 +50,19 @@ namespace HospitalWeb.DAL.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Diagnoses",
+                columns: table => new
+                {
+                    DiagnosisId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DiagnosisName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Diagnoses", x => x.DiagnosisId);
                 });
 
             migrationBuilder.CreateTable(
@@ -201,13 +215,35 @@ namespace HospitalWeb.DAL.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    NotificationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Topic = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    AppUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.NotificationId);
+                    table.ForeignKey(
+                        name: "FK_Notifications_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Addresses",
                 columns: table => new
                 {
                     AddressId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FullAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LocalityId = table.Column<int>(type: "int", nullable: true)
+                    LocalityId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -216,7 +252,54 @@ namespace HospitalWeb.DAL.Data.Migrations
                         name: "FK_Addresses_Localities_LocalityId",
                         column: x => x.LocalityId,
                         principalTable: "Localities",
-                        principalColumn: "LocalityId");
+                        principalColumn: "LocalityId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Hospitals",
+                columns: table => new
+                {
+                    HospitalId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    HospitalName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AddressId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Hospitals", x => x.HospitalId);
+                    table.ForeignKey(
+                        name: "FK_Hospitals_Addresses_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "Addresses",
+                        principalColumn: "AddressId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Patients",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Sex = table.Column<int>(type: "int", nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddressId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Patients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Patients_Addresses_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "Addresses",
+                        principalColumn: "AddressId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Patients_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -224,7 +307,8 @@ namespace HospitalWeb.DAL.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    SpecialtyId = table.Column<int>(type: "int", nullable: true)
+                    SpecialtyId = table.Column<int>(type: "int", nullable: false),
+                    HospitalId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -235,33 +319,49 @@ namespace HospitalWeb.DAL.Data.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_Doctors_Hospitals_HospitalId",
+                        column: x => x.HospitalId,
+                        principalTable: "Hospitals",
+                        principalColumn: "HospitalId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Doctors_Specialties_SpecialtyId",
                         column: x => x.SpecialtyId,
                         principalTable: "Specialties",
-                        principalColumn: "SpecialtyId");
+                        principalColumn: "SpecialtyId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Patients",
+                name: "Appointments",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Sex = table.Column<int>(type: "int", nullable: false),
-                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AddressId = table.Column<int>(type: "int", nullable: true)
+                    AppointmentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Prescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AppointmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    State = table.Column<int>(type: "int", nullable: false),
+                    DiagnosisId = table.Column<int>(type: "int", nullable: true),
+                    DoctorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    PatientId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Patients", x => x.Id);
+                    table.PrimaryKey("PK_Appointments", x => x.AppointmentId);
                     table.ForeignKey(
-                        name: "FK_Patients_Addresses_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "Addresses",
-                        principalColumn: "AddressId");
+                        name: "FK_Appointments_Diagnoses_DiagnosisId",
+                        column: x => x.DiagnosisId,
+                        principalTable: "Diagnoses",
+                        principalColumn: "DiagnosisId");
                     table.ForeignKey(
-                        name: "FK_Patients_AspNetUsers_Id",
-                        column: x => x.Id,
-                        principalTable: "AspNetUsers",
+                        name: "FK_Appointments_Doctors_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "Doctors",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Appointments_Patients_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "Patients",
                         principalColumn: "Id");
                 });
 
@@ -272,8 +372,8 @@ namespace HospitalWeb.DAL.Data.Migrations
                     ScheduleId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DayOfWeek = table.Column<int>(type: "int", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DoctorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -287,37 +387,47 @@ namespace HospitalWeb.DAL.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Records",
+                name: "Meetings",
                 columns: table => new
                 {
-                    RecordId = table.Column<int>(type: "int", nullable: false)
+                    MeetingId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Diagnosis = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Prescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RecordDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    State = table.Column<int>(type: "int", nullable: false),
-                    DoctorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    PatientId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Topic = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    StartLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JoinLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AppointmentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Records", x => x.RecordId);
+                    table.PrimaryKey("PK_Meetings", x => x.MeetingId);
                     table.ForeignKey(
-                        name: "FK_Records_Doctors_DoctorId",
-                        column: x => x.DoctorId,
-                        principalTable: "Doctors",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Records_Patients_PatientId",
-                        column: x => x.PatientId,
-                        principalTable: "Patients",
-                        principalColumn: "Id");
+                        name: "FK_Meetings_Appointments_AppointmentId",
+                        column: x => x.AppointmentId,
+                        principalTable: "Appointments",
+                        principalColumn: "AppointmentId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_LocalityId",
                 table: "Addresses",
                 column: "LocalityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_DiagnosisId",
+                table: "Appointments",
+                column: "DiagnosisId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_DoctorId",
+                table: "Appointments",
+                column: "DoctorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_PatientId",
+                table: "Appointments",
+                column: "PatientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -359,24 +469,34 @@ namespace HospitalWeb.DAL.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Doctors_HospitalId",
+                table: "Doctors",
+                column: "HospitalId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Doctors_SpecialtyId",
                 table: "Doctors",
                 column: "SpecialtyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Patients_AddressId",
-                table: "Patients",
+                name: "IX_Hospitals_AddressId",
+                table: "Hospitals",
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Records_DoctorId",
-                table: "Records",
-                column: "DoctorId");
+                name: "IX_Meetings_AppointmentId",
+                table: "Meetings",
+                column: "AppointmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Records_PatientId",
-                table: "Records",
-                column: "PatientId");
+                name: "IX_Notifications_AppUserId",
+                table: "Notifications",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Patients_AddressId",
+                table: "Patients",
+                column: "AddressId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Schedules_DoctorId",
@@ -405,7 +525,10 @@ namespace HospitalWeb.DAL.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Records");
+                name: "Meetings");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "Schedules");
@@ -414,19 +537,28 @@ namespace HospitalWeb.DAL.Data.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Patients");
+                name: "Appointments");
+
+            migrationBuilder.DropTable(
+                name: "Diagnoses");
 
             migrationBuilder.DropTable(
                 name: "Doctors");
 
             migrationBuilder.DropTable(
-                name: "Addresses");
+                name: "Patients");
+
+            migrationBuilder.DropTable(
+                name: "Hospitals");
+
+            migrationBuilder.DropTable(
+                name: "Specialties");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Specialties");
+                name: "Addresses");
 
             migrationBuilder.DropTable(
                 name: "Localities");

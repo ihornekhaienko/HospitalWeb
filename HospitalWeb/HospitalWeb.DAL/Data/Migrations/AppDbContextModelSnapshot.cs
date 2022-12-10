@@ -33,7 +33,7 @@ namespace HospitalWeb.DAL.Data.Migrations
                     b.Property<string>("FullAddress")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("LocalityId")
+                    b.Property<int>("LocalityId")
                         .HasColumnType("int");
 
                     b.HasKey("AddressId");
@@ -43,6 +43,83 @@ namespace HospitalWeb.DAL.Data.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Appointment", b =>
+                {
+                    b.Property<int>("AppointmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AppointmentId"), 1L, 1);
+
+                    b.Property<DateTime>("AppointmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DiagnosisId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DoctorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PatientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Prescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.HasKey("AppointmentId");
+
+                    b.HasIndex("DiagnosisId");
+
+                    b.HasIndex("DoctorId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("Appointments");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Diagnosis", b =>
+                {
+                    b.Property<int>("DiagnosisId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DiagnosisId"), 1L, 1);
+
+                    b.Property<string>("DiagnosisName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DiagnosisId");
+
+                    b.ToTable("Diagnoses");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Hospital", b =>
+                {
+                    b.Property<int>("HospitalId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HospitalId"), 1L, 1);
+
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HospitalName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("HospitalId");
+
+                    b.HasIndex("AddressId");
+
+                    b.ToTable("Hospitals");
+                });
+
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Identity.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -50,6 +127,9 @@ namespace HospitalWeb.DAL.Data.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("CalendarId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -133,39 +213,64 @@ namespace HospitalWeb.DAL.Data.Migrations
                     b.ToTable("Localities");
                 });
 
-            modelBuilder.Entity("HospitalWeb.DAL.Entities.Record", b =>
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Meeting", b =>
                 {
-                    b.Property<int>("RecordId")
+                    b.Property<int>("MeetingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecordId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MeetingId"), 1L, 1);
 
-                    b.Property<string>("Diagnosis")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DoctorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("PatientId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Prescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("RecordDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("State")
+                    b.Property<int>("AppointmentId")
                         .HasColumnType("int");
 
-                    b.HasKey("RecordId");
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
 
-                    b.HasIndex("DoctorId");
+                    b.Property<string>("JoinLink")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("PatientId");
+                    b.Property<string>("StartLink")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Records");
+                    b.Property<string>("Topic")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MeetingId");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.ToTable("Meetings");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Notification", b =>
+                {
+                    b.Property<int>("NotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationId"), 1L, 1);
+
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Topic")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("NotificationId");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Schedule", b =>
@@ -358,8 +463,13 @@ namespace HospitalWeb.DAL.Data.Migrations
                 {
                     b.HasBaseType("HospitalWeb.DAL.Entities.Identity.AppUser");
 
-                    b.Property<int?>("SpecialtyId")
+                    b.Property<int>("HospitalId")
                         .HasColumnType("int");
+
+                    b.Property<int>("SpecialtyId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("HospitalId");
 
                     b.HasIndex("SpecialtyId");
 
@@ -370,7 +480,7 @@ namespace HospitalWeb.DAL.Data.Migrations
                 {
                     b.HasBaseType("HospitalWeb.DAL.Entities.Identity.AppUser");
 
-                    b.Property<int?>("AddressId")
+                    b.Property<int>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("BirthDate")
@@ -388,24 +498,63 @@ namespace HospitalWeb.DAL.Data.Migrations
                 {
                     b.HasOne("HospitalWeb.DAL.Entities.Locality", "Locality")
                         .WithMany("Addresses")
-                        .HasForeignKey("LocalityId");
+                        .HasForeignKey("LocalityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Locality");
                 });
 
-            modelBuilder.Entity("HospitalWeb.DAL.Entities.Record", b =>
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Appointment", b =>
                 {
+                    b.HasOne("HospitalWeb.DAL.Entities.Diagnosis", "Diagnosis")
+                        .WithMany("Appointments")
+                        .HasForeignKey("DiagnosisId");
+
                     b.HasOne("HospitalWeb.DAL.Entities.Identity.Doctor", "Doctor")
-                        .WithMany("Records")
+                        .WithMany("Appointments")
                         .HasForeignKey("DoctorId");
 
                     b.HasOne("HospitalWeb.DAL.Entities.Identity.Patient", "Patient")
-                        .WithMany("Records")
+                        .WithMany("Appointments")
                         .HasForeignKey("PatientId");
+
+                    b.Navigation("Diagnosis");
 
                     b.Navigation("Doctor");
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Hospital", b =>
+                {
+                    b.HasOne("HospitalWeb.DAL.Entities.Address", "Address")
+                        .WithMany("Hospitals")
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Meeting", b =>
+                {
+                    b.HasOne("HospitalWeb.DAL.Entities.Appointment", "Appointment")
+                        .WithMany("Meetings")
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Notification", b =>
+                {
+                    b.HasOne("HospitalWeb.DAL.Entities.Identity.AppUser", "AppUser")
+                        .WithMany("Notifications")
+                        .HasForeignKey("AppUserId");
+
+                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Schedule", b =>
@@ -479,6 +628,12 @@ namespace HospitalWeb.DAL.Data.Migrations
 
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Identity.Doctor", b =>
                 {
+                    b.HasOne("HospitalWeb.DAL.Entities.Hospital", "Hospital")
+                        .WithMany("Doctors")
+                        .HasForeignKey("HospitalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("HospitalWeb.DAL.Entities.Identity.AppUser", null)
                         .WithOne()
                         .HasForeignKey("HospitalWeb.DAL.Entities.Identity.Doctor", "Id")
@@ -487,7 +642,11 @@ namespace HospitalWeb.DAL.Data.Migrations
 
                     b.HasOne("HospitalWeb.DAL.Entities.Specialty", "Specialty")
                         .WithMany("Doctors")
-                        .HasForeignKey("SpecialtyId");
+                        .HasForeignKey("SpecialtyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hospital");
 
                     b.Navigation("Specialty");
                 });
@@ -496,7 +655,9 @@ namespace HospitalWeb.DAL.Data.Migrations
                 {
                     b.HasOne("HospitalWeb.DAL.Entities.Address", "Address")
                         .WithMany("Patients")
-                        .HasForeignKey("AddressId");
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HospitalWeb.DAL.Entities.Identity.AppUser", null)
                         .WithOne()
@@ -509,7 +670,29 @@ namespace HospitalWeb.DAL.Data.Migrations
 
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Address", b =>
                 {
+                    b.Navigation("Hospitals");
+
                     b.Navigation("Patients");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Appointment", b =>
+                {
+                    b.Navigation("Meetings");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Diagnosis", b =>
+                {
+                    b.Navigation("Appointments");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Hospital", b =>
+                {
+                    b.Navigation("Doctors");
+                });
+
+            modelBuilder.Entity("HospitalWeb.DAL.Entities.Identity.AppUser", b =>
+                {
+                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Locality", b =>
@@ -524,14 +707,14 @@ namespace HospitalWeb.DAL.Data.Migrations
 
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Identity.Doctor", b =>
                 {
-                    b.Navigation("Records");
+                    b.Navigation("Appointments");
 
                     b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Identity.Patient", b =>
                 {
-                    b.Navigation("Records");
+                    b.Navigation("Appointments");
                 });
 #pragma warning restore 612, 618
         }
