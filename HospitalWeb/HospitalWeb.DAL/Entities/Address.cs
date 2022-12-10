@@ -11,6 +11,8 @@ namespace HospitalWeb.DAL.Entities
         public int LocalityId { get; set; }
         public Locality Locality { get; set; }
 
+        public ICollection<Hospital> Hospitals { get; set; }
+
         public ICollection<Patient> Patients { get; set; }
 
         public override string ToString()

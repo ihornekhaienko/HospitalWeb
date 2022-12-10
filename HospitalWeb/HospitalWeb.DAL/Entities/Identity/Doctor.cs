@@ -14,6 +14,9 @@ namespace HospitalWeb.DAL.Entities.Identity
         public int SpecialtyId { get; set; }
         public Specialty Specialty { get; set; }
 
+        public int HospitalId { get; set; }
+        public Hospital Hospital { get; set; }
+
         public ICollection<Appointment> Appointments { get; set; }
 
         public ICollection<Schedule> Schedules { get; set; }

@@ -14,6 +14,7 @@ namespace HospitalWeb.DAL.Services.Implementations
         private GenericRepository<Appointment> _appointmentRepository;
         private GenericRepository<Diagnosis> _diagnosisRepository;
         private GenericRepository<Doctor> _doctorRepository;
+        private GenericRepository<Hospital> _hospitalRepository;
         private GenericRepository<Locality> _localityRepository;
         private GenericRepository<Meeting> _meetingRepository;
         private GenericRepository<Notification> _notificationRepository;
@@ -90,7 +91,17 @@ namespace HospitalWeb.DAL.Services.Implementations
                 return _doctorRepository;
             }
         }
-        
+
+        public virtual IRepository<Hospital> Hospitals
+        {
+            get
+            {
+                if (_hospitalRepository == null)
+                    _hospitalRepository = new GenericRepository<Hospital>(_db);
+                return _hospitalRepository;
+            }
+        }
+
         public virtual IRepository<Locality> Localities
         {
             get
