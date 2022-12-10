@@ -453,4 +453,13 @@
   <data name="Calendar" xml:space="preserve">
     <value>Open in Google Calendar</value>
   </data>
+  <data name="HospitalRequired" xml:space="preserve">
+    <value>The hospital field is required</value>
+  </data>
+  <data name="Hospitals" xml:space="preserve">
+    <value>Hospitals</value>
+  </data>
+  <data name="TitleRequired" xml:space="preserve">
+    <value>The title field is required</value>
+  </data>
 </root>

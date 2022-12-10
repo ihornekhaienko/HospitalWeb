@@ -456,4 +456,10 @@
   <data name="Calendar" xml:space="preserve">
     <value>Переглянути в Google Calendar</value>
   </data>
+  <data name="HospitalRequired" xml:space="preserve">
+    <value>Необхідно вказати лікарню</value>
+  </data>
+  <data name="TitleRequired" xml:space="preserve">
+    <value>Необхідно вказати назву</value>
+  </data>
 </root>
