@@ -462,4 +462,7 @@
   <data name="TitleRequired" xml:space="preserve">
     <value>Необхідно вказати назву</value>
   </data>
+  <data name="DoctorsCount" xml:space="preserve">
+    <value>Кількість лікарів</value>
+  </data>
 </root>

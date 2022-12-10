@@ -1,0 +1,72 @@
+﻿@model HospitalsViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = SharedLocalizer["Hospitals"];
+    int cols = 3;
+    int total = Model.Hospitals.Count();
+    int counter = 1;
+}
+
+<form method="get" asp-controller="Hospitals" asp-action="Search">
+    <div class="mb-3 mt-3">
+        <label>@SharedLocalizer["Search"]: </label>
+        <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["Locality"]</label></span>
+        <span class="input-group-btn input-space">
+            <select name="locality" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Localities, 
+                            "LocalityId", 
+                            "LocalityName",  
+                            Model.FilterModel.SelectedLocality))">
+            </select>
+        </span>
+        <span class="input-group-btn input-space">
+            <button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button>
+        </span>
+        <span class="input-group-btn input-space">
+            <a asp-controller="Doctors" asp-action="Search" class="btn btn-info btn-sm">@SharedLocalizer["ClearFilters"]</a>
+        </span>
+    </div>
+</form>
+
+<div class="container">
+    @foreach (var hospital in Model.Hospitals)
+    {
+        if (counter % cols == 1)
+        {
+            @:<div class="row mb-3" >
+        }
+        <div class="col-sm-4 mx-auto">
+            <div class="card" style="width:300px;">
+                @{
+                    byte[] image = hospital.Image ?? ViewBag.Image;
+                    var base64 = Convert.ToBase64String(image);
+                    var Image = String.Format("data:image/gif;base64,{0}", base64);
+                }
+                <img src="@Image" class="card-img-top photo" alt="@SharedLocalizer["Hospital"] @counter">
+                <div class="card-body text-center">
+                    <h4 class="card-title">@hospital.HospitalName</h4>
+                    <p class="card-text">@hospital.Address.ToString()</p>
+                    <p class="card-text">@SharedLocalizer["DoctorsCount"]: @hospital.DoctorsCount</p>
+                    <a asp-controller="Doctors" asp-action="Search" asp-route-hospital="@hospital.HospitalId" class="btn btn-primary">
+                        @Localizer["ShowDoctors"]
+                    </a>
+                </div>
+                <input asp-for="@hospital.HospitalId" type="hidden" />
+            </div>
+        </div>    
+
+        if ((counter % cols == 0) || ((counter) == total))
+        {
+            @:</div>
+        }
+        counter++;
+    }
+</div>
+
+<page-link page-model="@(Model.PageModel)" page-action="Search"
+page-url-locality="@(Model.FilterModel.SelectedLocality)"
+page-url-searchString="@(Model.FilterModel.SearchString)"
+page-url-sortOrder="@(Model.SortModel.Current)"></page-link>

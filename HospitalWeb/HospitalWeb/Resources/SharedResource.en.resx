@@ -462,4 +462,7 @@
   <data name="TitleRequired" xml:space="preserve">
     <value>The title field is required</value>
   </data>
+  <data name="DoctorsCount" xml:space="preserve">
+    <value>Doctors count</value>
+  </data>
 </root>

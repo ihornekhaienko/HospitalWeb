@@ -47,17 +47,19 @@ namespace HospitalWeb.Controllers
             _scheduleGenerator = scheduleGenerator;
             _meetingService = meetingService;
         }
-
+         
         [HttpGet]
         public async Task<IActionResult> Search(
             string searchString,
             int? specialty,
+            int? hospital,
+            int? locality,
             int page = 1,
             DoctorSortState sortOrder = DoctorSortState.Id)
         {
             ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
-            var builder = new DoctorsViewModelBuilder(_api, page, searchString, sortOrder, specialty);
+            var builder = new DoctorsViewModelBuilder(_api, page, searchString, sortOrder, specialty, hospital, locality);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel();
