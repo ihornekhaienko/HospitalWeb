@@ -11,6 +11,7 @@ namespace HospitalWeb.WebApi.Clients.Implementations
         private AppointmentsApiClient _appointmentsApiClient;
         private DiagnosesApiClient _diagnosesApiClient;
         private DoctorsApiClient _doctorsApiClient;
+        private HospitalsApiClient _hospitalsApiClient;
         private LocalitiesApiClient _localitiesApiClient;
         private MeetingsApiClient _meetingsApiClient;
         private NotificationsApiClient _notificationsApiClient;
@@ -80,6 +81,16 @@ namespace HospitalWeb.WebApi.Clients.Implementations
                 if (_doctorsApiClient == null)
                     _doctorsApiClient = new DoctorsApiClient(_config);
                 return _doctorsApiClient;
+            }
+        }
+        
+        public HospitalsApiClient Hospitals
+        {
+            get
+            {
+                if (_hospitalsApiClient == null)
+                    _hospitalsApiClient = new HospitalsApiClient(_config);
+                return _hospitalsApiClient;
             }
         }
 

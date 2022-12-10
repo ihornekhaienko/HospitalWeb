@@ -2,6 +2,7 @@
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +29,81 @@ namespace HospitalWeb.WebApi.Controllers
         }
 
         /// <summary>
-        /// Return a list of Hospitals
+        /// Returns a filtered list of Hospitals
         /// </summary>
-        /// <returns>List of Hospitals</returns>
+        /// <param name="searchString">Search string that identifies Hospital</param>
+        /// <param name="locality">Locality's Id</param>
+        /// <param name="sortOrder">Sorting order of the filtered list</param>
+        /// <param name="pageSize">Count of the result on one page</param>
+        /// <param name="pageNumber">Number of the page</param>
+        /// <returns>Fltered list of Hospitals</returns>
         [HttpGet]
-        public async Task<IEnumerable<Hospital>> Get()
+        public async Task<IEnumerable<Hospital>> Get(
+            string searchString,
+            int? locality,
+            HospitalSortState sortOrder = HospitalSortState.Id,
+            int pageSize = 10,
+            int pageNumber = 1)
         {
-            return await _uow.Hospitals.GetAllAsync(include: s => s.Include(s => s.Doctors).Include(s => s.Address));
+            int totalCount = 0;
+
+            Func<Hospital, bool> filter = (h) =>
+            {
+                bool result = true;
+
+                if (!string.IsNullOrWhiteSpace(searchString))
+                {
+                    result = h.HospitalName.Contains(searchString, StringComparison.OrdinalIgnoreCase);
+                }
+
+                if (locality != null && locality != 0)
+                {
+                    result = result && h.Address.Locality.LocalityId == locality;
+                }
+
+                return result;
+            };
+
+            Func<IQueryable<Hospital>, IOrderedQueryable<Hospital>> orderBy = (hospitals) =>
+            {
+                totalCount = hospitals.Count();
+
+                switch (sortOrder)
+                {
+                    case HospitalSortState.NameAsc:
+                        hospitals = hospitals.OrderBy(h => h.HospitalName);
+                        break;
+                    case HospitalSortState.NameDesc:
+                        hospitals = hospitals.OrderByDescending(h => h.HospitalName);
+                        break;
+                    case HospitalSortState.DoctorsCountAsc:
+                        hospitals = hospitals.OrderBy(h => h.Doctors.Count);
+                        break;
+                    case HospitalSortState.DoctorsCountDesc:
+                        hospitals = hospitals.OrderByDescending(h => h.Doctors.Count);
+                        break;
+                    default:
+                        hospitals = hospitals.OrderBy(h => h.HospitalId);
+                        break;
+                }
+
+                return (IOrderedQueryable<Hospital>)hospitals;
+            };
+
+            var hospitals = await _uow.Hospitals
+                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize,
+                include: p => p
+                 .Include(p => p.Address)
+                    .ThenInclude(a => a.Locality)
+                .Include(p => p.Doctors));
+
+            Response.Headers.Add("TotalCount", totalCount.ToString());
+            Response.Headers.Add("Count", hospitals.Count().ToString());
+            Response.Headers.Add("PageSize", pageSize.ToString());
+            Response.Headers.Add("PageNumber", pageNumber.ToString());
+            Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
+
+            return hospitals;
         }
 
         /// <summary>
