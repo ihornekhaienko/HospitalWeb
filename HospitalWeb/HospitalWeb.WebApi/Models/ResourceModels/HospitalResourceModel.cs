@@ -6,6 +6,8 @@
 
         public string HospitalName { get; set; }
 
+        public byte[] Image { get; set; }
+
         public int AddressId { get; set; }
     }
 }

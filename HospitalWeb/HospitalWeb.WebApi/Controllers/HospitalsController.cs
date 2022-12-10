@@ -87,7 +87,8 @@ namespace HospitalWeb.WebApi.Controllers
                 return BadRequest();
             }
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<HospitalResourceModel, Hospital>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<HospitalResourceModel, Hospital>()
+                .ForMember(d => d.Image, o => o.AllowNull()));
             var mapper = new Mapper(config);
 
             var entity = mapper.Map<HospitalResourceModel, Hospital>(hospital);
