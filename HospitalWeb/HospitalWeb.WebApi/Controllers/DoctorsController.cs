@@ -121,6 +121,7 @@ namespace HospitalWeb.WebApi.Controllers
                 .Include(d => d.Appointments)
                     .ThenInclude(a => a.Diagnosis)
                 .Include(d => d.Schedules)
+                .Include(d => d.Hospital)
                 .Include(d => d.Specialty));
 
             Response.Headers.Add("TotalCount", totalCount.ToString());
@@ -145,6 +146,7 @@ namespace HospitalWeb.WebApi.Controllers
                 .Include(d => d.Appointments)
                     .ThenInclude(a => a.Diagnosis)
                 .Include(d => d.Schedules)
+                .Include(d => d.Hospital)
                 .Include(d => d.Specialty));
 
             if (doctor == null)

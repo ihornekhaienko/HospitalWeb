@@ -35,6 +35,7 @@ namespace HospitalWeb.WebApi.Controllers
         {
             return await _uow.Addresses.GetAllAsync(include: a => a
                 .Include(a => a.Locality)
+                .Include(a => a.Hospitals)
                 .Include(a => a.Patients));
         }
 
@@ -49,6 +50,7 @@ namespace HospitalWeb.WebApi.Controllers
             var address = await _uow.Addresses.GetAsync(a => a.AddressId == id, 
                 include: a => a
                 .Include(a => a.Locality)
+                .Include(a => a.Hospitals)
                 .Include(a => a.Patients));
 
             if (address == null)
@@ -72,6 +74,7 @@ namespace HospitalWeb.WebApi.Controllers
                 .GetAsync(a => a.FullAddress == address && a.Locality.LocalityName == locality,
                 include: a => a
                 .Include(a => a.Locality)
+                .Include(a => a.Hospitals)
                 .Include(a => a.Patients));
 
             if (obj == null)
