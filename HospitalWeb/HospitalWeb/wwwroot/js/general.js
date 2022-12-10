@@ -1,4 +1,12 @@
-﻿function confirmSignUp(message) {
+﻿$('#activator').click(function () {
+    $('#uploader').click();
+});
+
+$('#uploader').change(function () {
+    this.form.submit();
+});
+
+function confirmSignUp(message) {
     return confirm(message);
 }
 

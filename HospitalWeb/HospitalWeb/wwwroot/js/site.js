@@ -170,6 +170,14 @@ hubConnection.on("NotifyFill", function (topic, message) {
 
 hubConnection.start();
 
+$('#activator').click(function () {
+    $('#uploader').click();
+});
+
+$('#uploader').change(function () {
+    this.form.submit();
+});
+
 function confirmSignUp(message) {
     return confirm(message);
 }
