@@ -23,7 +23,29 @@
                             Model.FilterModel.SelectedSpecialty))">
             </select>
         </span>
-        <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button></span>
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["Hospital"]</label></span>
+        <span class="input-group-btn input-space">
+            <select name="hospital" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Hospitals, 
+                            "HospitalId", 
+                            "HospitalName", 
+                            Model.FilterModel.SelectedHospital))">
+            </select>
+        </span>
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["Locality"]</label></span>
+        <span class="input-group-btn input-space">
+            <select name="locality" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Localities, 
+                            "LocalityId", 
+                            "LocalityName", 
+                            Model.FilterModel.SelectedLocality))">
+            </select>
+        </span>
+    </div>
+    <div class="mb-3">
+        <span class="input-group-btn"><button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button></span>
         <span class="input-group-btn input-space"><a asp-action="Doctors"> @SharedLocalizer["BackToFullList"]</a></span>
     </div>
 </form>
@@ -66,6 +88,13 @@
                    @SharedLocalizer["Specialty"]
                 </a>
             </th>
+            <th>
+                <a asp-action="Doctors"
+                   asp-route-sortOrder="@(Model.SortModel.HospitalSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   @SharedLocalizer["Hospital"]
+                </a>
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -89,6 +118,9 @@
                     @doctor.Specialty
                 </td>
                 <td>
+                    @doctor.Hospital
+                </td>
+                <td>
                     <span>
                         <a asp-controller="Administration" asp-action="EditDoctor" asp-route-id="@doctor.Id">
                             @SharedLocalizer["Edit"]
@@ -108,5 +140,7 @@
 
 <page-link page-model="@(Model.PageModel)" page-action="Doctors"
 page-url-specialty="@(Model.FilterModel.SelectedSpecialty)"
+page-url-hospital="@(Model.FilterModel.SelectedHospital)"
+page-url-locality="@(Model.FilterModel.SelectedLocality)"
 page-url-searchString="@(Model.FilterModel.SearchString)"
 page-url-sortOrder="@(Model.SortModel.Current)"></page-link>

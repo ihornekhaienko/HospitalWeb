@@ -79,11 +79,15 @@ namespace HospitalWeb.Filters.Builders.Implementations
                 .Select(s => new SpecialtyDTO { SpecialtyId = s.SpecialtyId, SpecialtyName = s.SpecialtyName })
                 .ToList();
 
+            response = _api.Hospitals.Get();
+
             var hospitals = _api.Hospitals
                .ReadMany(response)
                .OrderBy(h => h.HospitalName)
                .Select(h => new HospitalDTO { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
                .ToList();
+
+            response = _api.Localities.Get();
 
             var localities = _api.Localities
                .ReadMany(response)

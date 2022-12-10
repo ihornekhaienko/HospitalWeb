@@ -121,6 +121,12 @@ namespace HospitalWeb.WebApi.Controllers
                     case DoctorSortState.SpecialtyDesc:
                         doctors = doctors.OrderByDescending(d => d.Specialty.SpecialtyName);
                         break;
+                    case DoctorSortState.HospitalAsc:
+                        doctors = doctors.OrderBy(d => d.Hospital.HospitalName);
+                        break;
+                    case DoctorSortState.HospitalDesc:
+                        doctors = doctors.OrderByDescending(d => d.Hospital.HospitalName);
+                        break;
                     default:
                         doctors = doctors.OrderBy(d => d.Id);
                         break;

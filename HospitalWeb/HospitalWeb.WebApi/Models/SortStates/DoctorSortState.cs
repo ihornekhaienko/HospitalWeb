@@ -13,5 +13,7 @@
         PhoneDesc,
         SpecialtyAsc,
         SpecialtyDesc,
+        HospitalAsc,
+        HospitalDesc
     }
 }

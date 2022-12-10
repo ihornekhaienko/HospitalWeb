@@ -25,5 +25,9 @@ namespace HospitalWeb.ViewModels.Administration
         [Required(ErrorMessage = "SpecialtyRequired")]
         [Display(Name = "Specialty")]
         public string Specialty { get; set; }
+
+        [Required(ErrorMessage = "HospitalRequired")]
+        [Display(Name = "Hospital")]
+        public int Hospital { get; set; }
     }
 }

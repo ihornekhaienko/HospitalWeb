@@ -42,6 +42,15 @@
                 <span asp-validation-for="Specialty" class="text-danger"></span>
             </div>
             <div class="mb-3">
+                <label asp-for="Hospital" class="control-label"></label>
+                <select asp-for="Hospital" name="hospital" 
+                    asp-items="@(new SelectList(
+                                ViewBag.Hospitals, 
+                                "HospitalId", 
+                                "HospitalName"))">
+                </select>
+            </div>
+            <div class="mb-3">
                 <button type="submit" class="btn btn-success">@SharedLocalizer["Create"]</button>
             </div>
         </form>
