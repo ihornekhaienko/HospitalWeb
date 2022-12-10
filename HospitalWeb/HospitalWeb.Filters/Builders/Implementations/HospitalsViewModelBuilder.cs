@@ -60,7 +60,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
 
         public override void BuildFilterModel()
         {
-            var response = _api.Specialties.Get();
+            var response = _api.Localities.Get();
             var localities = _api.Localities
                .ReadMany(response)
                .OrderBy(l => l.LocalityName)

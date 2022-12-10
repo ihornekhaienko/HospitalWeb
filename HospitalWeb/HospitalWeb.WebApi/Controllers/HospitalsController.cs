@@ -76,6 +76,12 @@ namespace HospitalWeb.WebApi.Controllers
                     case HospitalSortState.NameDesc:
                         hospitals = hospitals.OrderByDescending(h => h.HospitalName);
                         break;
+                    case HospitalSortState.AddressAsc:
+                        hospitals = hospitals.OrderBy(h => h.Address.ToString());
+                        break;
+                    case HospitalSortState.AddressDesc:
+                        hospitals = hospitals.OrderByDescending(h => h.Address.ToString());
+                        break;
                     case HospitalSortState.DoctorsCountAsc:
                         hospitals = hospitals.OrderBy(h => h.Doctors.Count);
                         break;
@@ -114,7 +120,11 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Hospital>> Get(int id)
         {
-            var hospital = await _uow.Hospitals.GetAsync(s => s.HospitalId == id, include: s => s.Include(s => s.Doctors).Include(s => s.Address));
+            var hospital = await _uow.Hospitals
+                .GetAsync(s => s.HospitalId == id, 
+                include: s => s.Include(s => s.Doctors)
+                    .Include(s => s.Address)
+                        .ThenInclude(s => s.Locality));
 
             if (hospital == null)
             {
@@ -132,7 +142,11 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Hospital>> Get(string name)
         {
-            var hospital = await _uow.Hospitals.GetAsync(s => s.HospitalName == name, include: s => s.Include(s => s.Doctors).Include(s => s.Address));
+            var hospital = await _uow.Hospitals
+                .GetAsync(s => s.HospitalName == name, 
+                include: s => s.Include(s => s.Doctors)
+                    .Include(s => s.Address)
+                        .ThenInclude(s => s.Locality));
 
             if (hospital == null)
             {

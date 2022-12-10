@@ -6,7 +6,7 @@ namespace HospitalWeb.ViewModels.Administration
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "NameRequired")]
+        [Required(ErrorMessage = "TitleRequired")]
         [Display(Name = "Name")]
         public string Name { get; set; }
 

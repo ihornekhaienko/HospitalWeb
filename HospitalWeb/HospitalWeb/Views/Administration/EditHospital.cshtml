@@ -1,0 +1,57 @@
+﻿@model HospitalViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = Localizer["Title"];
+}
+
+<h2>@Localizer["Title"]</h2>
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-controller="Administration" asp-action="UploadPhoto" asp-route-id="@Model.Id" enctype="multipart/form-data"> 
+            <div class="mb-2">
+                @{
+                    byte[] image = Model.Image ?? ViewBag.Image;
+                    var base64 = Convert.ToBase64String(image);
+                    var Image = String.Format("data:image/gif;base64,{0}", base64);
+                }
+                <img src="@Image" class="rounded-circle photo" alt="hospital">
+            </div>
+            <div class="mb-3">
+                <input type="file" name="file" id="uploader" style="display: none;" />
+                <input type="button" value="@SharedLocalizer["UploadPhoto"]" id="activator" class="btn btn-info btn-sm"/>
+            </div>
+        </form>          
+        <form asp-controller="Administration" asp-action="EditHospital">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control input-validation-error" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control input-validation-error" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Locality" class="control-label"></label>
+                <input asp-for="Locality" class="form-control input-validation-error" type="text" list="localities"/>
+                <datalist id="localities">
+                    @foreach (var locality in ViewBag.Localities)
+                    {
+                        <option value="@locality"></option>
+                    }
+                </datalist>
+                <span asp-validation-for="Locality" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-success">@SharedLocalizer["Update"]</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Administration" asp-action="Doctors">@SharedLocalizer["BackToFullList"]</a>
+</div>

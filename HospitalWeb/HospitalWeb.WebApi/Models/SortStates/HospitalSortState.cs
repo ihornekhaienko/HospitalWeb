@@ -5,6 +5,8 @@
         Id,
         NameAsc,
         NameDesc,
+        AddressAsc,
+        AddressDesc,
         DoctorsCountAsc,
         DoctorsCountDesc
     }

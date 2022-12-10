@@ -1,0 +1,89 @@
+﻿@model HospitalsViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = SharedLocalizer["Hospitals"];
+}
+
+<h1>@SharedLocalizer["Hospitals"]</h1>
+<p>
+    <a asp-controller="Administration" asp-action="CreateHospital">@SharedLocalizer["CreateNew"]</a>
+</p>
+<form method="get">
+    <div class="mb-3">
+        <label>@SharedLocalizer["Search"]: </label>
+        <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["Locality"]</label></span>
+        <span class="input-group-btn input-space">
+            <select name="locality" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Localities, 
+                            "LocalityId", 
+                            "LocalityName", 
+                            Model.FilterModel.SelectedLocality))">
+            </select>
+        </span>
+        <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button></span>
+        <span class="input-group-btn input-space"><a asp-action="Hospitals"> @SharedLocalizer["BackToFullList"]</a></span>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-action="Hospitals"
+                   asp-route-sortOrder="@(Model.SortModel.NameSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   @SharedLocalizer["Title"]
+                </a>
+            </th>
+            <th>
+                <a asp-action="Hospitals"
+                   asp-route-sortOrder="@(Model.SortModel.AddressSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   @SharedLocalizer["Address"]
+                </a>
+            </th>
+            <th>
+                <a asp-action="Hospitals"
+                   asp-route-sortOrder="@(Model.SortModel.DoctorsCountSort)"
+                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                   @Localizer["DoctorsCount"]
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody> 
+        @foreach(var hospital in Model.Hospitals)
+        {
+            <tr>
+                <td>
+                    @hospital.HospitalName
+                </td>
+                <td>
+                    @hospital.Address
+                </td>
+                <td>
+                    @hospital.DoctorsCount
+                </td>
+                <td>
+                    <span>
+                        <a asp-controller="Administration" asp-action="EditHospital" asp-route-id="@hospital.HospitalId">
+                            @SharedLocalizer["Edit"]
+                        </a> |
+                        <a asp-controller="Administration" asp-action="DeleteHospital" asp-route-id="@hospital.HospitalId">
+                            @SharedLocalizer["Delete"]
+                        </a>
+                    </span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<page-link page-model="@(Model.PageModel)" page-action="Hospitals"
+page-url-locality="@(Model.FilterModel.SelectedLocality)"
+page-url-searchString="@(Model.FilterModel.SearchString)"
+page-url-sortOrder="@(Model.SortModel.Current)"></page-link>
