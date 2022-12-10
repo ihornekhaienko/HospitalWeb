@@ -86,7 +86,8 @@ namespace HospitalWeb.Controllers
                 Email = doctor.Email,
                 Phone = doctor.PhoneNumber,
                 Image = doctor.Image,
-                Specialty = doctor.Specialty.SpecialtyName
+                Specialty = doctor.Specialty.SpecialtyName,
+                Hospital = doctor.Hospital.HospitalName
             };
 
             return View(model);

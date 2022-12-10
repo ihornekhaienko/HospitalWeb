@@ -9,7 +9,7 @@
 }
 
 <form method="get" asp-controller="Doctors" asp-action="Search">
-    <div class="mb-5 mt-3">
+    <div class="mb-3 mt-3">
         <label>@SharedLocalizer["Search"]: </label>
         <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
         <span class="input-group-btn input-space"><label>@SharedLocalizer["Specialty"]</label></span>
@@ -23,6 +23,27 @@
             </select>
         </span>
         <span class="input-group-btn input-space">
+            <select name="hospital" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Hospitals, 
+                            "HospitalId", 
+                            "HospitalName", 
+                            Model.FilterModel.SelectedHospital))">
+            </select>
+        </span>
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["Locality"]</label></span>
+        <span class="input-group-btn input-space">
+            <select name="locality" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Localities, 
+                            "LocalityId", 
+                            "LocalityName", 
+                            Model.FilterModel.SelectedLocality))">
+            </select>
+        </span>
+    </div>
+    <div class="mb-3">
+        <span class="input-group-btn input">
             <button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button>
         </span>
         <span class="input-group-btn input-space">
@@ -49,6 +70,7 @@
                 <div class="card-body text-center">
                     <h4 class="card-title">@doctor.ToString()</h4>
                     <p class="card-text">@doctor.Specialty</p>
+                    <p class="card-text">@doctor.Hospital</p>
                     <a asp-controller="Doctors" asp-action="Details" asp-route-id="@doctor.Id" class="btn btn-primary">
                         @Localizer["MakeAppointment"]
                     </a>
@@ -67,5 +89,7 @@
 
 <page-link page-model="@(Model.PageModel)" page-action="Search"
 page-url-specialty="@(Model.FilterModel.SelectedSpecialty)"
+page-url-hospital="@(Model.FilterModel.SelectedHospital)"
+page-url-locality="@(Model.FilterModel.SelectedLocality)"
 page-url-searchString="@(Model.FilterModel.SearchString)"
 page-url-sortOrder="@(Model.SortModel.Current)"></page-link>
