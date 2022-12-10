@@ -16,24 +16,30 @@ namespace HospitalWeb.Controllers
     public class AdministrationController : Controller
     {
         private readonly ILogger<AdministrationController> _logger;
+        private readonly IWebHostEnvironment _environment;
         private readonly ApiUnitOfWork _api;
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenManager _tokenManager;
         private readonly ICalendarService _calendar;
+        private readonly IFileManager _fileManager;
         private readonly IPasswordGenerator _passwordGenerator;
         private readonly INotifier _notifier;
 
         public AdministrationController(
             ILogger<AdministrationController> logger,
+            IWebHostEnvironment environment,
             ApiUnitOfWork api,
             UserManager<AppUser> userManager,
             ITokenManager tokenManager,
             ICalendarService calendar,
+            IFileManager fileManager,
             IPasswordGenerator passwordGenerator,
             INotifier notifier)
         {
             _logger = logger;
+            _environment = environment;
             _api = api;
+            _fileManager = fileManager;
             _userManager = userManager;
             _tokenManager = tokenManager;
             _calendar = calendar;
@@ -165,7 +171,8 @@ namespace HospitalWeb.Controllers
                     admin.PhoneNumber = model.Phone;
                     admin.IsSuperAdmin = model.IsSuperAdmin;
 
-                    var tokenResult = await _tokenManager.GetToken(admin);
+                    var user = await _userManager.GetUserAsync(User);
+                    var tokenResult = await _tokenManager.GetToken(user);
 
                     response = _api.Admins.Put(admin, tokenResult.Token, tokenResult.Provider);
 
@@ -224,6 +231,170 @@ namespace HospitalWeb.Controllers
                 }
 
                 return RedirectToAction("Admins", "Administration");
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Hospitals(
+            string searchString,
+            int? locality,
+            int page = 1,
+            HospitalSortState sortOrder = HospitalSortState.Id)
+        {
+            var builder = new HospitalsViewModelBuilder(_api, page, searchString, sortOrder, locality);
+            var director = new ViewModelBuilderDirector();
+            director.MakeViewModel(builder);
+            var viewModel = builder.GetViewModel();
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult CreateHospital()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateHospital(HospitalViewModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var locality = _api.Localities.GetOrCreate(model.Locality);
+                    var address = _api.Addresses.GetOrCreate(model.Address, locality);
+
+                    var hospital = new HospitalResourceModel
+                    {
+                        HospitalName = model.Name,
+                        AddressId = address.AddressId
+                    };
+
+                    var user = await _userManager.GetUserAsync(User);
+                    var tokenResult = await _tokenManager.GetToken(user);
+
+                    var response = _api.Hospitals.Post(hospital, tokenResult.Token, tokenResult.Provider);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("Hospitals", "Administration");
+                    }
+                }
+
+                return View(model);
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditHospital(string id)
+        {
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/hospital.jpg"));
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+
+            var response = _api.Hospitals.Get(id, null, null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var hospital = _api.Hospitals.Read(response);
+
+            var model = new HospitalViewModel
+            {
+                Id = hospital.HospitalId,
+                Name = hospital.HospitalName,
+                Address = hospital.Address.FullAddress,
+                Locality = hospital.Address.Locality.LocalityName,
+                Image = hospital.Image
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditHospital(HospitalViewModel model)
+        {
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/hospital.jpg"));
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var response = _api.Hospitals.Get(model.Id, null, null);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        return NotFound();
+                    }
+
+                    var hospital = _api.Hospitals.Read(response);
+
+                    var locality = _api.Localities.GetOrCreate(model.Locality);
+                    var address = _api.Addresses.GetOrCreate(model.Address, locality);
+
+                    hospital.HospitalName = model.Name;
+                    hospital.AddressId = address.AddressId;
+
+                    var user = await _userManager.GetUserAsync(User);
+                    var tokenResult = await _tokenManager.GetToken(user);
+
+                    response = _api.Hospitals.Put(hospital, tokenResult.Token, tokenResult.Provider);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("Hospitals", "Administration");
+                    }
+                }
+
+                return View(model);
+            }
+            catch (Exception err)
+            {
+                _logger.LogCritical(err.StackTrace);
+                return RedirectToAction("Index", "Error", err.Message);
+            }
+        }
+
+        public async Task<IActionResult> DeleteHospital(int id)
+        {
+            try
+            {
+                if (id < 0)
+                {
+                    return NotFound();
+                }
+
+                var response = _api.Hospitals.Get(id, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var hospital = _api.Hospitals.Read(response);
+
+                var user = await _userManager.GetUserAsync(User);
+                var tokenResult = await _tokenManager.GetToken(user);
+
+                var result = _api.Hospitals.Delete(id, tokenResult.Token, tokenResult.Provider);
+
+                return RedirectToAction("Hospitals", "Administration");
             }
             catch (Exception err)
             {
