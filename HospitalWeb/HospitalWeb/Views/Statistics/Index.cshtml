@@ -1,12 +1,15 @@
-﻿@model AppointmentsViewModel
+﻿@using Newtonsoft.Json
+@inject IViewLocalizer Localizer
+@model AppointmentsViewModel
 @inject IHtmlLocalizer<SharedResource> SharedLocalizer
 @{
     ViewBag.Title = SharedLocalizer["Statistics"];
+    var appointments = JsonConvert.SerializeObject(Model.Appointments);
 }
 
 <h1 class="mb-5">@SharedLocalizer["Statistics"]</h1>
 <form method="get">
-    <div class="mb-4">
+    <div class="mb-5">
         <span class="input-group-btn"><label>@SharedLocalizer["Filter"]</label></span>
         <span class="input-group-btn input-space"><label>@SharedLocalizer["From"]:</label></span>
         <span class="input-group-btn input-space">
@@ -16,13 +19,82 @@
         <span class="input-group-btn input-space">
             <input type="date" name="toDate"/>
         </span>
-    </div>
-    <div class="mb-2">
-        <span class="input-group-btn"><button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button></span>
+        <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button></span>
         <span class="input-group-btn input-space"><a asp-action="Index" asp-controller="Statistics"> @SharedLocalizer["ClearFilters"]</a></span>
     </div>
 </form>
 
 <div class="container">
+    <div class="row">
+        <div class="col-sm-6 text-center" id="attendance">
+        </div>
 
+        <div class="col-sm-6">
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+
+        </div>
+
+        <div class="col-sm-6">
+
+        </div>
+    </div>
 </div>
+
+@section scripts {
+    <script>
+        function plotAttendance(dates, counts) {
+            div = document.getElementById('attendance');
+
+            layout = {
+                title: {
+                    text: '@Localizer["Attendance"]'
+                },
+                xaxis: {
+                    title: {
+                        text: '@Localizer["AttendanceX"]'
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: '@Localizer["AttendanceY"]'
+                    }
+                }
+            };
+
+            Plotly.newPlot(div, [{
+                x: dates,
+                y: counts
+            }], layout );
+        }
+
+        $(document).ready(function() {
+            var appointments = @Html.Raw(@appointments);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Attendance")',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(appointments),
+                success: function(model) {
+                    console.log(model);
+                    let dates = model.map((m) => m.visitDate);
+                    let counts = model.map((m) => m.visitsCount);
+                    console.log(dates);
+                    console.log(counts);
+
+                    plotAttendance(dates, counts);
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            })
+        });
+
+    </script>
+}
