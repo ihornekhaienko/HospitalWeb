@@ -35,7 +35,7 @@
     </div>
 
     <div class="row">
-        <div class="col-sm-6" >
+        <div class="col-sm-6" id="hospital-stat">
 
         </div>
 
@@ -133,6 +133,57 @@
                     console.log(labels);
 
                     plotDiagnosis(labels, values);
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            })
+        });
+
+         function plotHospital(labels, values) {
+            let div = document.getElementById('hospital-stat');
+
+            let data = [{
+                x: values,
+                y: labels,
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                    color: 'rgb(46, 139, 87)'
+                }
+            }];
+
+            let layout = {
+                title: {
+                    text: '@Localizer["Hospital"]'
+                },
+                xaxis: {
+                    title: {
+                        text: '@Localizer["HospitalX"]'
+                    }
+                }
+            };
+
+            Plotly.newPlot(div, data, layout);
+        }
+
+        $(document).ready(function() {
+            var appointments = @Html.Raw(@appointments);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Hospital")',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(appointments),
+                success: function(model) {
+                    console.log(model);
+                    let values = model.map((m) => m.count);
+                    let labels = model.map((m) => m.label);
+                    console.log(values);
+                    console.log(labels);
+
+                    plotHospital(labels, values);
                 },
                 error: function(err) {
                     console.log(err);

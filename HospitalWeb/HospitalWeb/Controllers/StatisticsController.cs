@@ -71,6 +71,35 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpPost]
+        public IActionResult Hospital([FromBody] List<AppointmentDTO> appointments)
+        {
+            var rawModel = appointments
+                .GroupBy(a => a.Hospital)
+                .Select(g => new HospitalStatViewModel { Label = g.Key, Count = g.Count() })
+                .OrderBy(m => m.Count)
+                .ToList();
+
+            var model = rawModel
+                .Take(10)
+                .ToList();
+
+            if (rawModel.Count > 10)
+            {
+                var other = new HospitalStatViewModel
+                {
+                    Label = "Other",
+                    Count = rawModel
+                        .Skip(10)
+                        .Sum(m => m.Count)
+                };
+
+                model.Add(other);
+            }
+
+            return Json(model);
+        }
+
+        [HttpPost]
         public IActionResult Specialty([FromBody] List<AppointmentDTO> appointments)
         {
             var rawModel = appointments
