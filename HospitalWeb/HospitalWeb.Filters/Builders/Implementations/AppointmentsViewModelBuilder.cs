@@ -26,10 +26,10 @@ namespace HospitalWeb.Filters.Builders.Implementations
 
         public AppointmentsViewModelBuilder(
            ApiUnitOfWork api,
-           int pageNumber,
-           string searchString,
-           AppointmentSortState sortOrder,
-           string userId,
+           int pageNumber = 1,
+           string searchString = null,
+           AppointmentSortState sortOrder = AppointmentSortState.DateAsc,
+           string userId = null,
            int? state = null,
            DateTime? fromTime = null,
            DateTime? toTime = null,
@@ -47,7 +47,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
         public override void BuildEntityModel()
         {
             var response = _api.Appointments.Filter(_searchString, _userId, _state, _fromTime, _toTime, _sortOrder, _pageSize, _pageNumber);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 _appointments = _api.Appointments.ReadMany(response)
