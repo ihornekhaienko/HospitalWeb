@@ -26,6 +26,10 @@
       "provider": "unpkg",
       "library": "@microsoft/signalr@6.0.11",
       "destination": "wwwroot/lib/microsoft/signalr/"
+    },
+    {
+      "library": "plotly.js@2.16.4",
+      "destination": "wwwroot/lib/plotly.js/"
     }
   ]
 }
