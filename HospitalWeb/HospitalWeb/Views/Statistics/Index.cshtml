@@ -26,20 +26,20 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-sm-6 text-center" id="attendance">
+        <div class="col-sm-6 text-center" id="attendance-stat">
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-sm-6" id="diagnosis-stat">
 
         </div>
     </div>
 
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-6" >
 
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-sm-6" id="specialty-stat">
 
         </div>
     </div>
@@ -48,9 +48,14 @@
 @section scripts {
     <script>
         function plotAttendance(dates, counts) {
-            div = document.getElementById('attendance');
+            let div = document.getElementById('attendance-stat');
 
-            layout = {
+            let data = [{
+                x: dates,
+                y: counts
+            }];
+
+            let layout = {
                 title: {
                     text: '@Localizer["Attendance"]'
                 },
@@ -66,10 +71,7 @@
                 }
             };
 
-            Plotly.newPlot(div, [{
-                x: dates,
-                y: counts
-            }], layout );
+            Plotly.newPlot(div, data, layout);
         }
 
         $(document).ready(function() {
@@ -96,5 +98,88 @@
             })
         });
 
+        function plotDiagnosis(labels, values) {
+            let div = document.getElementById('diagnosis-stat');
+
+            let data = [{
+                x: labels,
+                y: values,
+                type: 'bar'
+            }];
+
+            let layout = {
+                title: {
+                    text: '@Localizer["Diagnosis"]'
+                }
+            };
+
+            Plotly.newPlot(div, data, layout);
+        }
+
+        $(document).ready(function() {
+            var appointments = @Html.Raw(@appointments);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Diagnosis")',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(appointments),
+                success: function(model) {
+                    console.log(model);
+                    let values = model.map((m) => m.count);
+                    let labels = model.map((m) => m.label);
+                    console.log(values);
+                    console.log(labels);
+
+                    plotDiagnosis(labels, values);
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            })
+        });
+
+        function plotSpecialty(labels, values) {
+            let div = document.getElementById('specialty-stat');
+
+            let data = [{
+                values: values,
+                labels: labels,
+                type: 'pie'
+            }];
+
+            let layout = {
+                title: {
+                    text: '@Localizer["Specialty"]'
+                }
+            };
+
+            Plotly.newPlot(div, data, layout);
+        }
+
+        $(document).ready(function() {
+            var appointments = @Html.Raw(@appointments);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Specialty")',
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(appointments),
+                success: function(model) {
+                    console.log(model);
+                    let values = model.map((m) => m.count);
+                    let labels = model.map((m) => m.label);
+                    console.log(values);
+                    console.log(labels);
+
+                    plotSpecialty(labels, values);
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            })
+        });
     </script>
 }
