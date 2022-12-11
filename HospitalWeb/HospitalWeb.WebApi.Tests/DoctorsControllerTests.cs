@@ -2,6 +2,7 @@
 using FluentAssertions;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Interfaces;
+using HospitalWeb.Services.Extensions;
 using HospitalWeb.Tests.Services;
 using HospitalWeb.WebApi.Controllers;
 using HospitalWeb.WebApi.Models.ResourceModels;

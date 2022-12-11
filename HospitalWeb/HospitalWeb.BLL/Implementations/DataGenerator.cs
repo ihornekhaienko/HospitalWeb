@@ -2,7 +2,7 @@
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Entities.Identity;
 
-namespace HospitalWeb.Tests.Services
+namespace HospitalWeb.Services.Extensions
 {
     public static class DataGenerator
     {
@@ -49,8 +49,8 @@ namespace HospitalWeb.Tests.Services
         }
 
         public static List<Appointment> GetTestAppointments(
-            IEnumerable<Diagnosis> diagnoses, 
-            IEnumerable<Doctor> doctors, 
+            IEnumerable<Diagnosis> diagnoses,
+            IEnumerable<Doctor> doctors,
             IEnumerable<Patient> patients,
             int count = 100)
         {
@@ -83,6 +83,35 @@ namespace HospitalWeb.Tests.Services
             var testDiagnoses = faker.Generate(diagnoses.Length);
 
             return testDiagnoses;
+        }
+
+        public static List<Hospital> GetTestHospitals(int count = 100)
+        {
+            int id = 1;
+
+            var faker = new Faker<Hospital>()
+                .RuleFor(h => h.HospitalId, f => id)
+                .RuleFor(h => h.HospitalName, f => "Hospital " + id++);
+
+            var testHospitals = faker.Generate(count);
+
+            return testHospitals;
+        }
+
+        public static List<Hospital> GetTestHospitals(
+            IEnumerable<Address> addresses,
+            int count = 100)
+        {
+            int id = 1;
+
+            var faker = new Faker<Hospital>()
+                .RuleFor(h => h.HospitalId, f => id)
+                .RuleFor(h => h.HospitalName, f => "Hospital " + id++)
+                .RuleFor(h => h.Address, f => f.PickRandom(addresses));
+
+            var testHospitals = faker.Generate(count);
+
+            return testHospitals;
         }
 
         public static List<Locality> GetTestLocalities(int count = 100)
@@ -206,7 +235,10 @@ namespace HospitalWeb.Tests.Services
             return testDoctors;
         }
 
-        public static List<Doctor> GetTestDoctors(IEnumerable<Specialty> specialties, int count = 100)
+        public static List<Doctor> GetTestDoctors(
+            IEnumerable<Specialty> specialties,
+            IEnumerable<Hospital> hospitals,
+            int count = 100)
         {
             var faker = new Faker<Doctor>()
                 .RuleFor(u => u.Id, f => f.UniqueIndex.ToString())
@@ -215,7 +247,8 @@ namespace HospitalWeb.Tests.Services
                 .RuleFor(u => u.PhoneNumber, f => f.Phone.PhoneNumber())
                 .RuleFor(u => u.Name, f => f.Name.FirstName())
                 .RuleFor(u => u.Surname, f => f.Name.LastName())
-                .RuleFor(d => d.Specialty, f => f.PickRandom(specialties));
+                .RuleFor(d => d.Specialty, f => f.PickRandom(specialties))
+                .RuleFor(d => d.Hospital, f => f.PickRandom(hospitals));
 
             var testDoctors = faker.Generate(count);
 
