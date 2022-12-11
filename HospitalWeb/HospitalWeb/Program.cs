@@ -112,6 +112,7 @@ builder.Services.AddGoogleTokenProvider();
 builder.Services.AddInternalGoogleProvider();
 builder.Services.AddTokenManager();
 builder.Services.AddGoogleCalendar();
+builder.Services.AddDbInitializer(true);
 
 var app = builder.Build();
 

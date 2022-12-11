@@ -1,5 +1,9 @@
-﻿using HospitalWeb.Services.Implementations;
+﻿using HospitalWeb.DAL.Entities.Identity;
+using HospitalWeb.DAL.Services.Interfaces;
+using HospitalWeb.Services.Implementations;
 using HospitalWeb.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HospitalWeb.Services.Extensions
@@ -49,6 +53,16 @@ namespace HospitalWeb.Services.Extensions
         public static void AddGoogleCalendar(this IServiceCollection services)
         {
             services.AddScoped<ICalendarService, GoogleCalendarService>();
+        }
+
+        public static void AddDbInitializer(this IServiceCollection services, bool fullGenerate = false)
+        {
+            services.AddScoped<IDbInitializer, HospitalDbInitializer>(x =>
+                new HospitalDbInitializer(x.GetRequiredService<IConfiguration>(),
+                                          x.GetRequiredService<UserManager<AppUser>>(),
+                                          x.GetRequiredService<RoleManager<IdentityRole>>(),
+                                          x.GetRequiredService<IUnitOfWork>(),
+                                          fullGenerate));
         }
     }
 }
