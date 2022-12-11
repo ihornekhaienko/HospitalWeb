@@ -1,0 +1,28 @@
+﻿@model AppointmentsViewModel
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = SharedLocalizer["Statistics"];
+}
+
+<h1 class="mb-5">@SharedLocalizer["Statistics"]</h1>
+<form method="get">
+    <div class="mb-4">
+        <span class="input-group-btn"><label>@SharedLocalizer["Filter"]</label></span>
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["From"]:</label></span>
+        <span class="input-group-btn input-space">
+            <input type="date" name="fromDate"/>
+        </span>
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["To"]:</label></span>
+        <span class="input-group-btn input-space">
+            <input type="date" name="toDate"/>
+        </span>
+    </div>
+    <div class="mb-2">
+        <span class="input-group-btn"><button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button></span>
+        <span class="input-group-btn input-space"><a asp-action="Index" asp-controller="Statistics"> @SharedLocalizer["ClearFilters"]</a></span>
+    </div>
+</form>
+
+<div class="container">
+
+</div>
