@@ -8,11 +8,11 @@ namespace HospitalWeb.Filters.Models.FilterModels
         public List<LocalityDTO> Localities { get; private set; }
         public int? SelectedLocality { get; private set; }
 
-        public PatientFilterModel(string searchString, List<LocalityDTO> localities, int? localiity)
+        public PatientFilterModel(string searchString, List<LocalityDTO> localities, int? locality)
         {
             localities.Insert(0, new LocalityDTO { LocalityId = 0, LocalityName = "All" });
             Localities = localities;
-            SelectedLocality = localiity;
+            SelectedLocality = locality;
             SearchString = searchString;
         }
     }

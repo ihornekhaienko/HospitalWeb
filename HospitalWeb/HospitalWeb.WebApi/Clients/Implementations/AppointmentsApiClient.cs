@@ -25,6 +25,7 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             string searchString = null,
             string userId = null,
             int? state = null,
+            int? locality = null,
             DateTime? fromDate = null,
             DateTime? toDate = null,
             AppointmentSortState sortOrder = AppointmentSortState.DateAsc,
@@ -33,7 +34,7 @@ namespace HospitalWeb.WebApi.Clients.Implementations
             string token = null,
             string provider = null)
         {
-            string query = $"?searchString={searchString}&userId={userId}&state={state}&fromDate={fromDate}&toDate={toDate}" +
+            string query = $"?searchString={searchString}&userId={userId}&state={state}&locality={locality}&fromDate={fromDate}&toDate={toDate}" +
                 $"&sortOrder={sortOrder}&pageSize={pageSize}&pageNumber={pageNumber}";
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}{query}");

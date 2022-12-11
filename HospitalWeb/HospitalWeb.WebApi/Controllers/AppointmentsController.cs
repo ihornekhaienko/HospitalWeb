@@ -34,6 +34,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="searchString">String for searching through Specialty or Diagnosis</param>
         /// <param name="userId">Appointment owner's id</param>
         /// <param name="state">Appointment state</param>
+        /// <param name="locality">Appointment locality</param>
         /// <param name="fromDate">Starting date for searching</param>
         /// <param name="toDate">Ending date for searching</param>
         /// <param name="sortOrder">Sorting order of the filtered list</param>
@@ -45,6 +46,7 @@ namespace HospitalWeb.WebApi.Controllers
             string searchString = null,
             string userId = null,
             int? state = null,
+            int? locality = null,
             DateTime? fromDate = null,
             DateTime? toDate = null,
             AppointmentSortState sortOrder = AppointmentSortState.DateAsc,
@@ -71,6 +73,11 @@ namespace HospitalWeb.WebApi.Controllers
                 if (state != null && state != 0)
                 {
                     result = result && (int)a.State == state;
+                }
+
+                if (locality != null && locality != 0)
+                {
+                    result = result && (int)a.Patient.Address.LocalityId == locality;
                 }
 
                 if (fromDate != null)
@@ -134,6 +141,8 @@ namespace HospitalWeb.WebApi.Controllers
                 .Include(a => a.Meetings)
                 .Include(a => a.Doctor)
                     .ThenInclude(d => d.Specialty)
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Hospital)
                 .Include(a => a.Patient)
                     .ThenInclude(p => p.Address)
                         .ThenInclude(a => a.Locality));
@@ -161,6 +170,8 @@ namespace HospitalWeb.WebApi.Controllers
                 .Include(a => a.Meetings)
                 .Include(a => a.Doctor)
                     .ThenInclude(d => d.Specialty)
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Hospital)
                 .Include(a => a.Patient)
                     .ThenInclude(p => p.Address)
                         .ThenInclude(a => a.Locality));
@@ -189,6 +200,8 @@ namespace HospitalWeb.WebApi.Controllers
                 .Include(a => a.Meetings)
                 .Include(a => a.Doctor)
                     .ThenInclude(d => d.Specialty)
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Hospital)
                 .Include(a => a.Patient)
                     .ThenInclude(p => p.Address)
                         .ThenInclude(a => a.Locality));

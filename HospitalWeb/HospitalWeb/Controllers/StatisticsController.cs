@@ -20,10 +20,11 @@ namespace HospitalWeb.Controllers
 
         [HttpGet]
         public IActionResult Index(
+            int? locality = null,
             DateTime? fromDate = null,
             DateTime? toDate = null)
         {
-            var builder = new AppointmentsViewModelBuilder(_api, state: 5, fromTime: fromDate, toTime: toDate, pageSize: int.MaxValue);
+            var builder = new AppointmentsViewModelBuilder(_api, state: 5, locality: locality, fromTime: fromDate, toTime: toDate, pageSize: int.MaxValue);
             var director = new ViewModelBuilderDirector();
             director.MakeViewModel(builder);
             var viewModel = builder.GetViewModel(); 

@@ -10,7 +10,6 @@
 <h1 class="mb-5">@SharedLocalizer["Statistics"]</h1>
 <form method="get">
     <div class="mb-5">
-        <span class="input-group-btn"><label>@SharedLocalizer["Filter"]</label></span>
         <span class="input-group-btn input-space"><label>@SharedLocalizer["From"]:</label></span>
         <span class="input-group-btn input-space">
             <input type="date" name="fromDate"/>
@@ -18,6 +17,16 @@
         <span class="input-group-btn input-space"><label>@SharedLocalizer["To"]:</label></span>
         <span class="input-group-btn input-space">
             <input type="date" name="toDate"/>
+        </span>
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["Locality"]</label></span>
+        <span class="input-group-btn input-space">
+            <select name="locality" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.Localities, 
+                            "LocalityId", 
+                            "LocalityName", 
+                            Model.FilterModel.SelectedLocality))">
+            </select>
         </span>
         <span class="input-group-btn input-space"><button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button></span>
         <span class="input-group-btn input-space"><a asp-action="Index" asp-controller="Statistics"> @SharedLocalizer["ClearFilters"]</a></span>

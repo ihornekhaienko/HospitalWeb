@@ -1,11 +1,4 @@
-﻿using HospitalWeb.DAL.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HospitalWeb.Filters.Models.DTO
+﻿namespace HospitalWeb.Filters.Models.DTO
 {
     public class AppointmentDTO
     {
@@ -36,6 +29,8 @@ namespace HospitalWeb.Filters.Models.DTO
         public string PatientBirthDate { get; set; }
 
         public byte[] PatientImage { get; set; }
+
+        public string Hospital { get; set; }
 
         public string MeetingStartLink { get; set; }
 

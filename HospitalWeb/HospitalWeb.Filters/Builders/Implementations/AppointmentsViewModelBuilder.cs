@@ -15,6 +15,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
         private readonly ApiUnitOfWork _api;
         private readonly string _userId;
         private readonly int? _state;
+        private readonly int? _locality;
         private readonly DateTime? _fromTime;
         private readonly DateTime? _toTime;
         private readonly AppointmentSortState _sortOrder;
@@ -31,6 +32,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
            AppointmentSortState sortOrder = AppointmentSortState.DateAsc,
            string userId = null,
            int? state = null,
+           int? locality = null,
            DateTime? fromTime = null,
            DateTime? toTime = null,
            int pageSize = 10
@@ -40,13 +42,14 @@ namespace HospitalWeb.Filters.Builders.Implementations
             _sortOrder = sortOrder;
             _userId = userId;
             _state = state;
+            _locality = locality;
             _fromTime = fromTime;
             _toTime = toTime;
         }
 
         public override void BuildEntityModel()
         {
-            var response = _api.Appointments.Filter(_searchString, _userId, _state, _fromTime, _toTime, _sortOrder, _pageSize, _pageNumber);
+            var response = _api.Appointments.Filter(_searchString, _userId, _state, _locality, _fromTime, _toTime, _sortOrder, _pageSize, _pageNumber);
 
             if (response.IsSuccessStatusCode)
             {
@@ -67,6 +70,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
                         PatientBirthDate = a.Patient.BirthDate.ToShortDateString(),
                         PatientSex = a.Patient.Sex.ToString(),
                         PatientImage = a.Patient.Image,
+                        Hospital = a.Doctor.Hospital.HospitalName,
                         MeetingStartLink = a.Meetings.FirstOrDefault()?.StartLink,
                         MeetingJoinLink = a.Meetings.FirstOrDefault()?.JoinLink,
                     });
@@ -86,7 +90,14 @@ namespace HospitalWeb.Filters.Builders.Implementations
                 .Select(s => new StateDTO { Value = (int)s, Name = s.ToString() })
                 .ToList();
 
-            _filterModel = new AppointmentFilterModel(_searchString, states, _state, _fromTime, _toTime);
+            var response = _api.Localities.Get();
+            var localities = _api.Localities
+                .ReadMany(response)
+                .OrderBy(l => l.LocalityName)
+                .Select(l => new LocalityDTO { LocalityId = l.LocalityId, LocalityName = l.LocalityName })
+                .ToList();
+
+            _filterModel = new AppointmentFilterModel(_searchString, states, _state, localities, _locality, _fromTime, _toTime);
         }
 
         public override void BuildPageModel()
