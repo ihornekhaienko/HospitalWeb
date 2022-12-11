@@ -41,7 +41,8 @@ namespace HospitalWeb.Services.Extensions
             var faker = new Faker<Appointment>()
                 .RuleFor(a => a.AppointmentId, f => id++)
                 .RuleFor(a => a.State, f => f.PickRandom(states[1..2]))
-                .RuleFor(a => a.Prescription, f => f.Lorem.Text());
+                .RuleFor(a => a.Prescription, f => f.Lorem.Text())
+                .RuleFor(a => a.AppointmentDate, f => f.Date.Past(refDate: DateTime.Today));
 
             var testAppointments = faker.Generate(count);
 
@@ -61,6 +62,7 @@ namespace HospitalWeb.Services.Extensions
                 .RuleFor(a => a.AppointmentId, f => id++)
                 .RuleFor(a => a.State, f => f.PickRandom(states[1..2]))
                 .RuleFor(a => a.Prescription, f => f.Lorem.Text())
+                .RuleFor(a => a.AppointmentDate, f => f.Date.Past(refDate: DateTime.Today))
                 .RuleFor(a => a.Diagnosis, f => f.PickRandom(diagnoses))
                 .RuleFor(a => a.Doctor, f => f.PickRandom(doctors))
                 .RuleFor(a => a.Patient, f => f.PickRandom(patients));
@@ -70,17 +72,15 @@ namespace HospitalWeb.Services.Extensions
             return testAppointments;
         }
 
-        public static List<Diagnosis> GetTestDiagnoses()
+        public static List<Diagnosis> GetTestDiagnoses(int count = 100)
         {
-            var diagnoses = new[] { "Survey", "SARS", "Gastritis", "Ulcer", "Pancreatitis", "Twist" };
-
             int id = 1;
 
             var faker = new Faker<Diagnosis>()
-                .RuleFor(d => d.DiagnosisName, f => diagnoses[id - 1])
-                .RuleFor(d => d.DiagnosisId, f => id++);
+                .RuleFor(d => d.DiagnosisId, f => id++)
+                .RuleFor(d => d.DiagnosisName, f => f.Lorem.Word());
 
-            var testDiagnoses = faker.Generate(diagnoses.Length);
+            var testDiagnoses = faker.Generate(count);
 
             return testDiagnoses;
         }

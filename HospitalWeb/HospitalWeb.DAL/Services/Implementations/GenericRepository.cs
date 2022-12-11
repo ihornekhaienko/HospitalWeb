@@ -11,6 +11,8 @@ namespace HospitalWeb.DAL.Services.Implementations
         private readonly AppDbContext _db;
         private readonly DbSet<T> _dbSet;
 
+        public int Count => _dbSet.Count();
+
         public GenericRepository(AppDbContext db)
         {
             _db = db;

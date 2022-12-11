@@ -5,6 +5,8 @@ namespace HospitalWeb.DAL.Services.Interfaces
 {
     public interface IRepository<T> where T : class
     {
+        int Count { get; }
+
         IEnumerable<T> GetAll(Func<T, bool> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null, int first = 0, int offset = 0);
         Task<IEnumerable<T>> GetAllAsync(Func<T, bool> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null, int first = 0, int offset = 0);
         T Get(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null);
