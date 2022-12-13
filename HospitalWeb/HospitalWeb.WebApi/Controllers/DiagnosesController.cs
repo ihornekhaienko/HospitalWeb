@@ -94,7 +94,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="diagnosis">Diagnosis to create</param>
         /// <returns>The Diagnosis object</returns>
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "AdminsDoctorsOnly")]
         public async Task<ActionResult<Diagnosis>> Post(DiagnosisResourceModel diagnosis)
         {
             if (diagnosis == null)
@@ -119,6 +119,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <returns>The Diagnosis object</returns>
         [HttpPut]
         [Authorize]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Diagnosis>> Put(Diagnosis diagnosis)
         {
             if (diagnosis == null)
@@ -137,7 +138,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Diagnosis's id</param>
         /// <returns>The Diagnosis object</returns>
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Diagnosis>> Delete(int id)
         {
             var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisId == id);

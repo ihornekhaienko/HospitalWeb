@@ -83,7 +83,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Notification's id</param>
         /// <returns>The Notification object</returns>
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<ActionResult<Notification>> Get(int id)
         {
             var notification = await _uow.Notifications.GetAsync(s => s.NotificationId == id, include: n => n.Include(n => n.AppUser));

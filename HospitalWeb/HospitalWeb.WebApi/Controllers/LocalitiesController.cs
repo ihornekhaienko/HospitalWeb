@@ -3,6 +3,7 @@ using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -108,6 +109,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="locality">The Locality to update</param>
         /// <returns>The Locality object</returns>
         [HttpPut]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Locality>> Put(Locality locality)
         {
             if (locality == null)
@@ -126,6 +128,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Locality's id</param>
         /// <returns>The Locality object</returns>
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Locality>> Delete(int id)
         {
             var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id);

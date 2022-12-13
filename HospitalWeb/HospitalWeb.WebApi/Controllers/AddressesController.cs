@@ -2,6 +2,7 @@
 using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -114,6 +115,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="address"> The Address object  </param>
         /// <returns> The Address object </returns>
         [HttpPut]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Address>> Put(Address address)
         {
             if (address == null)
@@ -132,6 +134,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id"> The Address object id </param>
         /// <returns> The Address object </returns>
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Address>> Delete(int id)
         {
             var address = await _uow.Addresses.GetAsync(a => a.AddressId == id);

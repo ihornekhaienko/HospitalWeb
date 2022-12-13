@@ -220,7 +220,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="appointment">Appointment to create</param>
         /// <returns>Appointment object</returns>
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "DoctorsPatientsOnly")]
         public async Task<ActionResult<Appointment>> Post(AppointmentResourceModel appointment)
         {
             if (appointment == null)
@@ -244,7 +244,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="appointment">Appointment to update</param>
         /// <returns>Appointment object</returns>
         [HttpPut]
-        [Authorize]
+        [Authorize(Policy = "DoctorsPatientsOnly")]
         public async Task<ActionResult<Appointment>> Put(Appointment appointment)
         {
             if (appointment == null)
@@ -263,7 +263,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Appointment's id</param>
         /// <returns>Appointment object</returns>
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Appointment>> Delete(int id)
         {
             var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);

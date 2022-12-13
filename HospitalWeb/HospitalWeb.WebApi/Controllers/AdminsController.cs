@@ -142,7 +142,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="admin">Admin to create</param>
         /// <returns>The Admin object</returns>
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "SuperAdminsOnly")]
         public async Task<ActionResult<Admin>> Post(AdminResourceModel admin)
         {
             if (admin == null)
@@ -185,7 +185,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="admin">The Admin to update</param>
         /// <returns>The Admin object</returns>
         [HttpPut]
-        [Authorize]
+        [Authorize(Policy = "SuperAdminsOnly")]
         public async Task<ActionResult<Admin>> Put(Admin admin)
         {
             if (admin == null)
@@ -211,7 +211,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="searchString">Admin's id or Email</param>
         /// <returns>The Admin object</returns>
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Policy = "SuperAdminsOnly")]
         public async Task<ActionResult<Admin>> Delete(string searchString)
         {
             var admin = await _uow.Admins.GetAsync(a => a.Id == searchString || a.Email == searchString);

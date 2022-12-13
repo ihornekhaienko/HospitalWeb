@@ -219,7 +219,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="patient">The Patient to update</param>
         /// <returns>The Patient object</returns>
         [HttpPut]
-        [Authorize]
+        [Authorize(Policy = "PatientsOnly")]
         public async Task<ActionResult<Patient>> Put(Patient patient)
         {
             if (patient == null)
@@ -245,7 +245,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="searchString">Patient's id or Email</param>
         /// <returns>The Patient object</returns>
         [HttpDelete("{searchString}")]
-        [Authorize]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Patient>> Delete(string searchString)
         {
             var patient = await _uow.Patients.GetAsync(p => p.Id == searchString || p.Email == searchString);

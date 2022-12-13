@@ -187,7 +187,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="doctor">Doctor to create</param>
         /// <returns>The Doctor object</returns>
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Doctor>> Post(DoctorResourceModel doctor)
         {
             if (doctor == null)
@@ -230,7 +230,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="doctor">The Doctor to update</param>
         /// <returns>The Doctor object</returns>
         [HttpPut]
-        [Authorize]
+        [Authorize(Policy = "AdminsDoctorsOnly")]
         public async Task<ActionResult<Doctor>> Put(Doctor doctor)
         {
             if (doctor == null)
@@ -256,7 +256,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="searchString">Doctor's id or Email</param>
         /// <returns>The Doctor object</returns>
         [HttpDelete("{searchString}")]
-        [Authorize]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Doctor>> Delete(string searchString)
         {
             try

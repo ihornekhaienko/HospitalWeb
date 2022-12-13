@@ -162,7 +162,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="hospital">Hospital to create</param>
         /// <returns>The Hospital object</returns>
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Hospital>> Post(HospitalResourceModel hospital)
         {
             if (hospital == null)
@@ -187,7 +187,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="hospital">The Hospital to update</param>
         /// <returns>The Hospital object</returns>
         [HttpPut]
-        [Authorize]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Hospital>> Put(Hospital hospital)
         {
             if (hospital == null)
@@ -206,7 +206,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Hospital's id</param>
         /// <returns>The Hospital object</returns>
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Hospital>> Delete(int id)
         {
             var hospital = await _uow.Hospitals.GetAsync(s => s.HospitalId == id);
