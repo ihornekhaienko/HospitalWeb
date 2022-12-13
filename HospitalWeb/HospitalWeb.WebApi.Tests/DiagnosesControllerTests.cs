@@ -55,7 +55,7 @@ namespace HospitalWeb.WebApi.Tests
             var logger = Mock.Of<ILogger<DiagnosesController>>();
 
             int id = 5;
-            var diagnoses = DataGenerator.GetTestDiagnoses();
+            var diagnoses = DataGenerator.GetTestDiagnosesWithId();
             var correct = diagnoses.Where(a => a.DiagnosisId == id).First();
 
             var diagnosisRepo = new Mock<IRepository<Diagnosis>>();

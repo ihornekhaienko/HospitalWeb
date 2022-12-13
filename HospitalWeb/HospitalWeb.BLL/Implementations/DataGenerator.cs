@@ -155,7 +155,7 @@ namespace HospitalWeb.Services.Extensions
             return testHospitals;
         }
 
-        public static List<Hospital> GetTestHospitalsWithid(
+        public static List<Hospital> GetTestHospitalsWithId(
            IEnumerable<Address> addresses,
            int count = 100)
         {

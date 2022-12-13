@@ -55,7 +55,7 @@ namespace HospitalWeb.WebApi.Tests
             var logger = Mock.Of<ILogger<LocalitiesController>>();
 
             int id = 5;
-            var localities = DataGenerator.GetTestLocalities();
+            var localities = DataGenerator.GetTestLocalitiesWithId();
             var correct = localities.Where(a => a.LocalityId == id).First();
 
             var diagnosisRepo = new Mock<IRepository<Locality>>();
@@ -109,7 +109,7 @@ namespace HospitalWeb.WebApi.Tests
             var logger = Mock.Of<ILogger<LocalitiesController>>();
 
             int id = 5;
-            var localities = DataGenerator.GetTestLocalities();
+            var localities = DataGenerator.GetTestLocalitiesWithId();
             var correct = localities.Where(a => a.LocalityId == id).First();
             string name = correct.LocalityName;
 

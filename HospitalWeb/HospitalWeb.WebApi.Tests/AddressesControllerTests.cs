@@ -109,7 +109,7 @@ namespace HospitalWeb.WebApi.Tests
             var logger = Mock.Of<ILogger<AddressesController>>();
 
             var localities = DataGenerator.GetTestLocalities();
-            var addresses = DataGenerator.GetTestAddresses(localities);
+            var addresses = DataGenerator.GetTestAddressesWithId(localities);
             var correct = addresses.First();
 
             var addressRepo = new Mock<IRepository<Address>>();

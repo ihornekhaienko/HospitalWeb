@@ -55,7 +55,7 @@ namespace HospitalWeb.WebApi.Tests
             var logger = Mock.Of<ILogger<SpecialtiesController>>();
 
             int id = 5;
-            var specialties = DataGenerator.GetTestSpecialties();
+            var specialties = DataGenerator.GetTestSpecialtiesWithId();
             var correct = specialties.Where(a => a.SpecialtyId == id).First();
 
             var diagnosisRepo = new Mock<IRepository<Specialty>>();
@@ -109,7 +109,7 @@ namespace HospitalWeb.WebApi.Tests
             var logger = Mock.Of<ILogger<SpecialtiesController>>();
 
             int id = 5;
-            var specialties = DataGenerator.GetTestSpecialties();
+            var specialties = DataGenerator.GetTestSpecialtiesWithId();
             var correct = specialties.Where(a => a.SpecialtyId == id).First();
             string name = correct.SpecialtyName;
 

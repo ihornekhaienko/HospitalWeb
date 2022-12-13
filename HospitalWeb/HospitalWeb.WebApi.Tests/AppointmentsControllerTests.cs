@@ -173,7 +173,7 @@ namespace HospitalWeb.WebApi.Tests
             var diagnoses = DataGenerator.GetTestDiagnoses();
             var doctors = DataGenerator.GetTestDoctors();
             var patients = DataGenerator.GetTestPatients();
-            var appointments = DataGenerator.GetTestAppointments(diagnoses, doctors, patients);
+            var appointments = DataGenerator.GetTestAppointmentsWithId(diagnoses, doctors, patients);
             var correct = appointments.First();
 
             var appointmentRepo = new Mock<IRepository<Appointment>>();
@@ -207,7 +207,7 @@ namespace HospitalWeb.WebApi.Tests
             var diagnoses = DataGenerator.GetTestDiagnoses();
             var doctors = DataGenerator.GetTestDoctors();
             var patients = DataGenerator.GetTestPatients();
-            var appointments = DataGenerator.GetTestAppointments(diagnoses, doctors, patients);
+            var appointments = DataGenerator.GetTestAppointmentsWithId(diagnoses, doctors, patients);
 
             var appointmentRepo = new Mock<IRepository<Appointment>>();
             appointmentRepo.Setup(r => r.GetAsync(It.IsAny<Expression<Func<Appointment, bool>>>(),
