@@ -38,6 +38,18 @@ namespace HospitalWeb.Services.Implementations
                     new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
                 };
 
+                if (user is Admin admin)
+                {
+                    if (admin.IsSuperAdmin)
+                    {
+                        claims.Add(new Claim("AccessLevel", "Super"));
+                    }
+                    else
+                    {
+                        claims.Add(new Claim("AccessLevel", "Basic"));
+                    }
+                }
+
                 ClaimsIdentity claimsIdentity =
                     new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
