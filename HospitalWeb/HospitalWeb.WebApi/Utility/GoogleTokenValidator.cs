@@ -32,7 +32,11 @@ namespace HospitalWeb.WebApi.Utility
             validatedToken = null;
             try
             {
-                var payload = GoogleJsonWebSignature.ValidateAsync(securityToken, new GoogleJsonWebSignature.ValidationSettings() { Audience = new[] { _clientId } }).Result; // here is where I delegate to Google to validate
+                var payload = GoogleJsonWebSignature
+                    .ValidateAsync(securityToken, new GoogleJsonWebSignature.ValidationSettings() 
+                    { 
+                        Audience = new[] { _clientId } 
+                    }).Result;
 
                 var claims = new List<Claim>
                 {
