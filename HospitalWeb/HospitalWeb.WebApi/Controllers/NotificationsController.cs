@@ -45,7 +45,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="pageNumber">Number of the page</param>
         /// <returns>List of Notifications</returns>
         [HttpGet("details")]
-        [Authorize]
         public async Task<IEnumerable<Notification>> Get(string owner, int pageSize = 10, int pageNumber = 1)
         {
             int totalCount = 0;
