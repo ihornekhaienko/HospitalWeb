@@ -93,7 +93,10 @@ namespace HospitalWeb.Controllers
                         Password = password
                     };
 
-                    var response =_api.Admins.Post(admin);
+                    var user = await _userManager.GetUserAsync(User);
+                    var tokenResult = await _tokenManager.GetToken(user);
+
+                    var response =_api.Admins.Post(admin, tokenResult.Token, tokenResult.Provider);
 
                     if (response.IsSuccessStatusCode)
                     {
