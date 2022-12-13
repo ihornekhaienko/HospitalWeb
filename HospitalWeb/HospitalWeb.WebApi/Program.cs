@@ -82,6 +82,10 @@ builder.Services.AddAuthentication()
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = securityKey
         };
+
+        o.SecurityTokenValidators.Clear();
+        o.SecurityTokenValidators.Add(new InternalTokenValidator());
+        o.SaveToken = true;
     })
     .AddPolicyScheme("Default", "Default", o =>
     {
@@ -107,6 +111,42 @@ builder.Services.AddAuthorization(options =>
         .RequireAuthenticatedUser()
         .AddAuthenticationSchemes("Default")
         .Build();
+
+    options.AddPolicy("AdminsOnly", policy =>
+    {
+        policy.RequireAuthenticatedUser()
+            .AddAuthenticationSchemes("Default")
+            .RequireRole("Admin");
+    });
+
+    options.AddPolicy("SuperAdminsOnly", policy =>
+    {
+        policy.RequireAuthenticatedUser()
+            .AddAuthenticationSchemes("Default")
+            .RequireRole("Admin")
+            .RequireClaim("AccessLevel", "Super");
+    });
+
+    options.AddPolicy("PatientsOnly", policy =>
+    {
+        policy.RequireAuthenticatedUser()
+            .AddAuthenticationSchemes("Default")
+            .RequireRole("Patient");
+    });
+
+    options.AddPolicy("AdminsDoctorsOnly", policy =>
+    {
+        policy.RequireAuthenticatedUser()
+            .AddAuthenticationSchemes("Default")
+            .RequireRole("Admin", "Doctor");
+    });
+
+    options.AddPolicy("DoctorsPatientsOnly", policy =>
+    {
+        policy.RequireAuthenticatedUser()
+            .AddAuthenticationSchemes("Default")
+            .RequireRole("Doctor", "Patient");
+    });
 });
 #endregion
 
