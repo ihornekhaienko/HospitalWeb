@@ -33,10 +33,5 @@ namespace HospitalWeb.WebApi.Clients.Implementations
 
             return _client.SendAsync(request).Result;
         }
-
-        public IEnumerable<IdentityError> ReadErrors(HttpResponseMessage response)
-        {
-            return response.Content.ReadAsAsync<IEnumerable<IdentityError>>().Result;
-        }
     }
 }
