@@ -1,0 +1,15 @@
+﻿@model ErrorViewModel
+@inject IHtmlLocalizer Localizer
+@{
+    ViewBag.Title = Localizer["Title"];
+}
+<div class="list-header clearfix text-danger">
+    <h2>@Localizer["Error"]</h2>
+    <p>@Localizer["Message"]</p>
+    @if (Model != null )
+    {
+        <p>
+            @Model.Message
+        </p>
+    }
+</div>
