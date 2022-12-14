@@ -1,5 +1,6 @@
 ﻿using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Services.Interfaces;
+using HospitalWeb.ViewModels.Error;
 using HospitalWeb.WebApi.Clients.Implementations;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Mvc;
@@ -32,14 +33,25 @@ namespace HospitalWeb.Controllers
             int page = 1,
             HospitalSortState sortOrder = HospitalSortState.Id)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/hospital-icon.png"));
+            try
+            {
+                ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/hospital-icon.png"));
 
-            var builder = new HospitalsViewModelBuilder(_api, page, searchString, sortOrder, locality);
-            var director = new ViewModelBuilderDirector();
-            director.MakeViewModel(builder);
-            var viewModel = builder.GetViewModel();
+                var builder = new HospitalsViewModelBuilder(_api, page, searchString, sortOrder, locality);
+                var director = new ViewModelBuilderDirector();
+                director.MakeViewModel(builder);
+                var viewModel = builder.GetViewModel();
 
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in HospitalsController.Search.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
     }
 }
