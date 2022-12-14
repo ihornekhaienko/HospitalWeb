@@ -98,5 +98,10 @@ namespace HospitalWeb.WebApi.Clients.Implementations
         {
             return response.Content.ReadAsAsync<IEnumerable<TEntity>>().Result;
         }
+
+        public override TErrorResponse ReadError<TErrorResponse>(HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<TErrorResponse>().Result;
+        }
     }
 }

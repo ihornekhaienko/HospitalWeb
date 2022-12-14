@@ -12,6 +12,8 @@
 
         IEnumerable<TEntity> ReadMany(HttpResponseMessage response);
 
+        TErrorResponse ReadError<TErrorResponse>(HttpResponseMessage response);
+
         HttpResponseMessage Post(TResource obj, string token = null, string provider = null);
 
         HttpResponseMessage Post(TEntity obj, string token = null, string provider = null);
