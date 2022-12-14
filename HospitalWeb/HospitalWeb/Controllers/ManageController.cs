@@ -1,13 +1,11 @@
 ﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Implementations;
 using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Services.Extensions;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.ViewModels.Manage;
 using HospitalWeb.WebApi.Clients.Implementations;
-using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -60,41 +58,55 @@ namespace HospitalWeb.Controllers
                 return RedirectToAction("PatientProfile", "Manage");
             }
 
-            return NotFound();
+            return RedirectToAction("NotFound", "Error");
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> AdminProfile(int page = 1)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-
-            var response = _api.Admins.Get(User.Identity.Name, null, null);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return NotFound();
+                ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+
+                var response = _api.Admins.Get(User.Identity.Name, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Admins.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                var admin = _api.Admins.Read(response);
+
+                var builder = new NotificationsViewModelBuilder(_api, page, admin.Id, 5);
+                var director = new ViewModelBuilderDirector();
+                director.MakeViewModel(builder);
+                var notifications = builder.GetViewModel();
+
+                var model = new AdminProfileViewModel
+                {
+                    Name = admin.Name,
+                    Surname = admin.Surname,
+                    Email = admin.Email,
+                    Phone = admin.PhoneNumber,
+                    Image = admin.Image,
+                    IsSuperAdmin = admin.IsSuperAdmin,
+                    Notifications = notifications
+                };
+
+                return View(model);
             }
-
-            var admin = _api.Admins.Read(response);
-
-            var builder = new NotificationsViewModelBuilder(_api, page, admin.Id, 5);
-            var director = new ViewModelBuilderDirector();
-            director.MakeViewModel(builder);
-            var notifications = builder.GetViewModel();
-
-            var model = new AdminProfileViewModel
+            catch (Exception err)
             {
-                Name = admin.Name,
-                Surname = admin.Surname,
-                Email = admin.Email,
-                Phone = admin.PhoneNumber,
-                Image = admin.Image,
-                IsSuperAdmin = admin.IsSuperAdmin,
-                Notifications = notifications
-            };
+                _logger.LogError($"Error in ManageController.AdminProfile.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            return View(model);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [HttpPost]
@@ -106,7 +118,10 @@ namespace HospitalWeb.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return NotFound();
+                    var statusCode = response.StatusCode;
+                    var message = _api.Admins.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                 }
 
                 var admin = _api.Admins.Read(response);
@@ -125,14 +140,20 @@ namespace HospitalWeb.Controllers
                 {
                     return RedirectToAction("Profile", "Manage");
                 }
-                else
-                {
-                    var errors = _api.Admins.ReadErrors(response);
 
-                    foreach (var error in errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                var errors = _api.Admins.ReadError<IEnumerable<IdentityError>>(response);
+
+                if (errors == null)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Admins.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
@@ -143,34 +164,45 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> DoctorProfile(int page = 1)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-
-            var response = _api.Doctors.Get(User.Identity.Name, null, null);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return NotFound();
+                ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+
+                var response = _api.Doctors.Get(User.Identity.Name, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var doctor = _api.Doctors.Read(response);
+
+                var builder = new NotificationsViewModelBuilder(_api, page, doctor.Id, 5);
+                var director = new ViewModelBuilderDirector();
+                director.MakeViewModel(builder);
+                var notifications = builder.GetViewModel();
+
+                var model = new DoctorProfileViewModel
+                {
+                    Name = doctor.Name,
+                    Surname = doctor.Surname,
+                    Email = doctor.Email,
+                    Phone = doctor.PhoneNumber,
+                    Image = doctor.Image,
+                    Specialty = doctor.Specialty.SpecialtyName,
+                    Notifications = notifications
+                };
+
+                return View(model);
             }
-
-            var doctor = _api.Doctors.Read(response);
-
-            var builder = new NotificationsViewModelBuilder(_api, page, doctor.Id, 5);
-            var director = new ViewModelBuilderDirector();
-            director.MakeViewModel(builder);
-            var notifications = builder.GetViewModel();
-
-            var model = new DoctorProfileViewModel
+            catch (Exception err)
             {
-                Name = doctor.Name,
-                Surname = doctor.Surname,
-                Email = doctor.Email,
-                Phone = doctor.PhoneNumber,
-                Image = doctor.Image,
-                Specialty = doctor.Specialty.SpecialtyName,
-                Notifications = notifications
-            };
+                _logger.LogError($"Error in ManageController.DoctorProfile.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            return View(model);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [HttpPost]
@@ -182,7 +214,10 @@ namespace HospitalWeb.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return NotFound();
+                    var statusCode = response.StatusCode;
+                    var message = _api.Doctors.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                 }
 
                 var doctor = _api.Doctors.Read(response);
@@ -201,14 +236,20 @@ namespace HospitalWeb.Controllers
                 {
                     return RedirectToAction("Profile", "Manage");
                 }
-                else
-                {
-                    var errors = _api.Doctors.ReadErrors(response);
 
-                    foreach (var error in errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                var errors = _api.Doctors.ReadErrors(response);
+
+                if (errors == null)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Doctors.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
@@ -219,35 +260,49 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> PatientProfile(int page = 1)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-
-            var response = _api.Patients.Get(User.Identity.Name, null, null);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return NotFound();
+                ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+
+                var response = _api.Patients.Get(User.Identity.Name, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Patients.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                var patient = _api.Patients.Read(response);
+
+                var builder = new NotificationsViewModelBuilder(_api, page, patient.Id, 5);
+                var director = new ViewModelBuilderDirector();
+                director.MakeViewModel(builder);
+                var notifications = builder.GetViewModel();
+
+                var model = new PatientProfileViewModel
+                {
+                    Name = patient.Name,
+                    Surname = patient.Surname,
+                    Email = patient.Email,
+                    Phone = patient.PhoneNumber,
+                    Image = patient.Image,
+                    Address = patient.Address.FullAddress,
+                    Locality = patient.Address.Locality.LocalityName,
+                    Notifications = notifications
+                };
+
+                return View(model);
             }
-
-            var patient = _api.Patients.Read(response);
-
-            var builder = new NotificationsViewModelBuilder(_api, page, patient.Id, 5);
-            var director = new ViewModelBuilderDirector();
-            director.MakeViewModel(builder);
-            var notifications = builder.GetViewModel();
-
-            var model = new PatientProfileViewModel
+            catch (Exception err)
             {
-                Name = patient.Name,
-                Surname = patient.Surname,
-                Email = patient.Email,
-                Phone = patient.PhoneNumber,
-                Image = patient.Image,
-                Address = patient.Address.FullAddress,
-                Locality = patient.Address.Locality.LocalityName,
-                Notifications = notifications
-            };
+                _logger.LogError($"Error in ManageController.PatientProfile.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            return View(model);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [HttpPost]
@@ -262,7 +317,10 @@ namespace HospitalWeb.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return NotFound();
+                    var statusCode = response.StatusCode;
+                    var message = _api.Patients.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                 }
 
                 var patient = _api.Patients.Read(response);
@@ -282,14 +340,20 @@ namespace HospitalWeb.Controllers
                 {
                     return RedirectToAction("Profile", "Manage");
                 }
-                else
-                {
-                    var errors = _api.Patients.ReadErrors(response);
 
-                    foreach (var error in errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                var errors = _api.Patients.ReadError<IEnumerable<IdentityError>>(response);
+
+                if (errors == null)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Patients.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
@@ -301,42 +365,44 @@ namespace HospitalWeb.Controllers
         {
             try
             {
-                if (file != null)
-                {
-                    var bytes = await _fileManager.GetBytes(file);
-
-                    if (bytes != null && bytes.IsImage())
-                    {
-                        var response = _api.AppUsers.Get(User.Identity.Name, null, null);
-
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            return NotFound();
-                        }
-
-                        var user = _api.AppUsers.Read(response);
-
-                        user.Image = bytes;
-
-                        var tokenResult = await _tokenManager.GetToken(user);
-
-                        _api.AppUsers.Put(user, tokenResult.Token, tokenResult.Provider);
-
-                        return RedirectToAction("Profile", "Manage");
-                    }
-                    else
-                    {
-                        throw new Exception("Your file is not an image");
-                    }
-                }
-                else
+                if (file == null)
                 {
                     throw new Exception("Failed loading file");
                 }
+
+                var bytes = await _fileManager.GetBytes(file);
+
+                if (bytes == null && !bytes.IsImage())
+                {
+                    throw new Exception("Your file is not an image");
+                }
+
+                var response = _api.AppUsers.Get(User.Identity.Name, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.AppUsers.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                var user = _api.AppUsers.Read(response);
+
+                user.Image = bytes;
+
+                var tokenResult = await _tokenManager.GetToken(user);
+
+                _api.AppUsers.Put(user, tokenResult.Token, tokenResult.Provider);
+
+                return RedirectToAction("Profile", "Manage");
             }
             catch (Exception err)
             {
-                _logger.LogCritical(err.StackTrace);
+                _logger.LogError($"Error in ManageController.UploadPhoto.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
@@ -358,7 +424,10 @@ namespace HospitalWeb.Controllers
                     var response = _api.AppUsers.Get(User.Identity.Name, null, null);
                     if (!response.IsSuccessStatusCode)
                     {
-                        return NotFound();
+                        var statusCode = response.StatusCode;
+                        var message = _api.AppUsers.ReadError<string>(response);
+
+                        return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                     }
                     var user = _api.AppUsers.Read(response);
 
@@ -369,12 +438,10 @@ namespace HospitalWeb.Controllers
                         await _notifier.NotifyUpdate(user.Email, user.Email);
                         return RedirectToAction("Profile", "Manage");
                     }
-                    else
+
+                    foreach (var error in result.Errors)
                     {
-                        foreach (var error in result.Errors)
-                        {
-                            ModelState.AddModelError(string.Empty, error.Description);
-                        }
+                        ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
 
@@ -392,7 +459,10 @@ namespace HospitalWeb.Controllers
             var response = _api.Notifications.Get(id);
             if (!response.IsSuccessStatusCode)
             {
-                return NotFound();
+                var statusCode = response.StatusCode;
+                var message = _api.Notifications.ReadError<string>(response);
+
+                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
             }
             var notification = _api.Notifications.Read(response);
 
