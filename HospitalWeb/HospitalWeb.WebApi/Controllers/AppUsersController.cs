@@ -35,9 +35,22 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <returns>List of users</returns>
         [HttpGet]
-        public async Task<IEnumerable<AppUser>> Get()
+        public async Task<ActionResult<IEnumerable<AppUser>>> Get()
         {
-            return await _uow.AppUsers.GetAllAsync();
+            try
+            {
+                var users = await _uow.AppUsers.GetAllAsync();
+
+                return new ObjectResult(users);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppUsersController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -48,14 +61,25 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{searchString}")]
         public async Task<ActionResult<AppUser>> Get(string searchString)
         {
-            var user = await _uow.AppUsers.GetAsync(a => a.Id == searchString || a.Email == searchString);
-
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
+                var user = await _uow.AppUsers.GetAsync(a => a.Id == searchString || a.Email == searchString);
 
-            return new ObjectResult(user);
+                if (user == null)
+                {
+                    return NotFound("The user object wasn't found");
+                }
+
+                return new ObjectResult(user);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppUsersController.Get(searchString): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -67,35 +91,48 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize]
         public async Task<ActionResult<AppUser>> Post(AppUserResourceModel user)
         {
-            if (user == null)
+            try
             {
-                return BadRequest();
+                if (user == null)
+                {
+                    return BadRequest("Passing null object to the AppUserController.Post method");
+                }
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUserResourceModel, AppUser>()
+                    .ForMember(d => d.Image, o => o.Ignore()));
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<AppUserResourceModel, AppUser>(user);
+
+                IdentityResult result;
+
+                if (string.IsNullOrWhiteSpace(user.Password))
+                {
+                    result = await _userManager.CreateAsync(entity);
+                }
+                else
+                {
+                    result = await _userManager.CreateAsync(entity, user.Password);
+                }
+
+                if (result.Succeeded)
+                {
+                    _logger.LogDebug($"Created user with id {entity.Id}");
+
+                    return Ok(entity);
+                }
+                else
+                {
+                    return BadRequest(result.Errors);
+                }
             }
-
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppUserResourceModel, AppUser>()
-                .ForMember(d => d.Image, o => o.Ignore()));
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<AppUserResourceModel, AppUser>(user);
-
-            IdentityResult result;
-
-            if (string.IsNullOrWhiteSpace(user.Password))
+            catch (Exception err)
             {
-                result = await _userManager.CreateAsync(entity);
-            }
-            else
-            {
-                result = await _userManager.CreateAsync(entity, user.Password);
-            }    
+                _logger.LogError($"Error in AppUsersController.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            if (result.Succeeded)
-            {
-                return Ok(entity);
-            }
-            else
-            {
-                return BadRequest(result.Errors);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
             }
         }
 
@@ -108,20 +145,33 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize]
         public async Task<ActionResult<AppUser>> Put(AppUser user)
         {
-            if (user == null)
+            try
             {
-                return BadRequest();
-            }
+                if (user == null)
+                {
+                    return BadRequest("Passing null object to the AppUserController.Put method");
+                }
 
-            var result = await _userManager.UpdateAsync(user);
+                var result = await _userManager.UpdateAsync(user);
 
-            if (result.Succeeded)
-            {
-                return Ok(user);
+                if (result.Succeeded)
+                {
+                    _logger.LogDebug($"Updated user with id {user.Id}");
+
+                    return Ok(user);
+                }
+                else
+                {
+                    return BadRequest(result.Errors);
+                }
             }
-            else
+            catch (Exception err)
             {
-                return BadRequest(result.Errors);
+                _logger.LogError($"Error in AppUsersController.Put: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
             }
         }
 
@@ -134,16 +184,29 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize]
         public async Task<ActionResult<AppUser>> Delete(string searchString)
         {
-            var user = await _uow.AppUsers.GetAsync(a => a.Id == searchString || a.Email == searchString);
-
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _uow.AppUsers.GetAsync(a => a.Id == searchString || a.Email == searchString);
+
+                if (user == null)
+                {
+                    return NotFound("The user object wasn't found");
+                }
+
+                await _userManager.DeleteAsync(user);
+
+                _logger.LogDebug($"Deleted user with id {user.Id}");
+
+                return Ok(user);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppUsersController.Delete: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _userManager.DeleteAsync(user);
-
-            return Ok(user);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
     }
 }

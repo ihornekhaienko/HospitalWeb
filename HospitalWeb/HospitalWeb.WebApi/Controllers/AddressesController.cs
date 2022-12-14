@@ -32,12 +32,25 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <returns> A list of Addresses </returns>
         [HttpGet]
-        public async Task<IEnumerable<Address>> Get()
+        public async Task<ActionResult<IEnumerable<Address>>> Get()
         {
-            return await _uow.Addresses.GetAllAsync(include: a => a
-                .Include(a => a.Locality)
-                .Include(a => a.Hospitals)
-                .Include(a => a.Patients));
+            try
+            {
+                var addresses = await _uow.Addresses.GetAllAsync(include: a => a
+                    .Include(a => a.Locality)
+                    .Include(a => a.Hospitals)
+                    .Include(a => a.Patients));
+
+                return new ObjectResult(addresses);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AddressesController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -48,18 +61,29 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Address>> Get(int id)
         {
-            var address = await _uow.Addresses.GetAsync(a => a.AddressId == id, 
-                include: a => a
-                .Include(a => a.Locality)
-                .Include(a => a.Hospitals)
-                .Include(a => a.Patients));
-
-            if (address == null)
+            try
             {
-                return NotFound();
-            }
+                var address = await _uow.Addresses.GetAsync(a => a.AddressId == id,
+                    include: a => a
+                    .Include(a => a.Locality)
+                    .Include(a => a.Hospitals)
+                    .Include(a => a.Patients));
 
-            return new ObjectResult(address);
+                if (address == null)
+                {
+                    return NotFound("The address object wasn't found");
+                }
+
+                return new ObjectResult(address);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AddressesController.Get(id): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -71,19 +95,30 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Address>> Get(string address, string locality)
         {
-            var obj = await _uow.Addresses
-                .GetAsync(a => a.FullAddress == address && a.Locality.LocalityName == locality,
-                include: a => a
-                .Include(a => a.Locality)
-                .Include(a => a.Hospitals)
-                .Include(a => a.Patients));
-
-            if (obj == null)
+            try
             {
-                return NotFound();
-            }
+                var obj = await _uow.Addresses
+                    .GetAsync(a => a.FullAddress == address && a.Locality.LocalityName == locality,
+                include: a => a
+                    .Include(a => a.Locality)
+                    .Include(a => a.Hospitals)
+                    .Include(a => a.Patients));
 
-            return new ObjectResult(obj);
+                if (obj == null)
+                {
+                    return NotFound("The address object wasn't found");
+                }
+
+                return new ObjectResult(obj);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AddressesController.Get(address, locality): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -94,19 +129,32 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Address>> Post(AddressResourceModel address)
         {
-            if (address == null)
+            try
             {
-                return BadRequest();
+                if (address == null)
+                {
+                    return BadRequest("Passing null object to the AddressesController.Post method");
+                }
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<AddressResourceModel, Address>());
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<AddressResourceModel, Address>(address);
+
+                await _uow.Addresses.CreateAsync(entity);
+
+                _logger.LogDebug($"Created address with id {entity.AddressId}");
+
+                return Ok(entity);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AddressesController.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<AddressResourceModel, Address>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<AddressResourceModel, Address>(address);
-
-            await _uow.Addresses.CreateAsync(entity);
-
-            return Ok(entity);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -118,14 +166,27 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Address>> Put(Address address)
         {
-            if (address == null)
+            try
             {
-                return BadRequest();
+                if (address == null)
+                {
+                    return BadRequest("Passing null object to the AddressesController.Put method");
+                }
+
+                await _uow.Addresses.UpdateAsync(address);
+
+                _logger.LogDebug($"Updated address with id {address.AddressId}");
+
+                return Ok(address);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AddressesController.Put: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Addresses.UpdateAsync(address);
-
-            return Ok(address);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -137,16 +198,29 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Address>> Delete(int id)
         {
-            var address = await _uow.Addresses.GetAsync(a => a.AddressId == id);
-
-            if (address == null)
+            try
             {
-                return NotFound();
+                var address = await _uow.Addresses.GetAsync(a => a.AddressId == id);
+
+                if (address == null)
+                {
+                    return NotFound("The address object wasn't found");
+                }
+
+                await _uow.Addresses.DeleteAsync(address);
+
+                _logger.LogDebug($"Deleted address with id {address.AddressId}");
+
+                return Ok(address);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AddressesController.Delete: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Addresses.DeleteAsync(address);
-
-            return Ok(address);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
     }
 }

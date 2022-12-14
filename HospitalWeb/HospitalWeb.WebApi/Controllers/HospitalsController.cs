@@ -38,78 +38,89 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="pageNumber">Number of the page</param>
         /// <returns>Fltered list of Hospitals</returns>
         [HttpGet]
-        public async Task<IEnumerable<Hospital>> Get(
+        public async Task<ActionResult<IEnumerable<Hospital>>> Get(
             string searchString,
             int? locality,
             HospitalSortState sortOrder = HospitalSortState.Id,
             int pageSize = 10,
             int pageNumber = 1)
         {
-            int totalCount = 0;
-
-            Func<Hospital, bool> filter = (h) =>
+            try
             {
-                bool result = true;
+                int totalCount = 0;
 
-                if (!string.IsNullOrWhiteSpace(searchString))
+                Func<Hospital, bool> filter = (h) =>
                 {
-                    result = h.HospitalName.Contains(searchString, StringComparison.OrdinalIgnoreCase);
-                }
+                    bool result = true;
 
-                if (locality != null && locality != 0)
+                    if (!string.IsNullOrWhiteSpace(searchString))
+                    {
+                        result = h.HospitalName.Contains(searchString, StringComparison.OrdinalIgnoreCase);
+                    }
+
+                    if (locality != null && locality != 0)
+                    {
+                        result = result && h.Address.Locality.LocalityId == locality;
+                    }
+
+                    return result;
+                };
+
+                Func<IQueryable<Hospital>, IOrderedQueryable<Hospital>> orderBy = (hospitals) =>
                 {
-                    result = result && h.Address.Locality.LocalityId == locality;
-                }
+                    totalCount = hospitals.Count();
 
-                return result;
-            };
+                    switch (sortOrder)
+                    {
+                        case HospitalSortState.NameAsc:
+                            hospitals = hospitals.OrderBy(h => h.HospitalName);
+                            break;
+                        case HospitalSortState.NameDesc:
+                            hospitals = hospitals.OrderByDescending(h => h.HospitalName);
+                            break;
+                        case HospitalSortState.AddressAsc:
+                            hospitals = hospitals.OrderBy(h => h.Address.ToString());
+                            break;
+                        case HospitalSortState.AddressDesc:
+                            hospitals = hospitals.OrderByDescending(h => h.Address.ToString());
+                            break;
+                        case HospitalSortState.DoctorsCountAsc:
+                            hospitals = hospitals.OrderBy(h => h.Doctors.Count);
+                            break;
+                        case HospitalSortState.DoctorsCountDesc:
+                            hospitals = hospitals.OrderByDescending(h => h.Doctors.Count);
+                            break;
+                        default:
+                            hospitals = hospitals.OrderBy(h => h.HospitalId);
+                            break;
+                    }
 
-            Func<IQueryable<Hospital>, IOrderedQueryable<Hospital>> orderBy = (hospitals) =>
+                    return (IOrderedQueryable<Hospital>)hospitals;
+                };
+
+                var hospitals = await _uow.Hospitals
+                    .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize,
+                    include: p => p
+                     .Include(p => p.Address)
+                        .ThenInclude(a => a.Locality)
+                    .Include(p => p.Doctors));
+
+                Response.Headers.Add("TotalCount", totalCount.ToString());
+                Response.Headers.Add("Count", hospitals.Count().ToString());
+                Response.Headers.Add("PageSize", pageSize.ToString());
+                Response.Headers.Add("PageNumber", pageNumber.ToString());
+                Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
+
+                return new ObjectResult(hospitals);
+            }
+            catch (Exception err)
             {
-                totalCount = hospitals.Count();
+                _logger.LogError($"Error in HospitalsController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-                switch (sortOrder)
-                {
-                    case HospitalSortState.NameAsc:
-                        hospitals = hospitals.OrderBy(h => h.HospitalName);
-                        break;
-                    case HospitalSortState.NameDesc:
-                        hospitals = hospitals.OrderByDescending(h => h.HospitalName);
-                        break;
-                    case HospitalSortState.AddressAsc:
-                        hospitals = hospitals.OrderBy(h => h.Address.ToString());
-                        break;
-                    case HospitalSortState.AddressDesc:
-                        hospitals = hospitals.OrderByDescending(h => h.Address.ToString());
-                        break;
-                    case HospitalSortState.DoctorsCountAsc:
-                        hospitals = hospitals.OrderBy(h => h.Doctors.Count);
-                        break;
-                    case HospitalSortState.DoctorsCountDesc:
-                        hospitals = hospitals.OrderByDescending(h => h.Doctors.Count);
-                        break;
-                    default:
-                        hospitals = hospitals.OrderBy(h => h.HospitalId);
-                        break;
-                }
-
-                return (IOrderedQueryable<Hospital>)hospitals;
-            };
-
-            var hospitals = await _uow.Hospitals
-                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize,
-                include: p => p
-                 .Include(p => p.Address)
-                    .ThenInclude(a => a.Locality)
-                .Include(p => p.Doctors));
-
-            Response.Headers.Add("TotalCount", totalCount.ToString());
-            Response.Headers.Add("Count", hospitals.Count().ToString());
-            Response.Headers.Add("PageSize", pageSize.ToString());
-            Response.Headers.Add("PageNumber", pageNumber.ToString());
-            Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
-
-            return hospitals;
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -120,18 +131,29 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Hospital>> Get(int id)
         {
-            var hospital = await _uow.Hospitals
-                .GetAsync(s => s.HospitalId == id, 
+            try
+            {
+                var hospital = await _uow.Hospitals
+                .GetAsync(s => s.HospitalId == id,
                 include: s => s.Include(s => s.Doctors)
                     .Include(s => s.Address)
                         .ThenInclude(s => s.Locality));
 
-            if (hospital == null)
-            {
-                return NotFound();
-            }
+                if (hospital == null)
+                {
+                    return NotFound("The hospital object wasn't found");
+                }
 
-            return new ObjectResult(hospital);
+                return new ObjectResult(hospital);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in HospitalsController.Get(id): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -142,18 +164,29 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Hospital>> Get(string name)
         {
-            var hospital = await _uow.Hospitals
-                .GetAsync(s => s.HospitalName == name, 
+            try
+            {
+                var hospital = await _uow.Hospitals
+                .GetAsync(s => s.HospitalName == name,
                 include: s => s.Include(s => s.Doctors)
                     .Include(s => s.Address)
                         .ThenInclude(s => s.Locality));
 
-            if (hospital == null)
-            {
-                return NotFound();
-            }
+                if (hospital == null)
+                {
+                    return NotFound("The hospital object wasn't found");
+                }
 
-            return new ObjectResult(hospital);
+                return new ObjectResult(hospital);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in HospitalsController.Get(name): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -165,20 +198,33 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Hospital>> Post(HospitalResourceModel hospital)
         {
-            if (hospital == null)
+            try
             {
-                return BadRequest();
+                if (hospital == null)
+                {
+                    return BadRequest("Passing null object to the HospitalsController.Post method");
+                }
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<HospitalResourceModel, Hospital>()
+                    .ForMember(d => d.Image, o => o.AllowNull()));
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<HospitalResourceModel, Hospital>(hospital);
+
+                await _uow.Hospitals.CreateAsync(entity);
+
+                _logger.LogDebug($"Created hospital with id {entity.HospitalId}");
+
+                return Ok(entity);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in HospitalsController.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<HospitalResourceModel, Hospital>()
-                .ForMember(d => d.Image, o => o.AllowNull()));
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<HospitalResourceModel, Hospital>(hospital);
-
-            await _uow.Hospitals.CreateAsync(entity);
-
-            return Ok(entity);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -190,14 +236,27 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Hospital>> Put(Hospital hospital)
         {
-            if (hospital == null)
+            try
             {
-                return BadRequest();
+                if (hospital == null)
+                {
+                    return BadRequest("Passing null object to the HospitalsController.Put method");
+                }
+
+                await _uow.Hospitals.UpdateAsync(hospital);
+
+                _logger.LogDebug($"Updated hospital with id {hospital.HospitalId}");
+
+                return Ok(hospital);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in HospitalsController.Put: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Hospitals.UpdateAsync(hospital);
-
-            return Ok(hospital);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -209,16 +268,29 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Hospital>> Delete(int id)
         {
-            var hospital = await _uow.Hospitals.GetAsync(s => s.HospitalId == id);
-
-            if (hospital == null)
+            try
             {
-                return NotFound();
+                var hospital = await _uow.Hospitals.GetAsync(s => s.HospitalId == id);
+
+                if (hospital == null)
+                {
+                    return NotFound("The hospital object wasn't found");
+                }
+
+                await _uow.Hospitals.DeleteAsync(hospital);
+
+                _logger.LogDebug($"Deleted hospital with id {hospital.HospitalId}");
+
+                return Ok(hospital);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in HospitalsController.Delete: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Hospitals.DeleteAsync(hospital);
-
-            return Ok(hospital);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
     }
 }

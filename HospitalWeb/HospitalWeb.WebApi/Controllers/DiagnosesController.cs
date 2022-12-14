@@ -32,14 +32,27 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <returns>List of diagnoses</returns>
         [HttpGet]
-        public async Task<IEnumerable<Diagnosis>> Get()
+        public async Task<ActionResult<IEnumerable<Diagnosis>>> Get()
         {
-            return await _uow.Diagnoses.GetAllAsync(                
+            try
+            {
+                var diagnoses = await _uow.Diagnoses.GetAllAsync(
                 include: d => d
                 .Include(d => d.Appointments)
                     .ThenInclude(a => a.Doctor)
                 .Include(d => d.Appointments)
                     .ThenInclude(a => a.Patient));
+
+                return new ObjectResult(diagnoses);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in DiagnosesController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -50,19 +63,30 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Diagnosis>> Get(int id)
         {
-            var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisId == id,
-                include: d => d
-                .Include(d => d.Appointments)
-                    .ThenInclude(a => a.Doctor)
-                .Include(d => d.Appointments)
-                    .ThenInclude(a => a.Patient));
-
-            if (diagnosis == null)
+            try
             {
-                return NotFound();
-            }
+                var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisId == id,
+               include: d => d
+               .Include(d => d.Appointments)
+                   .ThenInclude(a => a.Doctor)
+               .Include(d => d.Appointments)
+                   .ThenInclude(a => a.Patient));
 
-            return new ObjectResult(diagnosis);
+                if (diagnosis == null)
+                {
+                    return NotFound("The diagnosis object wasn't found");
+                }
+
+                return new ObjectResult(diagnosis);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in DiagnosesController.Get(id): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -73,19 +97,30 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Diagnosis>> Get(string name)
         {
-            var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisName == name, 
+            try
+            {
+                var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisName == name,
                 include: d => d
                 .Include(d => d.Appointments)
                     .ThenInclude(a => a.Doctor)
                 .Include(d => d.Appointments)
                     .ThenInclude(a => a.Patient));
 
-            if (diagnosis == null)
-            {
-                return NotFound();
-            }
+                if (diagnosis == null)
+                {
+                    return NotFound("The diagnosis object wasn't found");
+                }
 
-            return new ObjectResult(diagnosis);
+                return new ObjectResult(diagnosis);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in DiagnosesController.Get(name): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -97,19 +132,32 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsDoctorsOnly")]
         public async Task<ActionResult<Diagnosis>> Post(DiagnosisResourceModel diagnosis)
         {
-            if (diagnosis == null)
+            try
             {
-                return BadRequest();
+                if (diagnosis == null)
+                {
+                    return BadRequest("Passing null object to the DiagnosesController.Post method");
+                }
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<DiagnosisResourceModel, Diagnosis>());
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<DiagnosisResourceModel, Diagnosis>(diagnosis);
+
+                await _uow.Diagnoses.CreateAsync(entity);
+
+                _logger.LogDebug($"Created diagnosis with id {entity.DiagnosisId}");
+
+                return Ok(entity);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in DiagnosesController.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<DiagnosisResourceModel, Diagnosis>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<DiagnosisResourceModel, Diagnosis>(diagnosis);
-
-            await _uow.Diagnoses.CreateAsync(entity);
-
-            return Ok(entity);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -122,14 +170,27 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Diagnosis>> Put(Diagnosis diagnosis)
         {
-            if (diagnosis == null)
+            try
             {
-                return BadRequest();
+                if (diagnosis == null)
+                {
+                    return BadRequest("Passing null object to the DiagnosesController.Put method");
+                }
+
+                await _uow.Diagnoses.UpdateAsync(diagnosis);
+
+                _logger.LogDebug($"Updated diagnosis with id {diagnosis.DiagnosisId}");
+
+                return Ok(diagnosis);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in DiagnosesController.Put: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Diagnoses.UpdateAsync(diagnosis);
-
-            return Ok(diagnosis);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -141,16 +202,29 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Diagnosis>> Delete(int id)
         {
-            var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisId == id);
-
-            if (diagnosis == null)
+            try
             {
-                return NotFound();
+                var diagnosis = await _uow.Diagnoses.GetAsync(d => d.DiagnosisId == id);
+
+                if (diagnosis == null)
+                {
+                    return NotFound("The diagnosis object wasn't found");
+                }
+
+                await _uow.Diagnoses.DeleteAsync(diagnosis);
+
+                _logger.LogDebug($"Deleted diagnosis with id {diagnosis.DiagnosisId}");
+
+                return Ok(diagnosis);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in DiagnosesController.Delete: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Diagnoses.DeleteAsync(diagnosis);
-
-            return Ok(diagnosis);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
     }
 }

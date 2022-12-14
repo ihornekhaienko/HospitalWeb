@@ -33,9 +33,22 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <returns>List of Schedules</returns>
         [HttpGet]
-        public async Task<IEnumerable<Schedule>> Get()
+        public async Task<ActionResult<IEnumerable<Schedule>>> Get()
         {
-            return await _uow.Schedules.GetAllAsync(include: s => s.Include(d => d.Doctor));
+            try
+            {
+                var schedules = await _uow.Schedules.GetAllAsync(include: s => s.Include(d => d.Doctor));
+
+                return new ObjectResult(schedules);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SchedulesController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -46,14 +59,25 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Schedule>> Get(int id)
         {
-            var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id, include: s => s.Include(d => d.Doctor));
-
-            if (schedule == null)
+            try
             {
-                return NotFound();
-            }
+                var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id, include: s => s.Include(d => d.Doctor));
 
-            return new ObjectResult(schedule);
+                if (schedule == null)
+                {
+                    return NotFound("The schedule object wasn't found");
+                }
+
+                return new ObjectResult(schedule);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SchedulesController.Get(id): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -65,24 +89,35 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Schedule>> Get(string doctor, string day)
         {
-            DayOfWeek dayOfWeek;
-            var result = Enum.TryParse(day, out dayOfWeek);
-
-            if (!result)
+            try
             {
-                return BadRequest();
+                DayOfWeek dayOfWeek;
+                var result = Enum.TryParse(day, out dayOfWeek);
+
+                if (!result)
+                {
+                    return BadRequest("Cannot convert day to the DayOfWeek");
+                }
+
+                var schedule = await _uow.Schedules.GetAsync(s => s.Doctor.Id == doctor && s.DayOfWeek == dayOfWeek,
+                    include:
+                    s => s.Include(d => d.Doctor));
+
+                if (schedule == null)
+                {
+                    return NotFound();
+                }
+
+                return new ObjectResult(schedule);
             }
-
-            var schedule = await _uow.Schedules.GetAsync(s => s.Doctor.Id == doctor && s.DayOfWeek == dayOfWeek,
-                include: 
-                s => s.Include(d => d.Doctor));
-
-            if (schedule == null)
+            catch (Exception err)
             {
-                return NotFound();
-            }
+                _logger.LogError($"Error in SchedulesController.Get(doctor, day): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            return new ObjectResult(schedule);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -94,19 +129,32 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Schedule>> Post(ScheduleResourceModel schedule)
         {
-            if (schedule == null)
+            try
             {
-                return BadRequest();
+                if (schedule == null)
+                {
+                    return BadRequest("Passing null object to the SchedulesController.Post method");
+                }
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<ScheduleResourceModel, Schedule>());
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<ScheduleResourceModel, Schedule>(schedule);
+
+                await _uow.Schedules.CreateAsync(entity);
+
+                _logger.LogDebug($"Created schedule with id {entity.ScheduleId}");
+
+                return Ok(entity);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SchedulesController.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<ScheduleResourceModel, Schedule>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<ScheduleResourceModel, Schedule>(schedule);
-
-            await _uow.Schedules.CreateAsync(entity);
-
-            return Ok(entity);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -118,14 +166,27 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Schedule>> Put(Schedule schedule)
         {
-            if (schedule == null)
+            try
             {
-                return BadRequest();
+                if (schedule == null)
+                {
+                    return BadRequest("Passing null object to the SchedulesController.Put method");
+                }
+
+                await _uow.Schedules.UpdateAsync(schedule);
+
+                _logger.LogDebug($"Updated schedule with id {schedule.ScheduleId}");
+
+                return Ok(schedule);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SchedulesController.Put: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Schedules.UpdateAsync(schedule);
-
-            return Ok(schedule);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -137,16 +198,29 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Schedule>> Delete(int id)
         {
-            var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id);
-
-            if (schedule == null)
+            try
             {
-                return NotFound();
+                var schedule = await _uow.Schedules.GetAsync(s => s.ScheduleId == id);
+
+                if (schedule == null)
+                {
+                    return NotFound("The schedule object wasn't found");
+                }
+
+                await _uow.Schedules.DeleteAsync(schedule);
+
+                _logger.LogDebug($"Deleted schedule with id {schedule.ScheduleId}");
+
+                return Ok(schedule);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SchedulesController.Delete: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Schedules.DeleteAsync(schedule);
-
-            return Ok(schedule);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
     }
 }

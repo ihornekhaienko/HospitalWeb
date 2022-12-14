@@ -33,9 +33,22 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <returns>List of Localities</returns>
         [HttpGet]
-        public async Task<IEnumerable<Locality>> Get()
+        public async Task<ActionResult<IEnumerable<Locality>>> Get()
         {
-            return await _uow.Localities.GetAllAsync();
+            try
+            {
+                var localities = await _uow.Localities.GetAllAsync();
+
+                return new ObjectResult(localities);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in LocalitiesController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -46,17 +59,28 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Locality>> Get(int id)
         {
-            var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id,
+            try
+            {
+                var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id,
                 include: l => l
                 .Include(l => l.Addresses)
                     .ThenInclude(a => a.Patients));
 
-            if (locality == null)
-            {
-                return NotFound();
-            }
+                if (locality == null)
+                {
+                    return NotFound("The locality object wasn't found");
+                }
 
-            return new ObjectResult(locality);
+                return new ObjectResult(locality);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in LocalitiesController.Get(id): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -67,17 +91,28 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Locality>> Get(string name)
         {
-            var locality = await _uow.Localities.GetAsync(l => l.LocalityName == name,
+            try
+            {
+                var locality = await _uow.Localities.GetAsync(l => l.LocalityName == name,
                 include: l => l
                 .Include(l => l.Addresses)
                     .ThenInclude(a => a.Patients));
 
-            if (locality == null)
-            {
-                return NotFound();
-            }
+                if (locality == null)
+                {
+                    return NotFound("The locality object wasn't found");
+                }
 
-            return new ObjectResult(locality);
+                return new ObjectResult(locality);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in LocalitiesController.Get(name): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -88,19 +123,32 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Locality>> Post(LocalityResourceModel locality)
         {
-            if (locality == null)
+            try
             {
-                return BadRequest();
+                if (locality == null)
+                {
+                    return BadRequest("Passing null object to the LocalitiesController.Post method");
+                }
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<LocalityResourceModel, Locality>());
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<LocalityResourceModel, Locality>(locality);
+
+                await _uow.Localities.CreateAsync(entity);
+
+                _logger.LogDebug($"Created locality with id {entity.LocalityId}");
+
+                return Ok(entity);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in LocalitiesController.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<LocalityResourceModel, Locality>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<LocalityResourceModel, Locality>(locality);
-
-            await _uow.Localities.CreateAsync(entity);
-
-            return Ok(entity);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -112,14 +160,27 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Locality>> Put(Locality locality)
         {
-            if (locality == null)
+            try
             {
-                return BadRequest();
+                if (locality == null)
+                {
+                    return BadRequest("Passing null object to the LocalitiesController.Put method");
+                }
+
+                await _uow.Localities.UpdateAsync(locality);
+
+                _logger.LogDebug($"Updated locality with id {locality.LocalityId}");
+
+                return Ok(locality);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in LocalitiesController.Put: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Localities.UpdateAsync(locality);
-
-            return Ok(locality);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -131,16 +192,29 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Locality>> Delete(int id)
         {
-            var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id);
-
-            if (locality == null)
+            try
             {
-                return NotFound();
+                var locality = await _uow.Localities.GetAsync(l => l.LocalityId == id);
+
+                if (locality == null)
+                {
+                    return NotFound("The locality object wasn't found");
+                }
+
+                await _uow.Localities.DeleteAsync(locality);
+
+                _logger.LogDebug($"Deleted locality with id {locality.LocalityId}");
+
+                return Ok(locality);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in LocalitiesController.Delete: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Localities.DeleteAsync(locality);
-
-            return Ok(locality);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
     }
 }

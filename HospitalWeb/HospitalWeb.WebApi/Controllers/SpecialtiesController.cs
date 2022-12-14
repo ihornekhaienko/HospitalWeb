@@ -32,9 +32,22 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <returns>List of Specialties</returns>
         [HttpGet]
-        public async Task<IEnumerable<Specialty>> Get()
+        public async Task<ActionResult<IEnumerable<Specialty>>> Get()
         {
-            return await _uow.Specialties.GetAllAsync(include: s => s.Include(s => s.Doctors));
+            try
+            {
+                var specialties = await _uow.Specialties.GetAllAsync(include: s => s.Include(s => s.Doctors));
+
+                return new ObjectResult(specialties);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SpecialtiesController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -45,14 +58,25 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Specialty>> Get(int id)
         {
-            var specialty = await _uow.Specialties.GetAsync(s => s.SpecialtyId == id, include: s => s.Include(s => s.Doctors));
-
-            if (specialty == null)
+            try
             {
-                return NotFound();
-            }
+                var specialty = await _uow.Specialties.GetAsync(s => s.SpecialtyId == id, include: s => s.Include(s => s.Doctors));
 
-            return new ObjectResult(specialty);
+                if (specialty == null)
+                {
+                    return NotFound("The specialty object wasn't found");
+                }
+
+                return new ObjectResult(specialty);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SpecialtiesController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -63,14 +87,25 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Specialty>> Get(string name)
         {
-            var specialty = await _uow.Specialties.GetAsync(s => s.SpecialtyName == name, include: s => s.Include(s => s.Doctors));
-
-            if (specialty == null)
+            try
             {
-                return NotFound();
-            }
+                var specialty = await _uow.Specialties.GetAsync(s => s.SpecialtyName == name, include: s => s.Include(s => s.Doctors));
 
-            return new ObjectResult(specialty);
+                if (specialty == null)
+                {
+                    return NotFound("The specialty object wasn't found");
+                }
+
+                return new ObjectResult(specialty);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SpecialtiesController.Get(name): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -82,19 +117,32 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Specialty>> Post(SpecialtyResourceModel specialty)
         {
-            if (specialty == null)
+            try
             {
-                return BadRequest();
+                if (specialty == null)
+                {
+                    return BadRequest("Passing null object to the SpecialtiesController.Post method");
+                }
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<SpecialtyResourceModel, Specialty>());
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<SpecialtyResourceModel, Specialty>(specialty);
+
+                await _uow.Specialties.CreateAsync(entity);
+
+                _logger.LogDebug($"Created specialty with id {entity.SpecialtyId}");
+
+                return Ok(entity);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SpecialtiesController.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<SpecialtyResourceModel, Specialty>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<SpecialtyResourceModel, Specialty>(specialty);
-
-            await _uow.Specialties.CreateAsync(entity);
-
-            return Ok(entity);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -106,14 +154,27 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Specialty>> Put(Specialty specialty)
         {
-            if (specialty == null)
+            try
             {
-                return BadRequest();
+                if (specialty == null)
+                {
+                    return BadRequest("Passing null object to the SpecialtiesController.Post method");
+                }
+
+                await _uow.Specialties.UpdateAsync(specialty);
+
+                _logger.LogDebug($"Updated specialty with id {specialty.SpecialtyId}");
+
+                return Ok(specialty);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SpecialtiesController.Put: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Specialties.UpdateAsync(specialty);
-
-            return Ok(specialty);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -125,16 +186,29 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Specialty>> Delete(int id)
         {
-            var specialty = await _uow.Specialties.GetAsync(s => s.SpecialtyId == id);
-
-            if (specialty == null)
+            try
             {
-                return NotFound();
+                var specialty = await _uow.Specialties.GetAsync(s => s.SpecialtyId == id);
+
+                if (specialty == null)
+                {
+                    return NotFound("The specialty object wasn't found");
+                }
+
+                await _uow.Specialties.DeleteAsync(specialty);
+
+                _logger.LogDebug($"Deleted specialty with id {specialty.SpecialtyId}");
+
+                return Ok(specialty);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in SpecialtiesController.Delete: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Specialties.DeleteAsync(specialty);
-
-            return Ok(specialty);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
     }
 }

@@ -42,7 +42,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="pageNumber">Number of the page</param>
         /// <returns>Filtered list of Appointments</returns>
         [HttpGet]
-        public async Task<IEnumerable<Appointment>> Get(
+        public async Task<ActionResult<IEnumerable<Appointment>>> Get(
             string searchString = null,
             string userId = null,
             int? state = null,
@@ -53,107 +53,118 @@ namespace HospitalWeb.WebApi.Controllers
             int pageSize = 10,
             int pageNumber = 1)
         {
-            int totalCount = 0;
-
-            Func<Appointment, bool> filter = (a) =>
+            try
             {
-                bool result = true;
+                int totalCount = 0;
 
-                if (!string.IsNullOrWhiteSpace(searchString))
+                Func<Appointment, bool> filter = (a) =>
                 {
-                    result = a.Diagnosis.DiagnosisName.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
-                    a.Doctor.Specialty.SpecialtyName.Contains(searchString, StringComparison.OrdinalIgnoreCase);
-                }
+                    bool result = true;
 
-                if (!string.IsNullOrWhiteSpace(userId))
+                    if (!string.IsNullOrWhiteSpace(searchString))
+                    {
+                        result = a.Diagnosis.DiagnosisName.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                        a.Doctor.Specialty.SpecialtyName.Contains(searchString, StringComparison.OrdinalIgnoreCase);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(userId))
+                    {
+                        result = result && (a.Doctor.Id == userId || a.Patient.Id == userId);
+                    }
+
+                    if (state != null && state != 0)
+                    {
+                        result = result && (int)a.State == state;
+                    }
+
+                    if (locality != null && locality != 0)
+                    {
+                        result = result && (int)a.Patient.Address.LocalityId == locality;
+                    }
+
+                    if (fromDate != null)
+                    {
+                        result = result && DateTime.Compare((DateTime)fromDate, a.AppointmentDate) <= 0;
+                    }
+
+                    if (toDate != null)
+                    {
+                        result = result && DateTime.Compare((DateTime)toDate, a.AppointmentDate) >= 0;
+                    }
+
+                    return result;
+                };
+
+                Func<IQueryable<Appointment>, IOrderedQueryable<Appointment>> orderBy = (appointments) =>
                 {
-                    result = result && (a.Doctor.Id == userId || a.Patient.Id == userId);
-                }
+                    totalCount = appointments.Count();
 
-                if (state != null && state != 0)
-                {
-                    result = result && (int)a.State == state;
-                }
+                    switch (sortOrder)
+                    {
+                        case AppointmentSortState.DateDesc:
+                            appointments = appointments.OrderByDescending(a => a.AppointmentDate);
+                            break;
+                        case AppointmentSortState.DiagnosisAsc:
+                            appointments = appointments.OrderBy(a => a.Diagnosis.DiagnosisName);
+                            break;
+                        case AppointmentSortState.DiagnosisDesc:
+                            appointments = appointments.OrderByDescending(a => a.Diagnosis.DiagnosisName);
+                            break;
+                        case AppointmentSortState.StateAsc:
+                            appointments = appointments.OrderBy(a => a.State);
+                            break;
+                        case AppointmentSortState.StateDesc:
+                            appointments = appointments.OrderByDescending(a => a.State);
+                            break;
+                        case AppointmentSortState.DoctorAsc:
+                            appointments = appointments.OrderBy(a => a.Doctor.ToString());
+                            break;
+                        case AppointmentSortState.DoctorDesc:
+                            appointments = appointments.OrderByDescending(a => a.Doctor.ToString());
+                            break;
+                        case AppointmentSortState.PatientAsc:
+                            appointments = appointments.OrderBy(a => a.Patient.ToString());
+                            break;
+                        case AppointmentSortState.PatientDesc:
+                            appointments = appointments.OrderByDescending(a => a.Patient.ToString());
+                            break;
+                        default:
+                            appointments = appointments.OrderBy(a => a.AppointmentDate);
+                            break;
+                    }
 
-                if (locality != null && locality != 0)
-                {
-                    result = result && (int)a.Patient.Address.LocalityId == locality;
-                }
+                    return (IOrderedQueryable<Appointment>)appointments;
+                };
 
-                if (fromDate != null)
-                {
-                    result = result && DateTime.Compare((DateTime)fromDate, a.AppointmentDate) <= 0;
-                }
+                var appointments = await _uow.Appointments
+                    .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize,
+                    include: a => a
+                    .Include(a => a.Diagnosis)
+                    .Include(a => a.Meetings)
+                    .Include(a => a.Doctor)
+                        .ThenInclude(d => d.Specialty)
+                    .Include(a => a.Doctor)
+                        .ThenInclude(d => d.Hospital)
+                    .Include(a => a.Patient)
+                        .ThenInclude(p => p.Address)
+                            .ThenInclude(a => a.Locality));
 
-                if (toDate != null)
-                {
-                    result = result && DateTime.Compare((DateTime)toDate, a.AppointmentDate) >= 0;
-                }
+                Response.Headers.Add("TotalCount", totalCount.ToString());
+                Response.Headers.Add("Count", appointments.Count().ToString());
+                Response.Headers.Add("PageSize", pageSize.ToString());
+                Response.Headers.Add("PageNumber", pageNumber.ToString());
+                Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
 
-                return result;
-            };
-
-            Func<IQueryable<Appointment>, IOrderedQueryable<Appointment>> orderBy = (appointments) =>
+                return new ObjectResult(appointments);
+            }
+            catch (Exception err)
             {
-                totalCount = appointments.Count();
+                _logger.LogError($"Error in AppointmentsController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-                switch (sortOrder)
-                {
-                    case AppointmentSortState.DateDesc:
-                        appointments = appointments.OrderByDescending(a => a.AppointmentDate);
-                        break;
-                    case AppointmentSortState.DiagnosisAsc:
-                        appointments = appointments.OrderBy(a => a.Diagnosis.DiagnosisName);
-                        break;
-                    case AppointmentSortState.DiagnosisDesc:
-                        appointments = appointments.OrderByDescending(a => a.Diagnosis.DiagnosisName);
-                        break;
-                    case AppointmentSortState.StateAsc:
-                        appointments = appointments.OrderBy(a => a.State);
-                        break;
-                    case AppointmentSortState.StateDesc:
-                        appointments = appointments.OrderByDescending(a => a.State);
-                        break;
-                    case AppointmentSortState.DoctorAsc:
-                        appointments = appointments.OrderBy(a => a.Doctor.ToString());
-                        break;
-                    case AppointmentSortState.DoctorDesc:
-                        appointments = appointments.OrderByDescending(a => a.Doctor.ToString());
-                        break;
-                    case AppointmentSortState.PatientAsc:
-                        appointments = appointments.OrderBy(a => a.Patient.ToString());
-                        break;
-                    case AppointmentSortState.PatientDesc:
-                        appointments = appointments.OrderByDescending(a => a.Patient.ToString());
-                        break;
-                    default:
-                        appointments = appointments.OrderBy(a => a.AppointmentDate);
-                        break;
-                }
-
-                return (IOrderedQueryable<Appointment>)appointments;
-            };
-
-            var appointments = await _uow.Appointments
-                .GetAllAsync(filter: filter, orderBy: orderBy, first: pageSize, offset: (pageNumber - 1) * pageSize,
-                include: a => a
-                .Include(a => a.Diagnosis)
-                .Include(a => a.Meetings)
-                .Include(a => a.Doctor)
-                    .ThenInclude(d => d.Specialty)
-                .Include(a => a.Doctor)
-                    .ThenInclude(d => d.Hospital)
-                .Include(a => a.Patient)
-                    .ThenInclude(p => p.Address)
-                        .ThenInclude(a => a.Locality));
-
-            Response.Headers.Add("TotalCount", totalCount.ToString());
-            Response.Headers.Add("Count", appointments.Count().ToString());
-            Response.Headers.Add("PageSize", pageSize.ToString());
-            Response.Headers.Add("PageNumber", pageNumber.ToString());
-            Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
-
-            return appointments;
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -164,7 +175,9 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Appointment>> Get(int id)
         {
-            var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id,
+            try
+            {
+                var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id,
                 include: a => a
                 .Include(a => a.Diagnosis)
                 .Include(a => a.Meetings)
@@ -176,12 +189,21 @@ namespace HospitalWeb.WebApi.Controllers
                     .ThenInclude(p => p.Address)
                         .ThenInclude(a => a.Locality));
 
-            if (appointment == null)
-            {
-                return NotFound();
-            }
+                if (appointment == null)
+                {
+                    return NotFound("The appointment object wasn't found");
+                }
 
-            return new ObjectResult(appointment);
+                return new ObjectResult(appointment);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppointmentsController.Get(id): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -193,8 +215,10 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("details")]
         public async Task<ActionResult<Appointment>> Get(string doctor, DateTime date)
         {
-            var appointment = await _uow.Appointments
-                .GetAsync(a => a.Doctor.Id == doctor && DateTime.Compare(a.AppointmentDate, date) == 0, 
+            try
+            {
+                var appointment = await _uow.Appointments
+                .GetAsync(a => a.Doctor.Id == doctor && DateTime.Compare(a.AppointmentDate, date) == 0,
                 include: a => a
                 .Include(a => a.Diagnosis)
                 .Include(a => a.Meetings)
@@ -206,12 +230,21 @@ namespace HospitalWeb.WebApi.Controllers
                     .ThenInclude(p => p.Address)
                         .ThenInclude(a => a.Locality));
 
-            if (appointment == null)
-            {
-                return NotFound();
-            }
+                if (appointment == null)
+                {
+                    return NotFound();
+                }
 
-            return new ObjectResult(appointment);
+                return new ObjectResult(appointment);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppointmentsController.Get(doctor, date): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -223,19 +256,32 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "DoctorsPatientsOnly")]
         public async Task<ActionResult<Appointment>> Post(AppointmentResourceModel appointment)
         {
-            if (appointment == null)
+            try
             {
-                return BadRequest();
+                if (appointment == null)
+                {
+                    return BadRequest("Passing null object to the AppointmentsController.Post method");
+                }
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<AppointmentResourceModel, Appointment>());
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<AppointmentResourceModel, Appointment>(appointment);
+
+                await _uow.Appointments.CreateAsync(entity);
+
+                _logger.LogDebug($"Updated appointment with id {entity.AppointmentId}");
+
+                return Ok(entity);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppointmentsController.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<AppointmentResourceModel, Appointment>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<AppointmentResourceModel, Appointment>(appointment);
-
-            await _uow.Appointments.CreateAsync(entity);
-
-            return Ok(entity);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -247,14 +293,27 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "DoctorsPatientsOnly")]
         public async Task<ActionResult<Appointment>> Put(Appointment appointment)
         {
-            if (appointment == null)
+            try
             {
-                return BadRequest();
+                if (appointment == null)
+                {
+                    return BadRequest("Passing null object to the AppointmentsController.Put method");
+                }
+
+                await _uow.Appointments.UpdateAsync(appointment);
+
+                _logger.LogDebug($"Updated appointment with id {appointment.AppointmentId}");
+
+                return Ok(appointment);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppointmentsController.Put: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Appointments.UpdateAsync(appointment);
-
-            return Ok(appointment);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -266,16 +325,29 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize(Policy = "AdminsOnly")]
         public async Task<ActionResult<Appointment>> Delete(int id)
         {
-            var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
-
-            if (appointment == null)
+            try
             {
-                return NotFound();
+                var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
+
+                if (appointment == null)
+                {
+                    return NotFound("The appointment object wasn't found");
+                }
+
+                await _uow.Appointments.DeleteAsync(appointment);
+
+                _logger.LogDebug($"Updated appointment with id {appointment.AppointmentId}");
+
+                return Ok(appointment);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppointmentsController.Delete: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Appointments.DeleteAsync(appointment);
-
-            return Ok(appointment);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
     }
 }

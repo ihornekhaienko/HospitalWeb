@@ -32,9 +32,22 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <returns>List of Notifications</returns>
         [HttpGet]
-        public async Task<IEnumerable<Notification>> Get()
+        public async Task<ActionResult<IEnumerable<Notification>>> Get()
         {
-            return await _uow.Notifications.GetAllAsync(include: n => n.Include(n => n.AppUser));
+            try
+            {
+                var notifications = await _uow.Notifications.GetAllAsync(include: n => n.Include(n => n.AppUser));
+
+                return new ObjectResult(notifications);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in NotificationsController.Get(): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -45,36 +58,47 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="pageNumber">Number of the page</param>
         /// <returns>List of Notifications</returns>
         [HttpGet("details")]
-        public async Task<IEnumerable<Notification>> Get(string owner, int pageSize = 10, int pageNumber = 1)
+        public async Task<ActionResult<IEnumerable<Notification>>> Get(string owner, int pageSize = 10, int pageNumber = 1)
         {
-            int totalCount = 0;
-
-            Func<Notification, bool> filter = (n) =>
+            try
             {
-                return n.AppUserId == owner;
-            };
+                int totalCount = 0;
 
-            Func<IQueryable<Notification>, IOrderedQueryable<Notification>> orderBy = (notifications) =>
+                Func<Notification, bool> filter = (n) =>
+                {
+                    return n.AppUserId == owner;
+                };
+
+                Func<IQueryable<Notification>, IOrderedQueryable<Notification>> orderBy = (notifications) =>
+                {
+                    totalCount = notifications.Count();
+
+                    return notifications.OrderByDescending(n => n.NotificationId);
+                };
+
+                var notifications = await _uow.Notifications.GetAllAsync(
+                    filter: filter,
+                    orderBy: orderBy,
+                    first: pageSize,
+                    offset: (pageNumber - 1) * pageSize,
+                    include: n => n.Include(n => n.AppUser));
+
+                Response.Headers.Add("TotalCount", totalCount.ToString());
+                Response.Headers.Add("Count", notifications.Count().ToString());
+                Response.Headers.Add("PageSize", pageSize.ToString());
+                Response.Headers.Add("PageNumber", pageNumber.ToString());
+                Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
+
+                return new ObjectResult(notifications);
+            }
+            catch (Exception err)
             {
-                totalCount = notifications.Count();
+                _logger.LogError($"Error in NotificationsController.Get(owner): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-                return notifications.OrderByDescending(n => n.NotificationId);
-            };
-
-            var notifications = await _uow.Notifications.GetAllAsync(
-                filter: filter,
-                orderBy: orderBy,
-                first: pageSize,
-                offset: (pageNumber - 1) * pageSize,
-                include: n => n.Include(n => n.AppUser));
-
-            Response.Headers.Add("TotalCount", totalCount.ToString());
-            Response.Headers.Add("Count", notifications.Count().ToString());
-            Response.Headers.Add("PageSize", pageSize.ToString());
-            Response.Headers.Add("PageNumber", pageNumber.ToString());
-            Response.Headers.Add("TotalPages", ((int)Math.Ceiling(totalCount / (double)pageSize)).ToString());
-
-            return notifications;
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -85,14 +109,25 @@ namespace HospitalWeb.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Notification>> Get(int id)
         {
-            var notification = await _uow.Notifications.GetAsync(s => s.NotificationId == id, include: n => n.Include(n => n.AppUser));
-
-            if (notification == null)
+            try
             {
-                return NotFound();
-            }
+                var notification = await _uow.Notifications.GetAsync(s => s.NotificationId == id, include: n => n.Include(n => n.AppUser));
 
-            return new ObjectResult(notification);
+                if (notification == null)
+                {
+                    return NotFound("The notifcation object wasn't found");
+                }
+
+                return new ObjectResult(notification);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in NotificationsController.Get(id): {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -104,19 +139,32 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize]
         public async Task<ActionResult<Notification>> Post(NotificationResourceModel Notification)
         {
-            if (Notification == null)
+            try
             {
-                return BadRequest();
+                if (Notification == null)
+                {
+                    return BadRequest("Passing null object to the NotificationsController.Post method");
+                }
+
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<NotificationResourceModel, Notification>());
+                var mapper = new Mapper(config);
+
+                var entity = mapper.Map<NotificationResourceModel, Notification>(Notification);
+
+                await _uow.Notifications.CreateAsync(entity);
+
+                _logger.LogDebug($"Created notification with id {entity.NotificationId}");
+
+                return Ok(entity);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in NotificationsController.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<NotificationResourceModel, Notification>());
-            var mapper = new Mapper(config);
-
-            var entity = mapper.Map<NotificationResourceModel, Notification>(Notification);
-
-            await _uow.Notifications.CreateAsync(entity);
-
-            return Ok(entity);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -128,14 +176,27 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize]
         public async Task<ActionResult<Notification>> Put(Notification notification)
         {
-            if (notification == null)
+            try
             {
-                return BadRequest();
+                if (notification == null)
+                {
+                    return BadRequest("Passing null object to the NotificationsController.Put method");
+                }
+
+                await _uow.Notifications.UpdateAsync(notification);
+
+                _logger.LogDebug($"Updated notification with id {notification.NotificationId}");
+
+                return Ok(notification);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in NotificationsController.Put: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Notifications.UpdateAsync(notification);
-
-            return Ok(notification);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
 
         /// <summary>
@@ -147,16 +208,29 @@ namespace HospitalWeb.WebApi.Controllers
         [Authorize]
         public async Task<ActionResult<Notification>> Delete(int id)
         {
-            var notification = await _uow.Notifications.GetAsync(s => s.NotificationId == id);
-
-            if (notification == null)
+            try
             {
-                return NotFound();
+                var notification = await _uow.Notifications.GetAsync(s => s.NotificationId == id);
+
+                if (notification == null)
+                {
+                    return NotFound("The notifcation object wasn't found");
+                }
+
+                await _uow.Notifications.DeleteAsync(notification);
+
+                _logger.LogDebug($"Deleted notification with id {notification.NotificationId}");
+
+                return Ok(notification);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in NotificationsController.Delete: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            await _uow.Notifications.DeleteAsync(notification);
-
-            return Ok(notification);
+                return StatusCode(StatusCodes.Status500InternalServerError, err.Message);
+            }
         }
     }
 }
