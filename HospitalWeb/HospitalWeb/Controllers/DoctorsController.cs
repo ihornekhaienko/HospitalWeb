@@ -57,42 +57,67 @@ namespace HospitalWeb.Controllers
             int page = 1,
             DoctorSortState sortOrder = DoctorSortState.Id)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+            try
+            {
+                ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
-            var builder = new DoctorsViewModelBuilder(_api, page, searchString, sortOrder, specialty, hospital, locality);
-            var director = new ViewModelBuilderDirector();
-            director.MakeViewModel(builder);
-            var viewModel = builder.GetViewModel();
+                var builder = new DoctorsViewModelBuilder(_api, page, searchString, sortOrder, specialty, hospital, locality);
+                var director = new ViewModelBuilderDirector();
+                director.MakeViewModel(builder);
+                var viewModel = builder.GetViewModel();
 
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in DoctorsController.Search.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> Details(string id)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-
-            var response = _api.Doctors.Get(id, null, null);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return null;
+                ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+
+                var response = _api.Doctors.Get(id, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Doctors.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                var doctor = _api.Doctors.Read(id);
+
+                var model = new DoctorDetailsViewModel
+                {
+                    Id = doctor.Id,
+                    FullName = doctor.ToString(),
+                    Email = doctor.Email,
+                    Phone = doctor.PhoneNumber,
+                    Image = doctor.Image,
+                    Specialty = doctor.Specialty.SpecialtyName,
+                    Hospital = doctor.Hospital.HospitalName
+                };
+
+                return View(model);
             }
-
-            var doctor = _api.Doctors.Read(id);
-
-            var model = new DoctorDetailsViewModel
+            catch (Exception err)
             {
-                Id = doctor.Id,
-                FullName = doctor.ToString(),
-                Email = doctor.Email,
-                Phone = doctor.PhoneNumber,
-                Image = doctor.Image,
-                Specialty = doctor.Specialty.SpecialtyName,
-                Hospital = doctor.Hospital.HospitalName
-            };
+                _logger.LogError($"Error in DoctorsController.Details.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            return View(model);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [HttpGet]
@@ -102,7 +127,10 @@ namespace HospitalWeb.Controllers
 
             if (!response.IsSuccessStatusCode)
             {
-                return null;
+                var statusCode = response.StatusCode;
+                var message = _api.Doctors.ReadError<string>(response);
+
+                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
             }
 
             var doctor = _api.Doctors.Read(id);
@@ -120,14 +148,20 @@ namespace HospitalWeb.Controllers
                 var response = _api.Patients.Get(User.Identity.Name, null, null);
                 if (!response.IsSuccessStatusCode)
                 {
-                    return null;
+                    var statusCode = response.StatusCode;
+                    var message = _api.Patients.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                 }
                 var patient = _api.Patients.Read(response);
 
                 response = _api.Doctors.Get(doctorId, null, null);
                 if (!response.IsSuccessStatusCode)
                 {
-                    return null;
+                    var statusCode = response.StatusCode;
+                    var message = _api.Doctors.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                 }
                 var doctor = _api.Doctors.Read(response);
 
@@ -145,7 +179,10 @@ namespace HospitalWeb.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return BadRequest();
+                    var statusCode = response.StatusCode;
+                    var message = _api.Appointments.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                 }
 
                 var entity = _api.Appointments.Read(response);
@@ -159,7 +196,10 @@ namespace HospitalWeb.Controllers
             }
             catch (Exception err)
             {
-                _logger.LogCritical(err.StackTrace);
+                _logger.LogError($"Error in DoctorsController.SignUpForAppointment.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
