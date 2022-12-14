@@ -237,7 +237,7 @@ namespace HospitalWeb.Controllers
                     return RedirectToAction("Profile", "Manage");
                 }
 
-                var errors = _api.Doctors.ReadErrors(response);
+                var errors = _api.Doctors.ReadError<IEnumerable<IdentityError>>(response);
 
                 if (errors == null)
                 {
