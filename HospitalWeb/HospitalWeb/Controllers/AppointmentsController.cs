@@ -52,7 +52,10 @@ namespace HospitalWeb.Controllers
 
             if (!response.IsSuccessStatusCode)
             {
-                return NotFound();
+                var statusCode = response.StatusCode;
+                var message = _api.Appointments.ReadError<string>(response);
+
+                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
             }
 
             var appointment = _api.Appointments.Read(response);
@@ -82,26 +85,40 @@ namespace HospitalWeb.Controllers
             int page = 1,
             AppointmentSortState sortOrder = AppointmentSortState.DateDesc)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-
-            var response = _api.Doctors.Get(User.Identity.Name, null, null);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return NotFound();
+                ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+
+                var response = _api.Doctors.Get(User.Identity.Name, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Doctors.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                var user = _api.Doctors.Read(response);
+
+                ViewBag.Calendar = _calendar.GetCalendar(user);
+
+                var builder = new AppointmentsViewModelBuilder(_api,
+                    page, searchString, sortOrder, user.Id, state: state, fromTime: fromDate, toTime: toDate);
+                var director = new ViewModelBuilderDirector();
+                director.MakeViewModel(builder);
+                var viewModel = builder.GetViewModel();
+
+                return View(viewModel);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppointmentsController.History.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var user = _api.Doctors.Read(response);
-
-            ViewBag.Calendar = _calendar.GetCalendar(user);
-
-            var builder = new AppointmentsViewModelBuilder(_api,
-                page, searchString, sortOrder, user.Id, state: state, fromTime: fromDate, toTime: toDate);
-            var director = new ViewModelBuilderDirector();
-            director.MakeViewModel(builder);
-            var viewModel = builder.GetViewModel();
-
-            return View(viewModel);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [Authorize(Roles = "Doctor")]
@@ -112,29 +129,43 @@ namespace HospitalWeb.Controllers
                     int page = 1,
                     AppointmentSortState sortOrder = AppointmentSortState.DateAsc)
         {
-            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
-
-            var response = _api.Doctors.Get(User.Identity.Name, null, null);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return NotFound();
+                ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
+
+                var response = _api.Doctors.Get(User.Identity.Name, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Doctors.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                var user = _api.Doctors.Read(response);
+
+                ViewBag.Calendar = _calendar.GetCalendar(user);
+
+                var start = DateTime.Today;
+                var end = start.AddDays(1).AddTicks(-1);
+
+                var builder = new AppointmentsViewModelBuilder(_api,
+                    page, searchString, sortOrder, user.Id, state: state, fromTime: start, toTime: end);
+                var director = new ViewModelBuilderDirector();
+                director.MakeViewModel(builder);
+                var viewModel = builder.GetViewModel();
+
+                return View(viewModel);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppointmentsController.Today.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var user = _api.Doctors.Read(response);
-
-            ViewBag.Calendar = _calendar.GetCalendar(user);
-
-            var start = DateTime.Today;
-            var end = start.AddDays(1).AddTicks(-1);
-
-            var builder = new AppointmentsViewModelBuilder(_api,
-                page, searchString, sortOrder, user.Id, state: state, fromTime: start, toTime: end);
-            var director = new ViewModelBuilderDirector();
-            director.MakeViewModel(builder);
-            var viewModel = builder.GetViewModel();
-
-            return View(viewModel);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [Authorize(Roles = "Doctor")]
@@ -147,39 +178,43 @@ namespace HospitalWeb.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return NotFound();
+                    var statusCode = response.StatusCode;
+                    var message = _api.Appointments.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                 }
 
                 var appointment = _api.Appointments.Read(response);
 
-                if (appointment.State == State.Planned)
-                {
-                    var user = await _userManager.GetUserAsync(User);
-                    var tokenResult = await _tokenManager.GetToken(user);
-
-                    appointment.State = State.Canceled;
-
-                    _api.Appointments.Put(appointment, tokenResult.Token, tokenResult.Provider);
-
-                    var meeting = appointment.Meetings.FirstOrDefault();
-                    if (meeting != null)
-                    {
-                        _api.Meetings.Delete(meeting.MeetingId, tokenResult.Token, tokenResult.Provider);
-                    }
-
-                    await _calendar.CancelEvent(appointment.Doctor, appointment);
-                    await _calendar.CancelEvent(appointment.Patient, appointment);
-
-                    return RedirectToAction("History", "Appointments");
-                }
-                else
+                if (appointment.State != State.Planned)
                 {
                     throw new Exception($"Appointment has to planned to cancel it, whereas it is {appointment.State}");
                 }
+
+                var user = await _userManager.GetUserAsync(User);
+                var tokenResult = await _tokenManager.GetToken(user);
+
+                appointment.State = State.Canceled;
+
+                _api.Appointments.Put(appointment, tokenResult.Token, tokenResult.Provider);
+
+                var meeting = appointment.Meetings.FirstOrDefault();
+                if (meeting != null)
+                {
+                    _api.Meetings.Delete(meeting.MeetingId, tokenResult.Token, tokenResult.Provider);
+                }
+
+                await _calendar.CancelEvent(appointment.Doctor, appointment);
+                await _calendar.CancelEvent(appointment.Patient, appointment);
+
+                return RedirectToAction("History", "Appointments");
             }
             catch (Exception err)
             {
-                _logger.LogCritical(err.StackTrace);
+                _logger.LogError($"Error in AppointmentsController.Cancel.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
@@ -199,7 +234,10 @@ namespace HospitalWeb.Controllers
 
             if (!response.IsSuccessStatusCode)
             {
-                return NotFound();
+                var statusCode = response.StatusCode;
+                var message = _api.Appointments.ReadError<string>(response);
+
+                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
             }
 
             var appointment = _api.Appointments.Read(response);
@@ -230,47 +268,51 @@ namespace HospitalWeb.Controllers
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        return NotFound();
+                        var statusCode = response.StatusCode;
+                        var message = _api.Appointments.ReadError<string>(response);
+
+                        return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                     }
 
                     var appointment = _api.Appointments.Read(response);
 
-                    if (appointment.State == State.Planned)
-                    {
-                        response = _api.Diagnoses.Get(model.Diagnosis);
-
-                        var user = await _userManager.GetUserAsync(User);
-                        var tokenResult = await _tokenManager.GetToken(user);
-
-                        var diagnosis = _api.Diagnoses.GetOrCreate(model.Diagnosis, tokenResult.Token, tokenResult.Provider);
-
-                        appointment.DiagnosisId = diagnosis.DiagnosisId;
-                        appointment.Prescription = model.Prescription;
-                        appointment.State = State.Completed;
-                        _api.Appointments.Put(appointment, tokenResult.Token, tokenResult.Provider);
-
-                        var meeting = appointment.Meetings.FirstOrDefault();
-                        if (meeting != null)
-                        {
-                            _api.Meetings.Delete(meeting.MeetingId, tokenResult.Token, tokenResult.Provider);
-                        }
-
-                        await _calendar.ConfirmEvent(appointment.Doctor, appointment);
-                        await _calendar.ConfirmEvent(appointment.Patient, appointment);
-
-                        return RedirectToAction("Today", "Appointments");
-                    }
-                    else
+                    if (appointment.State != State.Planned)
                     {
                         throw new Exception($"Appointment has to be planned to submit it, whereas it is {appointment.State}");
                     }
+
+                    response = _api.Diagnoses.Get(model.Diagnosis);
+
+                    var user = await _userManager.GetUserAsync(User);
+                    var tokenResult = await _tokenManager.GetToken(user);
+
+                    var diagnosis = _api.Diagnoses.GetOrCreate(model.Diagnosis, tokenResult.Token, tokenResult.Provider);
+
+                    appointment.DiagnosisId = diagnosis.DiagnosisId;
+                    appointment.Prescription = model.Prescription;
+                    appointment.State = State.Completed;
+                    _api.Appointments.Put(appointment, tokenResult.Token, tokenResult.Provider);
+
+                    var meeting = appointment.Meetings.FirstOrDefault();
+                    if (meeting != null)
+                    {
+                        _api.Meetings.Delete(meeting.MeetingId, tokenResult.Token, tokenResult.Provider);
+                    }
+
+                    await _calendar.ConfirmEvent(appointment.Doctor, appointment);
+                    await _calendar.ConfirmEvent(appointment.Patient, appointment);
+
+                    return RedirectToAction("Today", "Appointments");
                 }
 
                 return View(model);
             }
             catch (Exception err)
             {
-                _logger.LogCritical(err.StackTrace);
+                _logger.LogError($"Error in AppointmentsController.Fill.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
@@ -278,17 +320,31 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult Print(int id)
         {
-            var response = _api.Appointments.Get(id);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return NotFound();
+                var response = _api.Appointments.Get(id);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Appointments.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+                var appointment = _api.Appointments.Read(response);
+
+                string filePath = Path.Combine(_environment.WebRootPath, $"files/docs/{id}.pdf");
+                _pdfPrinter.PrintAppointment(appointment, filePath);
+
+                return PhysicalFile(filePath, "application/json", $"{id}.pdf");
             }
-            var appointment = _api.Appointments.Read(response);
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AppointmentsController.Print.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            string filePath = Path.Combine(_environment.WebRootPath, $"files/docs/{id}.pdf");
-            _pdfPrinter.PrintAppointment(appointment, filePath);
-
-            return PhysicalFile(filePath, "application/json", $"{id}.pdf");
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
     }
 }
