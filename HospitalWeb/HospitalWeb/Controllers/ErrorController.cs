@@ -1,5 +1,6 @@
 ﻿using HospitalWeb.ViewModels.Error;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace HospitalWeb.Controllers
 {
@@ -8,6 +9,26 @@ namespace HospitalWeb.Controllers
         public IActionResult Index(ErrorViewModel model)
         {
             return View(model);
+        }
+
+        public IActionResult Http(HttpStatusCode statusCode, string message)
+        {
+            if (statusCode == HttpStatusCode.NotFound)
+            {
+                return RedirectToAction("NotFound", "Error", new ErrorViewModel { Message = message });
+            }
+
+            if (statusCode == HttpStatusCode.BadRequest)
+            {
+                return RedirectToAction("BadRequest", "Error", new ErrorViewModel { Message = message });
+            }
+
+            if (statusCode == HttpStatusCode.InternalServerError)
+            {
+                return RedirectToAction("InternalServer", "Error", new ErrorViewModel { Message = message });
+            }
+
+            return RedirectToAction("Index", "Error", new ErrorViewModel { Message = message });
         }
 
         public IActionResult NotFound(ErrorViewModel model)
