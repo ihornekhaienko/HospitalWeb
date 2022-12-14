@@ -9,5 +9,20 @@ namespace HospitalWeb.Controllers
         {
             return View(model);
         }
+
+        public IActionResult NotFound(ErrorViewModel model)
+        {
+            return View(model);
+        }
+
+        public IActionResult BadRequest(ErrorViewModel model)
+        {
+            return View(model);
+        }
+
+        public IActionResult InternalServer(ErrorViewModel model)
+        {
+            return View(model);
+        }
     }
 }
