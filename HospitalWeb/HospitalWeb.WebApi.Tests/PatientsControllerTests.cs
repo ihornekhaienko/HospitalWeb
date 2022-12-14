@@ -53,14 +53,16 @@ namespace HospitalWeb.WebApi.Tests
             };
 
             //Act
-            var result = await controller.Get(string.Empty, null);
+            var response = await controller.Get(string.Empty, null);
+            var result = response.Result as ObjectResult;
+            var value = result?.Value as IEnumerable<Patient>;
 
             //Assert
             patientRepo.Verify();
-            result.Should().NotBeNullOrEmpty();
-            result.Should().BeOfType<List<Patient>>();
-            result.Should().AllBeOfType<Patient>();
-            result.Count().Should().Be(patients.Count);
+            value.Should().NotBeNullOrEmpty();
+            value.Should().BeOfType<List<Patient>>();
+            value.Should().AllBeOfType<Patient>();
+            value.Count().Should().Be(patients.Count);
         }
 
         [Fact]

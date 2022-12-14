@@ -38,14 +38,16 @@ namespace HospitalWeb.WebApi.Tests
             var controller = new SchedulesController(logger, uow.Object);
 
             //Act
-            var result = await controller.Get();
+            var response = await controller.Get();
+            var result = response.Result as ObjectResult;
+            var value = result?.Value as IEnumerable<Schedule>;
 
             //Assert
             scheduleRepo.Verify();
-            result.Should().NotBeNullOrEmpty();
-            result.Should().BeOfType<List<Schedule>>();
-            result.Should().AllBeOfType<Schedule>();
-            result.Count().Should().Be(schedules.Count);
+            value.Should().NotBeNullOrEmpty();
+            value.Should().BeOfType<List<Schedule>>();
+            value.Should().AllBeOfType<Schedule>();
+            value.Count().Should().Be(schedules.Count);
         }
 
         [Fact]

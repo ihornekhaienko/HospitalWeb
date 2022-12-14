@@ -49,14 +49,16 @@ namespace HospitalWeb.WebApi.Tests
             };
 
             //Act
-            var result = await controller.Get();
+            var response = await controller.Get();
+            var result = response.Result as ObjectResult;
+            var value = result?.Value as IEnumerable<Appointment>;
 
             //Assert
             appointmentRepo.Verify();
-            result.Should().NotBeNullOrEmpty();
-            result.Should().BeOfType<List<Appointment>>();
-            result.Should().AllBeOfType<Appointment>();
-            result.Count().Should().Be(appointments.Count);
+            value.Should().NotBeNullOrEmpty();
+            value.Should().BeOfType<List<Appointment>>();
+            value.Should().AllBeOfType<Appointment>();
+            value.Count().Should().Be(appointments.Count);
         }
 
         [Fact]
@@ -100,14 +102,16 @@ namespace HospitalWeb.WebApi.Tests
             };
 
             //Act
-            var result = await controller.Get(state: (int)state, toDate: toDate);
+            var response = await controller.Get(state: (int)state, toDate: toDate);
+            var result = response.Result as ObjectResult;
+            var value = result?.Value as IEnumerable<Appointment>;
 
             //Assert
             appointmentRepo.Verify();
-            result.Should().NotBeNullOrEmpty();
-            result.Should().BeOfType<List<Appointment>>();
-            result.Should().AllBeOfType<Appointment>();
-            result.Count().Should().Be(filtered.Count);
+            value.Should().NotBeNullOrEmpty();
+            value.Should().BeOfType<List<Appointment>>();
+            value.Should().AllBeOfType<Appointment>();
+            value.Count().Should().Be(filtered.Count);
         }
 
         [Fact]

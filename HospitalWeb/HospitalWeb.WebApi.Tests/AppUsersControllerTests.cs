@@ -42,14 +42,16 @@ namespace HospitalWeb.WebApi.Tests
             var controller = new AppUsersController(logger, uow.Object, userManager.Object);
 
             //Act
-            var result = await controller.Get();
+            var response = await controller.Get();
+            var result = response.Result as ObjectResult;
+            var value = result?.Value as IEnumerable<AppUser>;
 
             //Assert
             appUserRepo.Verify();
-            result.Should().NotBeNullOrEmpty();
-            result.Should().BeOfType<List<AppUser>>();
-            result.Should().AllBeOfType<AppUser>();
-            result.Count().Should().Be(appUsers.Count);
+            value.Should().NotBeNullOrEmpty();
+            value.Should().BeOfType<List<AppUser>>();
+            value.Should().AllBeOfType<AppUser>();
+            value.Count().Should().Be(appUsers.Count);
         }
 
         [Fact]

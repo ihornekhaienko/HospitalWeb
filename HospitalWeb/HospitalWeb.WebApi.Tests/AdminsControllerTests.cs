@@ -53,14 +53,16 @@ namespace HospitalWeb.WebApi.Tests
             };
 
             //Act
-            var result = await controller.Get();
+            var response = await controller.Get();
+            var result = response.Result as ObjectResult;
+            var value = result?.Value as IEnumerable<Admin>;
 
             //Assert
             adminRepo.Verify();
-            result.Should().NotBeNullOrEmpty();
-            result.Should().BeOfType<List<Admin>>();
-            result.Should().AllBeOfType<Admin>();
-            result.Count().Should().Be(admins.Count);
+            value.Should().NotBeNullOrEmpty();
+            value.Should().BeOfType<List<Admin>>();
+            value.Should().AllBeOfType<Admin>();
+            value.Count().Should().Be(admins.Count);
         }
 
         [Fact]
@@ -104,14 +106,16 @@ namespace HospitalWeb.WebApi.Tests
             };
 
             //Act
-            var result = await controller.Get(searchString: searchString, pageSize: pageSize);
+            var response = await controller.Get(searchString: searchString, pageSize: pageSize);
+            var result = response.Result as ObjectResult;
+            var value = result?.Value as IEnumerable<Admin>;
 
             //Assert
             adminRepo.Verify();
-            result.Should().NotBeNullOrEmpty();
-            result.Should().BeOfType<List<Admin>>();
-            result.Should().AllBeOfType<Admin>();
-            result.Count().Should().Be(filtered.Count());
+            value.Should().NotBeNullOrEmpty();
+            value.Should().BeOfType<List<Admin>>();
+            value.Should().AllBeOfType<Admin>();
+            value.Count().Should().Be(filtered.Count());
         }
 
         [Fact]

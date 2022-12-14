@@ -38,14 +38,16 @@ namespace HospitalWeb.WebApi.Tests
             var controller = new AddressesController(logger, uow.Object);
 
             //Act
-            var result = await controller.Get();
+            var response = await controller.Get();
+            var result = response.Result as ObjectResult;
+            var value = result?.Value as IEnumerable<Address>;
 
             //Assert
             addressRepo.Verify();
-            result.Should().NotBeNullOrEmpty();
-            result.Should().BeOfType<List<Address>>();
-            result.Should().AllBeOfType<Address>();
-            result.Count().Should().Be(addresses.Count);
+            value.Should().NotBeNullOrEmpty();
+            value.Should().BeOfType<List<Address>>();
+            value.Should().AllBeOfType<Address>();
+            value.Count().Should().Be(addresses.Count);
         }
 
         [Fact]

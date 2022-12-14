@@ -38,14 +38,16 @@ namespace HospitalWeb.WebApi.Tests
             var controller = new LocalitiesController(logger, uow.Object);
 
             //Act
-            var result = await controller.Get();
+            var response = await controller.Get();
+            var result = response.Result as ObjectResult;
+            var value = result?.Value as IEnumerable<Locality>;
 
             //Assert
             diagnosisRepo.Verify();
-            result.Should().NotBeNullOrEmpty();
-            result.Should().BeOfType<List<Locality>>();
-            result.Should().AllBeOfType<Locality>();
-            result.Count().Should().Be(localities.Count);
+            value.Should().NotBeNullOrEmpty();
+            value.Should().BeOfType<List<Locality>>();
+            value.Should().AllBeOfType<Locality>();
+            value.Count().Should().Be(localities.Count);
         }
 
         [Fact]
