@@ -102,14 +102,20 @@ namespace HospitalWeb.Controllers
 
                     return RedirectToLocal(returnUrl);
                 }
-                else
-                {
-                    var errors = _api.Patients.ReadErrors(response);
 
-                    foreach (var error in errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                var errors = _api.Patients.ReadError<IEnumerable<IdentityError>>(response);
+
+                if (errors == null)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Patients.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
@@ -143,13 +149,11 @@ namespace HospitalWeb.Controllers
                 {
                     return RedirectToLocal(returnUrl);
                 }
-                else
-                {
-                    ViewBag.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                    ModelState.AddModelError(string.Empty, "Wrong email or password");
 
-                    return View(model);
-                }
+                ViewBag.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                ModelState.AddModelError(string.Empty, "Wrong email or password");
+
+                return View(model);
             }
 
             ViewBag.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -188,23 +192,23 @@ namespace HospitalWeb.Controllers
 
             var result = await _signInManager
                 .ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: false);
-
+             
             if (result.Succeeded)
             {
                 await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
+
                 return RedirectToLocal(returnUrl);
             }
-            else
-            {
-                ViewBag.ReturnUrl = returnUrl;
-                ViewBag.LoginProvider = info.LoginProvider;
-                var model = new ExternalLoginViewModel
-                {
-                    Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                };
 
-                return View("ExternalLogin", model);
-            }
+            ViewBag.ReturnUrl = returnUrl;
+            ViewBag.LoginProvider = info.LoginProvider;
+
+            var model = new ExternalLoginViewModel
+            {
+                Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+            };
+
+            return View("ExternalLogin", model);
         }
 
         [HttpPost]
@@ -265,7 +269,10 @@ namespace HospitalWeb.Controllers
             }
             catch (Exception err)
             {
-                _logger.LogCritical(err.StackTrace);
+                _logger.LogError($"Error in AccountController.ExternalLoginConfirm.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
@@ -300,7 +307,10 @@ namespace HospitalWeb.Controllers
                 var response = _api.AppUsers.Get(userId, null, null);
                 if (!response.IsSuccessStatusCode)
                 {
-                    return NotFound();
+                    var statusCode = response.StatusCode;
+                    var message = _api.AppUsers.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                 }
                 var user = _api.AppUsers.Read(response);
 
@@ -315,7 +325,10 @@ namespace HospitalWeb.Controllers
             }
             catch (Exception err)
             {
-                _logger.LogCritical(err.StackTrace);
+                _logger.LogError($"Error in AccountController.ConfirmEmail.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
@@ -339,13 +352,16 @@ namespace HospitalWeb.Controllers
                     var response = _api.AppUsers.Get(model.Email, null, null);
                     if (!response.IsSuccessStatusCode)
                     {
-                        return NotFound();
+                        var statusCode = response.StatusCode;
+                        var message = _api.AppUsers.ReadError<string>(response);
+
+                        return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                     }
                     var user = _api.AppUsers.Read(response);
 
                     if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                     {
-                        return RedirectToAction("ForgotPasswordConfirm");
+                        return RedirectToAction("ForgotPasswordConfirm", "Account");
                     }
 
                     var code = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -393,7 +409,10 @@ namespace HospitalWeb.Controllers
             }
             catch (Exception err)
             {
-                _logger.LogCritical(err.StackTrace);
+                _logger.LogError($"Error in AccountController.ResetPassword.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
@@ -418,12 +437,10 @@ namespace HospitalWeb.Controllers
                 {
                     return RedirectToAction("ResetPasswordConfirm", "Account");
                 }
-                else
+
+                foreach (var error in result.Errors)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
