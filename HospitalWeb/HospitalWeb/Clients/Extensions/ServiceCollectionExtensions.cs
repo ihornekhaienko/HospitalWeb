@@ -20,7 +20,8 @@ namespace HospitalWeb.Clients.Extensions
             where TImplementation : class, TInterface
         {
             services.AddHttpClient<TInterface, TImplementation>(name)
-                .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
+                .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)))
+                .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(2, TimeSpan.FromMinutes(1)));
         }
 
         public static void AddApiClients(this IServiceCollection services)
