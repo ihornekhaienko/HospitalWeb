@@ -21,7 +21,16 @@ namespace HospitalWeb.Clients.Extensions
         {
             services.AddHttpClient<TInterface, TImplementation>(name)
                 .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)))
-                .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(2, TimeSpan.FromMinutes(1)));
+                .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(2, TimeSpan.FromMinutes(1)))
+                .AddPolicyHandler(request =>
+                {
+                    if (request.Method == HttpMethod.Get)
+                    {
+                        return Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(5));
+                    }
+
+                    return Policy.NoOpAsync<HttpResponseMessage>();
+                });
         }
 
         public static void AddApiClients(this IServiceCollection services)
