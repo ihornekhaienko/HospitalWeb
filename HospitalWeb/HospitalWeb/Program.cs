@@ -101,6 +101,7 @@ builder.Services.AddAuthentication(o =>
 #endregion
 
 builder.Services.AddUnitOfWork();
+builder.Services.AddApiClients();
 builder.Services.AddApi();
 builder.Services.AddEmailNotifier();
 builder.Services.AddPasswordGenerator();
