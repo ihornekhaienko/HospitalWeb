@@ -2,13 +2,18 @@
 {
     public abstract class ApiClient<TEntity, TResource, TIdentifier> : IApiClient<TEntity, TResource, TIdentifier>
     {
-        protected readonly HttpClient _client;
         protected readonly IConfiguration _config;
+        protected readonly HttpClient _client;
+        protected readonly IHttpClientFactory _clientFactory;
+        protected readonly string _addressSuffix;
 
-        public ApiClient(IConfiguration config)
+        public ApiClient(IConfiguration config, IHttpClientFactory clientFactory, string addressSuffix)
         {
-            _client = new HttpClient();
             _config = config;
+
+            _clientFactory = clientFactory;
+            _addressSuffix = addressSuffix;
+            _client = _clientFactory.CreateClient(_addressSuffix);
             _client.BaseAddress = new Uri(_config["WebApi:Url"]);
         }
 

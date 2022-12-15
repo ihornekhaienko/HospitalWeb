@@ -6,7 +6,8 @@ namespace HospitalWeb.Clients.Implementations
 {
     public class SchedulesApiClient : GenericApiClient<Schedule, ScheduleResourceModel, int>
     {
-        public SchedulesApiClient(IConfiguration config) : base(config, "Schedules")
+        public SchedulesApiClient(IConfiguration config, IHttpClientFactory clientFactory) 
+            : base(config, clientFactory, "Schedules")
         {
         }
 

@@ -6,7 +6,8 @@ namespace HospitalWeb.Clients.Implementations
 {
     public class AddressesApiClient : GenericApiClient<Address, AddressResourceModel, int>
     {
-        public AddressesApiClient(IConfiguration config) : base(config, "Addresses")
+        public AddressesApiClient(IConfiguration config, IHttpClientFactory clientFactory) 
+            : base(config, clientFactory, "Addresses")
         {
         }
 

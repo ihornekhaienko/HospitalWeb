@@ -6,11 +6,9 @@ namespace HospitalWeb.Clients.Implementations
 {
     public class GenericApiClient<TEntity, TResource, TIdentifier> : ApiClient<TEntity, TResource, TIdentifier>
     {
-        protected readonly string _addressSuffix;
-
-        public GenericApiClient(IConfiguration config, string addressSuffix) : base(config)
+        public GenericApiClient(IConfiguration config, IHttpClientFactory clientFactory, string addressSuffix) 
+            : base(config, clientFactory, addressSuffix)
         {
-            _addressSuffix = addressSuffix;
         }
 
         public override HttpResponseMessage Get(string token = null, string provider = null)

@@ -6,7 +6,8 @@ namespace HospitalWeb.Clients.Implementations
 {
     public class LocalitiesApiClient : GenericApiClient<Locality, LocalityResourceModel, int>
     {
-        public LocalitiesApiClient(IConfiguration config) : base(config, "Localities")
+        public LocalitiesApiClient(IConfiguration config, IHttpClientFactory clientFactory) 
+            : base(config, clientFactory, "Localities")
         {
         }
 

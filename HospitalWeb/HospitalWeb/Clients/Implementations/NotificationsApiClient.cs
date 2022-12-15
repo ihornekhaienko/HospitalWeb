@@ -6,7 +6,8 @@ namespace HospitalWeb.Clients.Implementations
 {
     public class NotificationsApiClient : GenericApiClient<Notification, NotificationResourceModel, int>
     {
-        public NotificationsApiClient(IConfiguration config) : base(config, "Notifications")
+        public NotificationsApiClient(IConfiguration config, IHttpClientFactory clientFactory) 
+            : base(config, clientFactory, "Notifications")
         {
         }
 

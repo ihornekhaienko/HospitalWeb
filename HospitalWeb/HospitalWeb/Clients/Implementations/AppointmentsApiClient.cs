@@ -7,7 +7,8 @@ namespace HospitalWeb.Clients.Implementations
 {
     public class AppointmentsApiClient : GenericApiClient<Appointment, AppointmentResourceModel, int>
     {
-        public AppointmentsApiClient(IConfiguration config) : base(config, "Appointments")
+        public AppointmentsApiClient(IConfiguration config, IHttpClientFactory clientFactory) 
+            : base(config, clientFactory, "Appointments")
         {
         }
 

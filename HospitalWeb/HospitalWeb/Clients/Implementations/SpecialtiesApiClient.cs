@@ -6,7 +6,8 @@ namespace HospitalWeb.Clients.Implementations
 {
     public class SpecialtiesApiClient : GenericApiClient<Specialty, SpecialtyResourceModel, int>
     {
-        public SpecialtiesApiClient(IConfiguration config) : base(config, "Specialties")
+        public SpecialtiesApiClient(IConfiguration config, IHttpClientFactory clientFactory) 
+            : base(config, clientFactory, "Specialties")
         {
         }
 

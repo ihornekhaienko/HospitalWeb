@@ -8,7 +8,8 @@ namespace HospitalWeb.Clients.Implementations
 {
     public class AdminsApiClient : GenericApiClient<Admin, AdminResourceModel, string>
     {
-        public AdminsApiClient(IConfiguration config) : base(config, "Admins")
+        public AdminsApiClient(IConfiguration config, IHttpClientFactory clientFactory) 
+            : base(config, clientFactory, "Admins")
         {
         }
 

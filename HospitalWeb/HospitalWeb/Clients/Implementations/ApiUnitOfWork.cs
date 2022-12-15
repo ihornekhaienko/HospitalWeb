@@ -5,6 +5,8 @@ namespace HospitalWeb.Clients.Implementations
     public class ApiUnitOfWork
     {
         private readonly IConfiguration _config;
+        private readonly IHttpClientFactory _clientFactory;
+
         private AppUsersApiClient _appUsersApiClient;
         private AddressesApiClient _addressesApiClient;
         private AdminsApiClient _adminsApiClient;
@@ -19,9 +21,10 @@ namespace HospitalWeb.Clients.Implementations
         private SchedulesApiClient _schedulesApiClient;
         private SpecialtiesApiClient _specialtiesApiClient;
 
-        public ApiUnitOfWork(IConfiguration config)
+        public ApiUnitOfWork(IConfiguration config, IHttpClientFactory clientFactory)
         {
             _config = config;
+            _clientFactory = clientFactory;
         }
 
         public AppUsersApiClient AppUsers
@@ -29,7 +32,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_appUsersApiClient == null)
-                    _appUsersApiClient = new AppUsersApiClient(_config);
+                    _appUsersApiClient = new AppUsersApiClient(_config, _clientFactory);
                 return _appUsersApiClient;
             }
         }
@@ -39,7 +42,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_addressesApiClient == null)
-                    _addressesApiClient = new AddressesApiClient(_config);
+                    _addressesApiClient = new AddressesApiClient(_config, _clientFactory);
                 return _addressesApiClient;
             }
         }
@@ -49,7 +52,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_adminsApiClient == null)
-                    _adminsApiClient = new AdminsApiClient(_config);
+                    _adminsApiClient = new AdminsApiClient(_config, _clientFactory);
                 return _adminsApiClient;
             }
         }
@@ -59,7 +62,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_appointmentsApiClient == null)
-                    _appointmentsApiClient = new AppointmentsApiClient(_config);
+                    _appointmentsApiClient = new AppointmentsApiClient(_config, _clientFactory);
                 return _appointmentsApiClient;
             }
         }
@@ -69,7 +72,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_diagnosesApiClient == null)
-                    _diagnosesApiClient = new DiagnosesApiClient(_config);
+                    _diagnosesApiClient = new DiagnosesApiClient(_config, _clientFactory);
                 return _diagnosesApiClient;
             }
         }
@@ -79,7 +82,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_doctorsApiClient == null)
-                    _doctorsApiClient = new DoctorsApiClient(_config);
+                    _doctorsApiClient = new DoctorsApiClient(_config, _clientFactory);
                 return _doctorsApiClient;
             }
         }
@@ -89,7 +92,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_hospitalsApiClient == null)
-                    _hospitalsApiClient = new HospitalsApiClient(_config);
+                    _hospitalsApiClient = new HospitalsApiClient(_config, _clientFactory);
                 return _hospitalsApiClient;
             }
         }
@@ -99,7 +102,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_localitiesApiClient == null)
-                    _localitiesApiClient = new LocalitiesApiClient(_config);
+                    _localitiesApiClient = new LocalitiesApiClient(_config, _clientFactory);
                 return _localitiesApiClient;
             }
         }
@@ -109,7 +112,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_meetingsApiClient == null)
-                    _meetingsApiClient = new MeetingsApiClient(_config);
+                    _meetingsApiClient = new MeetingsApiClient(_config, _clientFactory);
                 return _meetingsApiClient;
             }
         }
@@ -119,7 +122,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_notificationsApiClient == null)
-                    _notificationsApiClient = new NotificationsApiClient(_config);
+                    _notificationsApiClient = new NotificationsApiClient(_config, _clientFactory);
                 return _notificationsApiClient;
             }
         }
@@ -129,7 +132,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_patientsApiClient == null)
-                    _patientsApiClient = new PatientsApiClient(_config);
+                    _patientsApiClient = new PatientsApiClient(_config, _clientFactory);
                 return _patientsApiClient;
             }
         }
@@ -139,7 +142,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_schedulesApiClient == null)
-                    _schedulesApiClient = new SchedulesApiClient(_config);
+                    _schedulesApiClient = new SchedulesApiClient(_config, _clientFactory);
                 return _schedulesApiClient;
             }
         }
@@ -149,7 +152,7 @@ namespace HospitalWeb.Clients.Implementations
             get
             {
                 if (_specialtiesApiClient == null)
-                    _specialtiesApiClient = new SpecialtiesApiClient(_config);
+                    _specialtiesApiClient = new SpecialtiesApiClient(_config, _clientFactory);
                 return _specialtiesApiClient;
             }
         }

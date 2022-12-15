@@ -6,7 +6,8 @@ namespace HospitalWeb.Clients.Implementations
 {
     public class MeetingsApiClient : GenericApiClient<Meeting, MeetingResourceModel, int>
     {
-        public MeetingsApiClient(IConfiguration config) : base(config, "Meetings")
+        public MeetingsApiClient(IConfiguration config, IHttpClientFactory clientFactory) 
+            : base(config, clientFactory, "Meetings")
         {
         }
 
