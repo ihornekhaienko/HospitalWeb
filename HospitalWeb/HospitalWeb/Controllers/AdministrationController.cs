@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using HospitalWeb.Filters.Builders.Implementations;
 using Microsoft.AspNetCore.Authorization;
 using HospitalWeb.WebApi.Models.SortStates;
-using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.Clients.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.DAL.Entities.Identity;
 using Microsoft.AspNetCore.Identity;

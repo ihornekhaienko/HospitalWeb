@@ -5,7 +5,7 @@ using HospitalWeb.Services.Extensions;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.ViewModels.Manage;
-using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.Clients.Implementations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

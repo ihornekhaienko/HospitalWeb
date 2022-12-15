@@ -1,7 +1,7 @@
 ﻿using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
-using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.Clients.Implementations;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Mvc;
 

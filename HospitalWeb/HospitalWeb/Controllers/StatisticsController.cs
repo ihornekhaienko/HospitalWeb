@@ -1,7 +1,7 @@
 ﻿using HospitalWeb.Filters.Builders.Implementations;
 using HospitalWeb.Filters.Models.DTO;
 using HospitalWeb.ViewModels.Statistics;
-using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.Clients.Implementations;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using HospitalWeb.ViewModels.Error;
 using System.Security.Claims;
-using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.Clients.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
 
 namespace HospitalWeb.Controllers

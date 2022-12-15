@@ -1,5 +1,5 @@
 ﻿using HospitalWeb.DAL.Entities;
-using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.Clients.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.SignalR;
 

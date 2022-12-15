@@ -1,7 +1,7 @@
 ﻿using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Doctors;
-using HospitalWeb.WebApi.Clients.Implementations;
+using HospitalWeb.Clients.Implementations;
 
 namespace HospitalWeb.Services.Implementations
 {

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HospitalWeb;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
-using HospitalWeb.WebApi.Clients.Extensions;
+using HospitalWeb.Clients.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using HospitalWeb.Hubs;
