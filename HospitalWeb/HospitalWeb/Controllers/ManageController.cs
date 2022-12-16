@@ -549,8 +549,20 @@ namespace HospitalWeb.Controllers
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             TempData["RecoveryCodes"] = recoveryCodes.ToArray();
 
-            return RedirectToAction("ShowRecoveryCodes");
+            return RedirectToAction("RecoveryCodes");
         }
 
+        [HttpGet]
+        public IActionResult RecoveryCodes()
+        {
+            var recoveryCodes = TempData["RecoveryCodes"] as string[];
+
+            if (recoveryCodes == null)
+            {
+                return RedirectToAction("TwoFactorAuthentication");
+            }
+
+            return View(recoveryCodes);
+        }
     }
 }

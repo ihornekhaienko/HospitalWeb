@@ -1,0 +1,24 @@
+﻿@model string[]
+@inject IViewLocalizer Localizer
+@{
+    ViewBag.Title = Localizer["Title"];
+}
+
+<h4>@Localizer["Title"]</h4>
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span><i class="fa-solid fa-triangle-exclamation"></i></span>
+        <strong>@Localizer["PutInSafePlace"]</strong>
+    </p>
+    <p>
+        @Localizer["LoseAccess"]
+    </p>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        @for (var row = 0; row < Model.Length; row += 2)
+        {
+            <code>@Model[row]</code><text>&nbsp;</text><code>@Model[row + 1]</code><br />
+        }
+    </div>
+</div>
