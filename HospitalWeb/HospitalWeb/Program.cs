@@ -1,7 +1,6 @@
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;
-using HospitalWeb.Middlewares.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HospitalWeb;
@@ -111,14 +110,12 @@ builder.Services.AddGoogleTokenProvider();
 builder.Services.AddInternalGoogleProvider();
 builder.Services.AddTokenManager();
 builder.Services.AddGoogleCalendar();
-builder.Services.AddDbInitializer();
 
 var app = builder.Build();
 
 if (builder.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseDbInitializer();
 }
 
 app.UseRequestLocalization();

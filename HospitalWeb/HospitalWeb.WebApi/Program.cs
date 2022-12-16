@@ -2,6 +2,7 @@ using Hangfire;
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;
+using HospitalWeb.WebApi.Middlewares;
 using HospitalWeb.WebApi.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -166,6 +167,7 @@ builder.Services.AddCors(options =>
 #endregion
 
 builder.Services.AddUnitOfWork();
+builder.Services.AddDbInitializer();
 
 var app = builder.Build();
 
@@ -182,6 +184,8 @@ app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseDbInitializer();
 
 app.UseHangfireDashboard("/dashboard");
 

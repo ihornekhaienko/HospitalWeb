@@ -1,6 +1,6 @@
-﻿using HospitalWeb.Middlewares.Implementations;
+﻿using HospitalWeb.WebApi.Middlewares.Implementations;
 
-namespace HospitalWeb.Middlewares.Extensions
+namespace HospitalWeb.WebApi.Middlewares
 {
     public static class MiddlewareExtensions
     {

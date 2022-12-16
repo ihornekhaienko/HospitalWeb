@@ -1,9 +1,7 @@
 ﻿using HospitalWeb.DAL.Data;
-using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.Services.Interfaces;
-using Microsoft.AspNetCore.Identity;
 
-namespace HospitalWeb.Middlewares.Implementations
+namespace HospitalWeb.WebApi.Middlewares.Implementations
 {
     public class DbInitializer
     {

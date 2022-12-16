@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HospitalWeb.DAL\HospitalWeb.DAL.csproj" />
-    <ProjectReference Include="..\HospitalWeb.WebApi\HospitalWeb.WebApi.csproj" />
   </ItemGroup>
 
 </Project>
