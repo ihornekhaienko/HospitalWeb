@@ -18,5 +18,7 @@ namespace HospitalWeb.ViewModels.Manage
         [Display(Name = "ConfirmPassword")]
         [Compare("NewPassword", ErrorMessage = "PasswordMatch")]
         public string ConfirmPassword { get; set; }
+
+        public bool Is2faEnabled { get; set; }
     }
 }
