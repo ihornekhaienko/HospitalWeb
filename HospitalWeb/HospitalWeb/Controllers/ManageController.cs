@@ -567,14 +567,13 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpGet]
-        [ValidateAntiForgeryToken]
-        public IActionResult Disable2faConfirm()
+        public IActionResult Disable2fa()
         {
-            return View("Disable2fa");
+            return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Disable2fa()
+        public async Task<IActionResult> Disable2faConfirm()
         {
             var response = _api.AppUsers.Get(User.Identity.Name, null, null);
 
