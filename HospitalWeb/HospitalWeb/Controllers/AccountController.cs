@@ -143,11 +143,16 @@ namespace HospitalWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
                     return RedirectToLocal(returnUrl);
+                }
+
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToAction("LoginWith2fa", new { rememberMe = model.RememberMe, returnUrl = returnUrl });
                 }
 
                 ViewBag.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -275,6 +280,56 @@ namespace HospitalWeb.Controllers
 
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
+        {
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = "Unable to load two-factor authentication user." });
+            }
+
+            var model = new LoginWith2faViewModel { RememberMe = rememberMe };
+            ViewBag.ReturnUrl = returnUrl;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoginWith2fa(LoginWith2faViewModel model, string returnUrl = null)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Error", 
+                    new ErrorViewModel { Message = $"Unable to load user with ID '{_userManager.GetUserId(User)}'." });
+            }
+
+            var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, model.RememberMe, model.RememberDevice);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
+                return RedirectToLocal(returnUrl);
+            }
+
+            _logger.LogWarning("Invalid authenticator code entered for user with ID {UserId}.", user.Id);
+            ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+
+            return View();
         }
 
         [HttpPost]

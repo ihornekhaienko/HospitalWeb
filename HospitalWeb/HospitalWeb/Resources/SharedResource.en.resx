@@ -477,4 +477,10 @@
   <data name="VerificationCodeErrorMessage" xml:space="preserve">
     <value>The {0} must be at least {2} and at max {1} characters long.</value>
   </data>
+  <data name="AuthenticatorCode" xml:space="preserve">
+    <value>Authenticator code</value>
+  </data>
+  <data name="RememberDevice" xml:space="preserve">
+    <value>Запам'ятати цей пристрій</value>
+  </data>
 </root>

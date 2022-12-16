@@ -1,0 +1,51 @@
+﻿@model LoginWith2faViewModel
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = Localizer["Title"];
+    Layout = "_AccountLayout";
+}
+
+<div class="row mt-5">
+    <div class="col-lg-4 bg-white m-auto pl-5 pr-5">
+        <h2 class="text-center pt-3">@Localizer["Title"]</h2>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div> 
+
+        <div class="text-center mb-3">
+            <p>
+                @Localizer["Caption"]
+            </p>
+        </div>
+
+        <form method="post" asp-action="LoginWith2fa" asp-controller="Account" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-antiforgery="true">
+            @Html.HiddenFor(m => m.RememberMe)
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fa-solid fa-key"></i>
+                    </span>
+                    <input type="text" asp-for="TwoFactorCode" class="form-control input-validation-error" 
+                        placeholder="@SharedLocalizer["AuthenticatorCode"]" autocomplete="off"/>                
+                </div>
+                <span asp-validation-for="TwoFactorCode" class="validator text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <input type="checkbox" asp-for="RememberDevice"/>
+                    <label asp-for="RememberDevice">@SharedLocalizer["RememberDevice"]</label>
+                </div>
+            </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-success">@SharedLocalizer["Submit"]</button>
+            </div>
+        </form>
+
+        <div class="text-center mb-3">
+            <a asp-controller="Account" asp-action="LoginWithRecoveryCode" asp-route-returnUrl="@ViewBag.ReturnUrl">
+                @Localizer["LoginWithRecovery"]
+            </a>
+        </div>
+    </div>
+ </div>
