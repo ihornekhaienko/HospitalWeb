@@ -63,5 +63,10 @@ namespace Microsoft.Extensions.DependencyInjection
                                           x.GetRequiredService<IUnitOfWork>(),
                                           fullGenerate));
         }
+
+        public static void AddAuthenticatorKeyService(this IServiceCollection services)
+        {
+            services.AddScoped<IAuthenticatorKeyService, AuthenticatorKeyService>();
+        }
     }
 }

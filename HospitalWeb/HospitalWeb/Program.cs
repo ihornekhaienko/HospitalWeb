@@ -24,6 +24,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders()
     .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
 #endregion
 
@@ -95,6 +96,7 @@ builder.Services.AddAuthentication(o =>
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     });
 
+builder.Services.AddAuthenticatorKeyService();
 #endregion
 
 builder.Services.AddApiClients();
