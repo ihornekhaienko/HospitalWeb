@@ -1,7 +1,6 @@
 ﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.Filters.Builders.Implementations;
-using HospitalWeb.Services.Extensions;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.ViewModels.Manage;
@@ -9,6 +8,7 @@ using HospitalWeb.Clients.Implementations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace HospitalWeb.Controllers
 {
@@ -23,6 +23,7 @@ namespace HospitalWeb.Controllers
         private readonly ITokenManager _tokenManager;
         private readonly IFileManager _fileManager;
         private readonly INotifier _notifier;
+        private readonly IAuthenticatorKeyService _authenticator;
 
         public ManageController(
             ILogger<ManageController> logger, 
@@ -31,7 +32,8 @@ namespace HospitalWeb.Controllers
             UserManager<AppUser> userManager,
             ITokenManager tokenManager,
             IFileManager fileManager,
-            INotifier notifier)
+            INotifier notifier,
+            IAuthenticatorKeyService authenticator)
         {
             _logger = logger;
             _environment = environment;
@@ -40,6 +42,7 @@ namespace HospitalWeb.Controllers
             _tokenManager = tokenManager;
             _fileManager = fileManager;
             _notifier = notifier;
+            _authenticator = authenticator;
         }
 
         [Authorize]
@@ -479,5 +482,75 @@ namespace HospitalWeb.Controllers
 
             return Ok();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Enable2fa()
+        {
+            var response = _api.AppUsers.Get(User.Identity.Name, null, null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var statusCode = response.StatusCode;
+                var message = _api.AppUsers.ReadError<string>(response);
+
+                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+            }
+
+            var user = _api.AppUsers.Read(response);
+            var model = new Enable2faViewModel();
+            model.SharedKey = await _authenticator.LoadSharedKey(user);
+            model.AuthenticatorUri = _authenticator.LoadQrCodeUri(user, model.SharedKey);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Enable2fa(Enable2faViewModel model)
+        {
+            var response = _api.AppUsers.Get(User.Identity.Name, null, null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var statusCode = response.StatusCode;
+                var message = _api.AppUsers.ReadError<string>(response);
+
+                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+            }
+
+            var user = _api.AppUsers.Read(response);
+
+            if (!ModelState.IsValid)
+            {
+                model.SharedKey = await _authenticator.LoadSharedKey(user);
+                model.AuthenticatorUri = _authenticator.LoadQrCodeUri(user, model.SharedKey);
+
+                return View(model);
+            }
+
+            var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+            var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
+                user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+
+            if (!is2faTokenValid)
+            {
+                ModelState.AddModelError("Code", "Verification code is invalid.");
+
+                model.SharedKey = await _authenticator.LoadSharedKey(user);
+                model.AuthenticatorUri = _authenticator.LoadQrCodeUri(user, model.SharedKey);
+
+                return View(model);
+            }
+
+            await _userManager.SetTwoFactorEnabledAsync(user, true);
+            _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
+
+            var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+            TempData["RecoveryCodes"] = recoveryCodes.ToArray();
+
+            return RedirectToAction("ShowRecoveryCodes");
+        }
+
     }
 }
