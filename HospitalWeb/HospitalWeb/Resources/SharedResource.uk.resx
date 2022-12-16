@@ -465,4 +465,10 @@
   <data name="DoctorsCount" xml:space="preserve">
     <value>Кількість лікарів</value>
   </data>
+  <data name="Disable2fa" xml:space="preserve">
+    <value>Вимкнути двофакторну аутентифікацію</value>
+  </data>
+  <data name="Enable2fa" xml:space="preserve">
+    <value>Ввімкнути двофакторну аутентифікацію</value>
+  </data>
 </root>

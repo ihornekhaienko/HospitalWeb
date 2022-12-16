@@ -23,6 +23,14 @@
                     </span>
                 }
                 <span><a asp-controller="Manage" asp-action="ChangePassword">@SharedLocalizer["ChangePassword"]</a></span>
+                @if (Model.Is2faEnabled)
+                {
+                    <span><a asp-controller="Manage" asp-action="Disable2fa">@SharedLocalizer["Disable2fa"]</a></span>
+                }
+                else
+                {
+                    <span><a asp-controller="Manage" asp-action="Enable2fa">@SharedLocalizer["Enable2fa"]</a></span>
+                }
                 <div class="mt-2">
                     <form method="post" asp-controller="Manage" asp-action="UploadPhoto" enctype="multipart/form-data"> 
                         <input type="file" name="file" id="uploader" style="display: none;" />
