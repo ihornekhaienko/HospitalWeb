@@ -31,11 +31,11 @@
                 <div class="col-md-6">
                     <form method="post">
                         <div class="form-group">
-                            <label asp-for="Code" class="control-label">Verification Code</label>
+                            <label asp-for="Code" class="control-label">@Localizer["VerificationCode"]</label>
                             <input asp-for="Code" class="form-control" autocomplete="off" />
                             <span asp-validation-for="Code" class="text-danger"></span>
                         </div>
-                        <button type="submit" class="btn btn-info mt-3">Verify</button>
+                        <button type="submit" class="btn btn-info mt-3">@Localizer["Verify"]</button>
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     </form>
                 </div>

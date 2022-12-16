@@ -553,6 +553,7 @@ namespace HospitalWeb.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult RecoveryCodes()
         {
             var recoveryCodes = TempData["RecoveryCodes"] as string[];
