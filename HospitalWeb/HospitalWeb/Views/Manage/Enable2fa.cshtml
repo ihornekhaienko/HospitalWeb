@@ -24,7 +24,7 @@
             <div id="qrCodeData" data-url="@Model.AuthenticatorUri"></div>
         </li>
         <li>
-            <p>
+            <p class="mt-3">
                 @Localizer["Explanation"]
             </p>
             <div class="row">
@@ -35,7 +35,7 @@
                             <input asp-for="Code" class="form-control" autocomplete="off" />
                             <span asp-validation-for="Code" class="text-danger"></span>
                         </div>
-                        <button type="submit" class="btn btn-info">Verify</button>
+                        <button type="submit" class="btn btn-info mt-3">Verify</button>
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     </form>
                 </div>

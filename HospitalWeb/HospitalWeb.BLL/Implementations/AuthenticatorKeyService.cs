@@ -1,4 +1,5 @@
-﻿using HospitalWeb.Services.Interfaces;
+﻿using HospitalWeb.DAL.Entities.Identity;
+using HospitalWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -9,21 +10,21 @@ namespace HospitalWeb.Services.Implementations
     {
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly UrlEncoder _urlEncoder; 
 
-        public AuthenticatorKeyService(UserManager<IdentityUser> userManager, UrlEncoder urlEncoder)
+        public AuthenticatorKeyService(UserManager<AppUser> userManager, UrlEncoder urlEncoder)
         {
             _userManager = userManager;
             _urlEncoder = urlEncoder;
         }
 
-        public string LoadQrCodeUri(IdentityUser user, string unformattedKey)
+        public string LoadQrCodeUri(AppUser user, string sharedKey)
         {
-            return GenerateQrCodeUri(user.Email, unformattedKey);
+            return GenerateQrCodeUri(user.Email, sharedKey);
         }
 
-        public async Task<string> LoadSharedKey(IdentityUser user)
+        public async Task<string> LoadSharedKey(AppUser user)
         {
             var unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
             if (string.IsNullOrEmpty(unformattedKey))
@@ -32,7 +33,7 @@ namespace HospitalWeb.Services.Implementations
                 unformattedKey = await _userManager.GetAuthenticatorKeyAsync(user);
             }
 
-            return unformattedKey;
+            return FormatKey(unformattedKey);
         }
 
         private string FormatKey(string unformattedKey)
