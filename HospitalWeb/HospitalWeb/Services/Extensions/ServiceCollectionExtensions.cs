@@ -1,9 +1,9 @@
 ﻿using HospitalWeb.Services.Implementations;
 using HospitalWeb.Services.Interfaces;
 
-namespace HospitalWeb.Services.Extensions
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ServiceCollectionExtensions
+    public static class MvcServiceCollectionExtensions
     {
         public static void AddScheduleGenerator(this IServiceCollection services)
         {

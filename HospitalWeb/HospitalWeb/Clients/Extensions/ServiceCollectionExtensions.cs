@@ -6,7 +6,7 @@ using HospitalWeb.WebApi.Models.ResourceModels;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 
-namespace HospitalWeb.Clients.Extensions
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {

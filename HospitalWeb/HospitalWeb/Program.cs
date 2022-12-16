@@ -1,4 +1,3 @@
-using HospitalWeb.Services.Extensions;
 using HospitalWeb.DAL.Data;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.DAL.Services.Extensions;
@@ -8,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using HospitalWeb;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
-using HospitalWeb.Clients.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using HospitalWeb.Hubs;

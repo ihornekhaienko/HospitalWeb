@@ -1,4 +1,4 @@
-﻿namespace HospitalWeb.Services.Extensions
+﻿namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ByteExtensions
     {
