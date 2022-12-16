@@ -30,6 +30,10 @@
     {
       "library": "plotly.js@2.16.4",
       "destination": "wwwroot/lib/plotly.js/"
+    },
+    {
+      "library": "qrcodejs@1.0.0",
+      "destination": "wwwroot/lib/qrcodejs/"
     }
   ]
 }
