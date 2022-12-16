@@ -1,0 +1,20 @@
+﻿@inject IViewLocalizer Localizer
+@{
+    ViewBag.Title = Localizer["Title"];
+}
+
+<h4>@Localizer["Title"]</h4>
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span><i class="fa-solid fa-triangle-exclamation"></i></span>
+        <strong>@Localizer["Warning"]</strong>
+    </p>
+    <p>
+        @Localizer["Explanation"]
+    </p>
+</div>
+<div>
+    <form asp-action="ResetAuthenticator" method="post" class="form-group">
+        <button class="btn btn-danger" type="submit">@Localizer["Disable"]</button>
+    </form>
+</div>

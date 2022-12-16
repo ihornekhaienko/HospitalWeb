@@ -560,10 +560,39 @@ namespace HospitalWeb.Controllers
 
             if (recoveryCodes == null)
             {
-                return RedirectToAction("TwoFactorAuthentication");
+                return RedirectToAction("Profile", "Manage");
             }
 
             return View(recoveryCodes);
+        }
+
+        [HttpGet]
+        [ValidateAntiForgeryToken]
+        public IActionResult Disable2faConfirm()
+        {
+            return View("Disable2fa");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Disable2fa()
+        {
+            var response = _api.AppUsers.Get(User.Identity.Name, null, null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var statusCode = response.StatusCode;
+                var message = _api.AppUsers.ReadError<string>(response);
+
+                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+            }
+
+            var user = _api.AppUsers.Read(response);
+
+            await _userManager.SetTwoFactorEnabledAsync(user, false);
+            await _userManager.ResetAuthenticatorKeyAsync(user);
+            _logger.LogInformation("User with id '{UserId}' has reset their authentication app key.", user.Id);
+
+            return RedirectToAction("Profile", "Manage");
         }
     }
 }
