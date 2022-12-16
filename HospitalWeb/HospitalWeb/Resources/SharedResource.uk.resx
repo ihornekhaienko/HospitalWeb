@@ -480,6 +480,9 @@
   <data name="AuthenticatorCode" xml:space="preserve">
     <value>Код аутентифікатора</value>
   </data>
+  <data name="RecoveryCode" xml:space="preserve">
+    <value>Код відновлення</value>
+  </data>
   <data name="RememberDevice" xml:space="preserve">
     <value>Запам'ятати цей пристрій</value>
   </data>

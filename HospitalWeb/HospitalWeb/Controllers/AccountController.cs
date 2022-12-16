@@ -286,17 +286,28 @@ namespace HospitalWeb.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
         {
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-
-            if (user == null)
+            try
             {
-                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = "Unable to load two-factor authentication user." });
+                var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+                if (user == null)
+                {
+                    throw new ApplicationException("Unable to load two-factor authentication user.");
+                }
+
+                var model = new LoginWith2faViewModel { RememberMe = rememberMe };
+                ViewBag.ReturnUrl = returnUrl;
+
+                return View(model);
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AccountController.LoginWith2fa.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            var model = new LoginWith2faViewModel { RememberMe = rememberMe };
-            ViewBag.ReturnUrl = returnUrl;
-
-            return View(model);
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [HttpPost]
@@ -304,32 +315,111 @@ namespace HospitalWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginWith2fa(LoginWith2faViewModel model, string returnUrl = null)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return View(model);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
 
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
+                var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+                if (user == null)
+                {
+                    throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
+
+                var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+                var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, model.RememberMe, model.RememberDevice);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
+                    return RedirectToLocal(returnUrl);
+                }
+
+                _logger.LogWarning("Invalid authenticator code entered for user with ID {UserId}.", user.Id);
+                ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+
+                return View();
+            }
+            catch (Exception err)
             {
-                return RedirectToAction("Index", "Error", 
-                    new ErrorViewModel { Message = $"Unable to load user with ID '{_userManager.GetUserId(User)}'." });
+                _logger.LogError($"Error in AccountController.LoginWith2fa.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
+        }
 
-            var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
-
-            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, model.RememberMe, model.RememberDevice);
-
-            if (result.Succeeded)
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithRecoveryCode(string returnUrl = null)
+        {
+            try
             {
-                _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
-                return RedirectToLocal(returnUrl);
+                var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+                if (user == null)
+                {
+                    throw new ApplicationException($"Unable to load two-factor authentication user.");
+                }
+
+                ViewBag.ReturnUrl = returnUrl;
+
+                return View();
             }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AccountController.LoginWithRecoveryCode.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
 
-            _logger.LogWarning("Invalid authenticator code entered for user with ID {UserId}.", user.Id);
-            ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
+        }
 
-            return View();
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoginWithRecoveryCode(LoginWithRecoveryCodeViewModel model, string returnUrl = null)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+
+                var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+                if (user == null)
+                {
+                    throw new ApplicationException($"Unable to load two-factor authentication user.");
+                }
+
+                var recoveryCode = model.RecoveryCode.Replace(" ", string.Empty);
+
+                var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User with ID {UserId} logged in with a recovery code.", user.Id);
+                    return RedirectToAction("Enable2fa", "Manage");
+                }
+
+                _logger.LogWarning("Invalid recovery code entered for user with ID {UserId}", user.Id);
+                ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
+
+                return View();
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AccountController.LoginWithRecoveryCode.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
         }
 
         [HttpPost]

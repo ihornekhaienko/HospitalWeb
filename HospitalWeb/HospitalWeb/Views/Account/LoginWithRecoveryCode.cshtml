@@ -1,0 +1,29 @@
+﻿@model LoginWithRecoveryCodeViewModel
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = SharedLocalizer["RecoveryCode"];
+    Layout = "_AccountLayout";
+}
+
+<div class="row mt-5">
+    <div class="col-lg-4 bg-white m-auto">
+        <h2 class="text-center pt-3">@SharedLocalizer["RecoveryCode"]</h2>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div> 
+
+        <form method="post" asp-controller="Account" asp-action="LoginWithRecoveryCode" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-antiforgery="true">
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fa-solid fa-key"></i>
+                    </span>
+                    <input type="text" asp-for="RecoveryCode" class="form-control input-validation-error" placeholder="@SharedLocalizer["RecoveryCode"]"/>                
+                </div>
+                <span asp-validation-for="RecoveryCode" class="validator text-danger"></span>
+            </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-success">@SharedLocalizer["Submit"]</button>
+            </div>
+        </form>
+    </div>
+ </div>
