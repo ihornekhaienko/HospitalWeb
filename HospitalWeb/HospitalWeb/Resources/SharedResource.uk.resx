@@ -471,4 +471,10 @@
   <data name="Enable2fa" xml:space="preserve">
     <value>Ввімкнути двофакторну аутентифікацію</value>
   </data>
+  <data name="VerificationCode" xml:space="preserve">
+    <value>Верифікаційний код</value>
+  </data>
+  <data name="VerificationCodeErrorMessage" xml:space="preserve">
+    <value>{0} має містити принаймні {2} і не більше {1} символів.</value>
+  </data>
 </root>
