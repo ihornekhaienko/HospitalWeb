@@ -205,6 +205,11 @@ namespace HospitalWeb.Controllers
                 return RedirectToLocal(returnUrl);
             }
 
+            if (result.RequiresTwoFactor)
+            {
+                return RedirectToAction("LoginWith2fa", new { rememberMe = false, returnUrl = returnUrl });
+            }
+
             ViewBag.ReturnUrl = returnUrl;
             ViewBag.LoginProvider = info.LoginProvider;
 
