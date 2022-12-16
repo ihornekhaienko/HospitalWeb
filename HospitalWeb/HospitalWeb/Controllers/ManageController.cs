@@ -94,7 +94,8 @@ namespace HospitalWeb.Controllers
                     Phone = admin.PhoneNumber,
                     Image = admin.Image,
                     IsSuperAdmin = admin.IsSuperAdmin,
-                    Notifications = notifications
+                    Notifications = notifications,
+                    Is2faEnabled = admin.TwoFactorEnabled
                 };
 
                 return View(model);
@@ -190,7 +191,8 @@ namespace HospitalWeb.Controllers
                     Phone = doctor.PhoneNumber,
                     Image = doctor.Image,
                     Specialty = doctor.Specialty.SpecialtyName,
-                    Notifications = notifications
+                    Notifications = notifications,
+                    Is2faEnabled = doctor.TwoFactorEnabled
                 };
 
                 return View(model);
@@ -290,7 +292,8 @@ namespace HospitalWeb.Controllers
                     Image = patient.Image,
                     Address = patient.Address.FullAddress,
                     Locality = patient.Address.Locality.LocalityName,
-                    Notifications = notifications
+                    Notifications = notifications,
+                    Is2faEnabled = patient.TwoFactorEnabled
                 };
 
                 return View(model);
