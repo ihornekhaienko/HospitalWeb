@@ -16,9 +16,26 @@ namespace HospitalWeb.Hubs
         {
             try
             {
-                _api.Grades.AddOrUpdate(stars, author, target);
+                HttpResponseMessage response;
 
-                var response = _api.Doctors.Get(target, null, null);
+                if (stars == 0)
+                {
+                    response = _api.Grades.Filter(author, target);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var grade = _api.Grades.ReadMany(response).FirstOrDefault();
+                        if (grade != null)
+                        {
+                            _api.Grades.Delete(grade.GradeId);
+                        }
+                    }
+                }
+                else
+                {
+                    _api.Grades.AddOrUpdate(stars, author, target);
+                }
+
+                response = _api.Doctors.Get(target, null, null);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -27,7 +44,7 @@ namespace HospitalWeb.Hubs
 
                 double rating = _api.Doctors.Read(response).Rating;
 
-                await Clients.All.SendAsync("ChangeRating", rating);
+                await Clients.All.SendAsync("ChangeRating", rating, target);
             }
             catch (Exception err)
             {

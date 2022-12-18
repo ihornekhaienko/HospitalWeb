@@ -133,7 +133,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="grade"> The Grade object  </param>
         /// <returns> The Grade object </returns>
         [HttpPost]
-        [Authorize(Policy = "PatientsOnly")]
         public async Task<ActionResult<Address>> Post(GradeResourceModel grade)
         {
             try
@@ -170,7 +169,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="grade"> The Grade object  </param>
         /// <returns> The Grade object </returns>
         [HttpPut]
-        [Authorize(Policy = "PatientsOnly")]
         public async Task<ActionResult<Grade>> Put(Grade grade)
         {
             try
@@ -202,7 +200,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id"> The Grade object id </param>
         /// <returns> The Grade object </returns>
         [HttpDelete("{id}")]
-        [Authorize(Policy = "PatientsOnly")]
         public async Task<ActionResult<Grade>> Delete(int id)
         {
             try

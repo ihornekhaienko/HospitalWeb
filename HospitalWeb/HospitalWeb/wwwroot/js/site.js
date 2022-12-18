@@ -312,15 +312,16 @@ const ratingHubConnection = new signalR.HubConnectionBuilder()
 
 function changeRating(stars, author, target) {
     try {
-        notificationHubConnection.invoke("ChangeRating", stars, author, target);
+        ratingHubConnection.invoke("ChangeRating", stars, author, target);
     } catch (err) {
         console.log(err.message);
     }
 }
 
-notificationHubConnection.on("ChangeRating", function (rating) {
+ratingHubConnection.on("ChangeRating", function (rating, target) {
     try {
-        console.log(rating);
+        let span = document.getElementById(`rating-overall-${target}`);
+        span.innerHTML = rating;
     } catch (err) {
         console.log(err.message);
     }

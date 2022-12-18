@@ -113,6 +113,8 @@ namespace HospitalWeb.Controllers
 
                 if (user != null)
                 {
+                    ViewBag.Author = user.Id;
+
                     response = _api.Grades.Filter(user.Id, doctor.Id);
 
                     if (!response.IsSuccessStatusCode)
