@@ -106,7 +106,7 @@ hubConnection.on("NotifySignUp", function (topic, message) {
             let row = document.createElement('div');
             row.classList.add('row');
             row.appendChild(createNotificationDiv(topic, message, 'alert-primary'));
-            np.appendChild(row);
+            np.insertBefore(row, np.firstChild);
         }
 
         increment();
@@ -132,7 +132,7 @@ hubConnection.on("NotifyCancel", function (topic, message) {
             let row = document.createElement('div');
             row.classList.add('row');
             row.appendChild(createNotificationDiv(topic, message, 'alert-danger'));
-            np.appendChild(row);
+            np.insertBefore(row, np.firstChild);
         }
 
         increment();
@@ -158,7 +158,7 @@ hubConnection.on("NotifyFill", function (topic, message) {
             let row = document.createElement('div');
             row.classList.add('row');
             row.appendChild(createNotificationDiv(topic, message, 'alert-success'));
-            np.appendChild(row);
+            np.insertBefore(row, np.firstChild);
         }
 
         increment();
