@@ -1,4 +1,4 @@
-const hubConnection = new signalR.HubConnectionBuilder()
+const notificationHubConnection = new signalR.HubConnectionBuilder()
     .withUrl('/NotificationHub')
     .build();
 
@@ -117,7 +117,7 @@ function createNotificationDiv(topic, message, alertType = 'alert-info') {
 
 function notifySignUp(receiver, topic, message) {
     try {
-        hubConnection.invoke("NotifySignUp", receiver, topic, message);
+        notificationHubConnection.invoke("NotifySignUp", receiver, topic, message);
     } catch (err) {
         console.log(err.message);
     }
@@ -169,7 +169,7 @@ function loadLatest() {
     });
 }
 
-hubConnection.on("NotifySignUp", function (topic, message) {
+notificationHubConnection.on("NotifySignUp", function (topic, message) {
     try {
         let popover = document.getElementById("notifications");
         popover.insertBefore(createNotificationDiv(topic, message, 'alert-primary'), popover.firstChild);
@@ -201,13 +201,13 @@ hubConnection.on("NotifySignUp", function (topic, message) {
 
 function notifyCancel(receiver, topic, message) {
     try {
-        hubConnection.invoke("NotifyCancel", receiver, topic, message);
+        notificationHubConnection.invoke("NotifyCancel", receiver, topic, message);
     } catch (err) {
         console.log(err.message);
     }
 }
 
-hubConnection.on("NotifyCancel", function (topic, message) {
+notificationHubConnection.on("NotifyCancel", function (topic, message) {
     try {
         let popover = document.getElementById("notifications");
         popover.insertBefore(createNotificationDiv(topic, message, 'alert-danger'), popover.firstChild);
@@ -239,13 +239,13 @@ hubConnection.on("NotifyCancel", function (topic, message) {
 
 function notifyFill(receiver, topic, message) {
     try {
-        hubConnection.invoke("NotifyFill", receiver, topic, message);
+        notificationHubConnection.invoke("NotifyFill", receiver, topic, message);
     } catch (err) {
         console.log(err.message);
     }
 }
 
-hubConnection.on("NotifyFill", function (topic, message) {
+notificationHubConnection.on("NotifyFill", function (topic, message) {
     try {
         let popover = document.getElementById("notifications");
         popover.insertBefore(createNotificationDiv(topic, message, 'alert-success'), popover.firstChild);
@@ -304,7 +304,29 @@ $(document).ready(function () {
     loadLatest();
 });
 
-hubConnection.start();
+notificationHubConnection.start();
+
+const ratingHubConnection = new signalR.HubConnectionBuilder()
+    .withUrl('/RatingHub')
+    .build();
+
+function changeRating(stars, author, target) {
+    try {
+        notificationHubConnection.invoke("ChangeRating", stars, author, target);
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
+notificationHubConnection.on("ChangeRating", function (rating) {
+    try {
+        console.log(rating);
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+ratingHubConnection.start();
 
 $('#activator').click(function () {
     $('#uploader').click();

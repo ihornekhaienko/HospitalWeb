@@ -9,6 +9,7 @@
     "outputFileName": "wwwroot/js/site.js",
     "inputFiles": [
       "wwwroot/js/notify.js",
+      "wwwroot/js/rating.js",
       "wwwroot/js/general.js"
     ]
   }
