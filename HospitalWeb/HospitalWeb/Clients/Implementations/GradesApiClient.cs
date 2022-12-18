@@ -26,5 +26,35 @@ namespace HospitalWeb.Clients.Implementations
 
             return _client.SendAsync(request).Result;
         }
+
+        public HttpResponseMessage AddOrUpdate(
+            int stars,
+            string author, 
+            string target,
+            string token = null,
+            string provider = null)
+        {
+            var response = Filter(author, target, token, provider);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var grade = ReadMany(response).FirstOrDefault();
+
+                if (grade != null)
+                {
+                    grade.Stars = stars;
+                    return Put(grade);
+                }
+            }
+
+            var gradeResource = new GradeResourceModel
+            {
+                Stars = stars,
+                AuthorId = author,
+                TargetId = target
+            };
+
+            return Post(gradeResource);
+        }
     }
 }

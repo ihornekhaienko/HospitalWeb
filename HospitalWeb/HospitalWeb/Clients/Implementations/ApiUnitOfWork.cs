@@ -13,6 +13,7 @@ namespace HospitalWeb.Clients.Implementations
         private AppointmentsApiClient _appointmentsApiClient;
         private DiagnosesApiClient _diagnosesApiClient;
         private DoctorsApiClient _doctorsApiClient;
+        private GradesApiClient _gradesApiClient;
         private HospitalsApiClient _hospitalsApiClient;
         private LocalitiesApiClient _localitiesApiClient;
         private MeetingsApiClient _meetingsApiClient;
@@ -86,7 +87,17 @@ namespace HospitalWeb.Clients.Implementations
                 return _doctorsApiClient;
             }
         }
-        
+
+        public GradesApiClient Grades
+        {
+            get
+            {
+                if (_gradesApiClient == null)
+                    _gradesApiClient = new GradesApiClient(_config, _clientFactory);
+                return _gradesApiClient;
+            }
+        }
+
         public HospitalsApiClient Hospitals
         {
             get
