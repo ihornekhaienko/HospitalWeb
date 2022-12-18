@@ -15,5 +15,7 @@ namespace HospitalWeb.DAL.Entities
         public Address Address { get; set; }
 
         public ICollection<Doctor> Doctors { get; set; }
+
+        public double Rating { get => Doctors.Average(d => d.Rating); }
     }
 }

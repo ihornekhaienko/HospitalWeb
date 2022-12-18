@@ -14,6 +14,7 @@ namespace HospitalWeb.DAL.Entities.Identity
         public Patient()
         {
             Appointments = new List<Appointment>();
+            Grades = new List<Grade>();
         }
 
         public Sex Sex { get; set; }
@@ -24,5 +25,7 @@ namespace HospitalWeb.DAL.Entities.Identity
         public Address Address { get; set; }
 
         public ICollection<Appointment> Appointments { get; set; }
+
+        public ICollection<Grade> Grades { get; set; }
     }
 }

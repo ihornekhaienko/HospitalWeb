@@ -4,6 +4,7 @@ using HospitalWeb.DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HospitalWeb.DAL.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221218202349_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,32 +96,6 @@ namespace HospitalWeb.DAL.Data.Migrations
                     b.HasKey("DiagnosisId");
 
                     b.ToTable("Diagnoses");
-                });
-
-            modelBuilder.Entity("HospitalWeb.DAL.Entities.Grade", b =>
-                {
-                    b.Property<int>("GradeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GradeId"), 1L, 1);
-
-                    b.Property<string>("AuthorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Stars")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TargetId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("GradeId");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("TargetId");
-
-                    b.ToTable("Grades");
                 });
 
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Hospital", b =>
@@ -552,21 +528,6 @@ namespace HospitalWeb.DAL.Data.Migrations
                     b.Navigation("Patient");
                 });
 
-            modelBuilder.Entity("HospitalWeb.DAL.Entities.Grade", b =>
-                {
-                    b.HasOne("HospitalWeb.DAL.Entities.Identity.Patient", "Author")
-                        .WithMany("Grades")
-                        .HasForeignKey("AuthorId");
-
-                    b.HasOne("HospitalWeb.DAL.Entities.Identity.Doctor", "Target")
-                        .WithMany("Grades")
-                        .HasForeignKey("TargetId");
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Target");
-                });
-
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Hospital", b =>
                 {
                     b.HasOne("HospitalWeb.DAL.Entities.Address", "Address")
@@ -750,16 +711,12 @@ namespace HospitalWeb.DAL.Data.Migrations
                 {
                     b.Navigation("Appointments");
 
-                    b.Navigation("Grades");
-
                     b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("HospitalWeb.DAL.Entities.Identity.Patient", b =>
                 {
                     b.Navigation("Appointments");
-
-                    b.Navigation("Grades");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,6 +12,7 @@ namespace HospitalWeb.DAL.Data
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Diagnosis> Diagnoses { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
+        public DbSet<Grade> Grades { get; set; }
         public DbSet<Hospital> Hospitals { get; set; }
         public DbSet<Locality> Localities { get; set; }
         public DbSet<Meeting> Meetings { get; set; }

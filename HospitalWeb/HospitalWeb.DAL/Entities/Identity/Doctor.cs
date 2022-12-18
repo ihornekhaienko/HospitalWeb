@@ -9,6 +9,7 @@ namespace HospitalWeb.DAL.Entities.Identity
         {
             Appointments = new List<Appointment>();
             Schedules = new List<Schedule>();
+            Grades = new List<Grade>();
         }
 
         public int SpecialtyId { get; set; }
@@ -20,5 +21,9 @@ namespace HospitalWeb.DAL.Entities.Identity
         public ICollection<Appointment> Appointments { get; set; }
 
         public ICollection<Schedule> Schedules { get; set; }
+
+        public ICollection<Grade> Grades { get; set; }
+
+        public double Rating { get => Grades.Average(g => g.Stars); }
     }
 }
