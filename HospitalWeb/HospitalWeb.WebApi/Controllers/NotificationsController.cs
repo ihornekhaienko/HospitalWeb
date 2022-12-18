@@ -136,7 +136,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="Notification">Notification to create</param>
         /// <returns>The Notification object</returns>
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult<Notification>> Post(NotificationResourceModel Notification)
         {
             try
@@ -173,7 +172,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="notification">The Notification to update</param>
         /// <returns>The Notification object</returns>
         [HttpPut]
-        [Authorize]
         public async Task<ActionResult<Notification>> Put(Notification notification)
         {
             try
@@ -205,7 +203,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Notification's id</param>
         /// <returns>The Notification object</returns>
         [HttpDelete("{id}")]
-        [Authorize]
         public async Task<ActionResult<Notification>> Delete(int id)
         {
             try
