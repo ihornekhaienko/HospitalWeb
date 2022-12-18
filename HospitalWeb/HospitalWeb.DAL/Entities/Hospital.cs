@@ -16,6 +16,19 @@ namespace HospitalWeb.DAL.Entities
 
         public ICollection<Doctor> Doctors { get; set; }
 
-        public double Rating { get => Doctors.Average(d => d.Rating); }
+        public double Rating 
+        {
+            get
+            {
+                var rated = Doctors.Where(d => d.Rating != 0).ToList();
+
+                if (rated.Count == 0)
+                {
+                    return 0;
+                }
+
+                return rated.Average(d => d.Rating);
+            }
+        }
     }
 }

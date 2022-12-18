@@ -48,8 +48,9 @@
                 <img src="@Image" class="card-img-top photo" alt="@SharedLocalizer["Hospital"] @counter">
                 <div class="card-body text-center">
                     <h4 class="card-title">@hospital.HospitalName</h4>
-                    <p class="card-text">@hospital.Address.ToString()</p>
-                    <p class="card-text">@SharedLocalizer["DoctorsCount"]: @hospital.DoctorsCount</p>
+                    <p class="card-text mb-0">@hospital.Address.ToString()</p>
+                    <p class="card-text mb-0">@SharedLocalizer["DoctorsCount"]: @hospital.DoctorsCount</p>
+                    <p class="card-text">@SharedLocalizer["Rating"]: @hospital.Rating</p>
                     <a asp-controller="Doctors" asp-action="Search" asp-route-hospital="@hospital.HospitalId" class="btn btn-primary">
                         @Localizer["ShowDoctors"]
                     </a>

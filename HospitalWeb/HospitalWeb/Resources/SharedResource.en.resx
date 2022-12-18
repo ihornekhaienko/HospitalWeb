@@ -486,4 +486,7 @@
   <data name="RememberDevice" xml:space="preserve">
     <value>Запам'ятати цей пристрій</value>
   </data>
+  <data name="Rating" xml:space="preserve">
+    <value>Rating</value>
+  </data>
 </root>

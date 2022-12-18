@@ -69,8 +69,9 @@
                 <img src="@Image" class="card-img-top photo" alt="@SharedLocalizer["Doctor"] @counter">
                 <div class="card-body text-center">
                     <h4 class="card-title">@doctor.ToString()</h4>
-                    <p class="card-text">@doctor.Specialty</p>
-                    <p class="card-text">@doctor.Hospital</p>
+                    <p class="card-text mb-0">@doctor.Specialty</p>
+                    <p class="card-text mb-0">@doctor.Hospital</p>
+                    <p class="card-text">@SharedLocalizer["Rating"]: @doctor.Rating</p>
                     <a asp-controller="Doctors" asp-action="Details" asp-route-id="@doctor.Id" class="btn btn-primary">
                         @Localizer["MakeAppointment"]
                     </a>
