@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     if (request.Method == HttpMethod.Get)
                     {
-                        return Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(5));
+                        return Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(30));
                     }
 
                     return Policy.NoOpAsync<HttpResponseMessage>();
