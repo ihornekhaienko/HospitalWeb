@@ -123,10 +123,61 @@ function notifySignUp(receiver, topic, message) {
     }
 }
 
+function getNotificationType(type) {
+    switch (type) {
+        case 0:
+            return 'alert-secondary';
+        case 1:
+            return 'alert-danger';
+        case 2:
+            return 'alert-success';
+        case 3:
+            return 'alert-primary';
+        default:
+            return 'alert-info';
+    }
+}
+
+function loadLatest() {
+    $.ajax({
+        type: "POST",
+        url: '/Home/LoadLatestNotifications',
+        dataType: "json",
+        contentType: "application/json",
+        success: function (notifications) {
+            if (notifications == null) {
+                return;
+            }
+            let popover = document.getElementById("notifications");
+            popover.innerHTML = '';
+            let counter = document.getElementById('notifications-count');
+            counter.innerHTML = '';
+
+            for (let notification of notifications) {
+                let type = getNotificationType(notification.type);
+                let div = createNotificationDiv(notification.topic, notification.message, type);
+
+                popover.appendChild(div);
+                increment();
+            }
+
+            updatePopover();
+        },
+        error: function (err) {
+            console.log(err);
+        }
+    });
+}
+
 hubConnection.on("NotifySignUp", function (topic, message) {
     try {
         let popover = document.getElementById("notifications");
         popover.insertBefore(createNotificationDiv(topic, message, 'alert-primary'), popover.firstChild);
+
+        if (popover.children.length > 5) {
+            np.removeChild(np.lastElementChild);
+            updatePageLink();
+        }
 
         let np = document.getElementById("notifications-profile");
         if (np) {
@@ -161,6 +212,11 @@ hubConnection.on("NotifyCancel", function (topic, message) {
         let popover = document.getElementById("notifications");
         popover.insertBefore(createNotificationDiv(topic, message, 'alert-danger'), popover.firstChild);
 
+        if (popover.children.length > 5) {
+            np.removeChild(np.lastElementChild);
+            updatePageLink();
+        }
+
         let np = document.getElementById("notifications-profile");
         if (np) {
             let row = document.createElement('div');
@@ -194,6 +250,11 @@ hubConnection.on("NotifyFill", function (topic, message) {
         let popover = document.getElementById("notifications");
         popover.insertBefore(createNotificationDiv(topic, message, 'alert-success'), popover.firstChild);
 
+        if (popover.children.length > 5) {
+            np.removeChild(np.lastElementChild);
+            updatePageLink();
+        }
+
         let np = document.getElementById("notifications-profile");
         if (np) {
             let row = document.createElement('div');
@@ -212,6 +273,35 @@ hubConnection.on("NotifyFill", function (topic, message) {
     } catch (err) {
         console.log(err.message);
     }
+});
+
+function read(id) {
+    try {
+        $.ajax({
+            url: '/Manage/ReadNotification',
+            data: { "id": id.toString() },
+            contentType: "application/json",
+            success: function (response) {
+                let div = document.getElementById('alert-' + id);
+                console.log(div);
+                div.classList.remove('alert-success');
+                div.classList.remove('alert-danger');
+                div.classList.remove('alert-primary');
+                div.classList.add('alert-secondary');
+
+                loadLatest();
+            },
+            error: function (err) {
+                console.log(err.responseText);
+            }
+        });
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
+$(document).ready(function () {
+    loadLatest();
 });
 
 hubConnection.start();

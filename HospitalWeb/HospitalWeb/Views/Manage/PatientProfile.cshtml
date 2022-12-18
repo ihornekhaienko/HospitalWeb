@@ -104,30 +104,3 @@
         </div>
     </div>
 </div>
-
-@section scripts {
-    <script>
-        function read(id) {
-            try {
-                $.ajax({
-                    url: '@Url.Action("ReadNotification", "Manage")',
-                    data: { "id": id.toString() },
-                    contentType: "application/json",
-                    success: function (response) {
-                        let div = document.getElementById('alert-' + id);
-                        console.log(div);
-                        div.classList.remove('alert-success');
-                        div.classList.remove('alert-danger');
-                        div.classList.remove('alert-primary');
-                        div.classList.add('alert-secondary');
-                    },
-                    error: function (err) {
-                        console.log(err.responseText);
-                    }
-                });
-            } catch (err) {
-                console.log(err.message);
-            }
-        }
-    </script>
-}

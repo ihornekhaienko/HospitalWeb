@@ -13,12 +13,13 @@ namespace HospitalWeb.Clients.Implementations
 
         public HttpResponseMessage Filter(
             string owner, 
+            bool? isRead = null,
             int pageSize = 10, 
             int pageNumber = 1,
             string token = null,
             string provider = null)
         {
-            string query = $"/details?owner={owner}&pageSize={pageSize}&pageNumber={pageNumber}";
+            string query = $"/details?owner={owner}&isRead={isRead}&pageSize={pageSize}&pageNumber={pageNumber}";
             var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}{query}");
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);

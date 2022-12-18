@@ -84,7 +84,7 @@ namespace HospitalWeb.Controllers
 
                 var admin = _api.Admins.Read(response);
 
-                var builder = new NotificationsViewModelBuilder(_api, page, admin.Id, 5);
+                var builder = new NotificationsViewModelBuilder(_api, page, admin.Id, pageSize: 5);
                 var director = new ViewModelBuilderDirector();
                 director.MakeViewModel(builder);
                 var notifications = builder.GetViewModel();
@@ -181,7 +181,7 @@ namespace HospitalWeb.Controllers
 
                 var doctor = _api.Doctors.Read(response);
 
-                var builder = new NotificationsViewModelBuilder(_api, page, doctor.Id, 5);
+                var builder = new NotificationsViewModelBuilder(_api, page, doctor.Id, pageSize: 5);
                 var director = new ViewModelBuilderDirector();
                 director.MakeViewModel(builder);
                 var notifications = builder.GetViewModel();
@@ -281,7 +281,7 @@ namespace HospitalWeb.Controllers
 
                 var patient = _api.Patients.Read(response);
 
-                var builder = new NotificationsViewModelBuilder(_api, page, patient.Id, 5);
+                var builder = new NotificationsViewModelBuilder(_api, page, patient.Id, pageSize: 5);
                 var director = new ViewModelBuilderDirector();
                 director.MakeViewModel(builder);
                 var notifications = builder.GetViewModel();

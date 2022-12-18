@@ -9,6 +9,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
     public class NotificationsViewModelBuilder : ViewModelBuilder<NotificationsViewModel>
     {
         private readonly ApiUnitOfWork _api;
+        private readonly bool? _isRead;
         private IEnumerable<NotificationDTO> _notifications;
         private PageModel _pageModel;
         private int _count = 0;
@@ -17,15 +18,17 @@ namespace HospitalWeb.Filters.Builders.Implementations
             ApiUnitOfWork api,
             int pageNumber,
             string searchString,
+            bool? isRead = null,
             int pageSize = 10
         ) : base(pageNumber, pageSize, searchString)
         {
             _api = api;
+            _isRead = isRead;
         }
 
         public override void BuildEntityModel()
         {
-            var response = _api.Notifications.Filter(_searchString, _pageSize, _pageNumber);
+            var response = _api.Notifications.Filter(_searchString, _isRead, _pageSize, _pageNumber);
 
             if (response.IsSuccessStatusCode)
             {

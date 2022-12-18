@@ -54,11 +54,12 @@ namespace HospitalWeb.WebApi.Controllers
         /// Returns the Notifications by User
         /// </summary>
         /// <param name="owner">User's id</param>
+        /// <param name="isRead">Notifications state</param>
         /// <param name="pageSize">Count of the result on one page</param>
         /// <param name="pageNumber">Number of the page</param>
         /// <returns>List of Notifications</returns>
         [HttpGet("details")]
-        public async Task<ActionResult<IEnumerable<Notification>>> Get(string owner, int pageSize = 10, int pageNumber = 1)
+        public async Task<ActionResult<IEnumerable<Notification>>> Get(string owner, bool? isRead = null, int pageSize = 10, int pageNumber = 1)
         {
             try
             {
@@ -66,7 +67,14 @@ namespace HospitalWeb.WebApi.Controllers
 
                 Func<Notification, bool> filter = (n) =>
                 {
-                    return n.AppUserId == owner;
+                    var result = n.AppUserId == owner;
+
+                    if (isRead != null)
+                    {
+                        result &= n.IsRead == isRead;
+                    }
+
+                    return result;
                 };
 
                 Func<IQueryable<Notification>, IOrderedQueryable<Notification>> orderBy = (notifications) =>
