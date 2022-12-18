@@ -32,7 +32,7 @@ namespace HospitalWeb.DAL.Entities.Identity
                     return 0;
                 }
 
-                return Grades.Average(a => a.Stars);
+                return Grades.Average(a => (double)a.Stars);
             }
         }
     }

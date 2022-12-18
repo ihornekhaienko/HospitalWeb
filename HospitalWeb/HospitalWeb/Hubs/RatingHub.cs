@@ -42,7 +42,7 @@ namespace HospitalWeb.Hubs
                     throw new Exception(response.StatusCode.ToString());
                 }
 
-                double rating = _api.Doctors.Read(response).Rating;
+                double rating = Math.Round(_api.Doctors.Read(response).Rating, 2);
 
                 await Clients.All.SendAsync("ChangeRating", rating, target);
             }
