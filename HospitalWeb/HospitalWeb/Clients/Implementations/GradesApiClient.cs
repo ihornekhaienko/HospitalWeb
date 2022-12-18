@@ -17,7 +17,7 @@ namespace HospitalWeb.Clients.Implementations
             string token = null,
             string provider = null)
         {
-            string query = $"?author={author}&target={target}";
+            string query = $"/details?author={author}&target={target}";
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}{query}");
 

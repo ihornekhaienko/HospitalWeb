@@ -99,12 +99,12 @@ namespace HospitalWeb.WebApi.Controllers
 
                     if (!string.IsNullOrWhiteSpace(author))
                     {
-                        result &= g.AuthorId == author;
+                        result = result && g.AuthorId == author;
                     }
 
                     if (!string.IsNullOrWhiteSpace(target))
                     {
-                        result &= g.TargetId == target;
+                        result = result && g.TargetId == target;
                     }
 
                     return result;
