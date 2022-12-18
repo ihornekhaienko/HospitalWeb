@@ -15,5 +15,7 @@
         public string Specialty { get; set; }
 
         public string Hospital { get; set; }
+
+        public double Rating { get; set; }
     }
 }

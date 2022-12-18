@@ -180,3 +180,54 @@ body {
     border: none;
     background-color: transparent;
 }
+
+.rating-group {
+    display: inline-flex;
+}
+
+.rating-icon {
+    pointer-events: none;
+}
+
+.rating-input {
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+.rating-label {
+    cursor: pointer;
+    padding: 0 0.1em;
+    font-size: 2rem;
+}
+
+.rating-icon-star {
+    color: orange;
+}
+
+.rating-icon-none {
+    color: #eee;
+}
+
+.rating-input-none:checked + .rating-label .rating-icon-none {
+    color: red;
+}
+
+.rating-input:checked ~ .rating-label .rating-icon-star {
+    color: #ddd;
+}
+
+.rating-group:hover .rating-label .rating-icon-star {
+    color: orange;
+}
+
+.rating-input:hover ~ .rating-label .rating-icon-star {
+    color: #ddd;
+}
+
+.rating-group:hover .rating-input-none:not(:hover) + .rating-label .rating-icon-none {
+    color: #eee;
+}
+
+.rating-input-none:hover + .rating-label .rating-icon-none {
+    color: red;
+}

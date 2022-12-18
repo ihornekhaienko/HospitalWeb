@@ -105,7 +105,8 @@ namespace HospitalWeb.Controllers
                     Phone = doctor.PhoneNumber,
                     Image = doctor.Image,
                     Specialty = doctor.Specialty.SpecialtyName,
-                    Hospital = doctor.Hospital.HospitalName
+                    Hospital = doctor.Hospital.HospitalName,
+                    Rating = doctor.Rating
                 };
 
                 return View(model);
