@@ -11,6 +11,7 @@ namespace HospitalWeb.DAL.Services.Interfaces
         IRepository<Appointment> Appointments { get; }
         IRepository<Diagnosis> Diagnoses { get; }
         IRepository<Doctor> Doctors { get; }
+        IRepository<Grade> Grades { get; }
         IRepository<Hospital> Hospitals { get; }
         IRepository<Locality> Localities { get; }
         IRepository<Meeting> Meetings { get; }
