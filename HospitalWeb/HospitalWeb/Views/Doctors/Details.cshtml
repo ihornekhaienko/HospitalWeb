@@ -25,10 +25,12 @@
                                 <p class="mb-1" style="color: #2b2a2a;">@Model.Hospital</p>
                                 <a class="mb-1" href="mailto:@Model.Email" style="text-decoration: none;">@Model.Email</a>
                                 <a class="mb-1" href="tel:@Model.Phone" style="text-decoration: none;">@Model.Phone</a>
-                                <p class="mb-1" style="color: #2b2a2a;">@SharedLocalizer["Rating"]: @Model.Rating</p>
-                                <div class="rating-group">
-                                        <input class="rating-input rating-input-none" name="rating" id="rating-none" value="0" type="radio">
-                                        <label aria-label="No rating" class="rating-label" for="rating-none">
+                                <p class="mb-1" style="color: #2b2a2a;" id="rating-overall">@SharedLocalizer["Rating"]: @Model.Rating</p>
+                                @if (Model.MyGrade != null)
+                                {
+                                    <div class="rating-group">
+                                        <input class="rating-input rating-input-none" name="rating" id="rating-0" value="0" type="radio">
+                                        <label aria-label="No rating" class="rating-label" for="rating-0">
                                             <i class="rating-icon rating-icon-none fa fa-ban"></i>
                                         </label>
 
@@ -56,7 +58,8 @@
                                             <i class="rating-icon rating-icon-star fa fa-star"></i>
                                         </label>
                                         <input class="rating-input" name="rating" id="rating-5" value="5" type="radio">
-                                </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -127,6 +130,19 @@
 
         $('#schedule').on('slide.bs.carousel', function(e) {
             e.preventDefault();
+        });
+
+        function setMyRating() {
+            console.log('@Model.MyGrade');
+            let id = '#rating-@Model.MyGrade';
+            console.log(id);
+
+            $(id).prop('checked', true);
+            console.log('here');
+        }
+
+        $(document).ready(function() {
+            setMyRating();
         });
 
         $(document).ready(function() {

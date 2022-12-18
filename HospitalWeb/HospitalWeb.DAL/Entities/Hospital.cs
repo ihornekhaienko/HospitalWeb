@@ -20,9 +20,9 @@ namespace HospitalWeb.DAL.Entities
         {
             get
             {
-                var rated = Doctors.Where(d => d.Rating != 0).ToList();
+                var rated = Doctors?.Where(d => d.Rating != 0).ToList();
 
-                if (rated.Count == 0)
+                if (rated == null || rated.Count == 0)
                 {
                     return 0;
                 }

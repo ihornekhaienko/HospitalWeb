@@ -133,6 +133,7 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<NotificationHub>("/NotificationHub");
+    endpoints.MapHub<RatingHub>("/RatingHub");
 });
 
 app.MapControllerRoute(

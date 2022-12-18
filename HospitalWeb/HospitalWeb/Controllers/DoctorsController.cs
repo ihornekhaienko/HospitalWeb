@@ -106,8 +106,27 @@ namespace HospitalWeb.Controllers
                     Image = doctor.Image,
                     Specialty = doctor.Specialty.SpecialtyName,
                     Hospital = doctor.Hospital.HospitalName,
-                    Rating = doctor.Rating
+                    Rating = doctor.Rating,
                 };
+
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user != null)
+                {
+                    response = _api.Grades.Filter(user.Id, doctor.Id);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var statusCode = response.StatusCode;
+                        var message = _api.Grades.ReadError<string>(response);
+
+                        return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                    }
+
+                    var grade = _api.Grades.ReadMany(response).FirstOrDefault();
+
+                    model.MyGrade = grade != null ? grade.Stars : 0;
+                }
 
                 return View(model);
             }
