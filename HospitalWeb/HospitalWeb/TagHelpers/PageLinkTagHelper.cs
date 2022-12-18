@@ -30,14 +30,11 @@ namespace HospitalWeb.TagHelpers
             IUrlHelper urlHelper = _urlHelperFactory.GetUrlHelper(ViewContext);
             output.TagName = "div";
 
-            // набор ссылок будет представлять список ul
             TagBuilder tag = new TagBuilder("ul");
             tag.AddCssClass("pagination");
 
-            // формируем три ссылки - на текущую, предыдущую и следующую
             TagBuilder currentItem = CreateTag(PageModel.PageNumber, urlHelper);
 
-            // создаем ссылку на предыдущую страницу, если она есть
             if (PageModel.HasPreviousPage)
             {
                 TagBuilder prevItem = CreateTag(PageModel.PageNumber - 1, urlHelper);
@@ -45,13 +42,18 @@ namespace HospitalWeb.TagHelpers
             }
 
             tag.InnerHtml.AppendHtml(currentItem);
-            // создаем ссылку на следующую страницу, если она есть
+
             if (PageModel.HasNextPage)
             {
                 TagBuilder nextItem = CreateTag(PageModel.PageNumber + 1, urlHelper);
                 tag.InnerHtml.AppendHtml(nextItem);
             }
             output.Content.AppendHtml(tag);
+
+            if (PageModel.TotalPages <= 1)
+            {
+                tag.AddCssClass("d-none");
+            }
         }
 
         TagBuilder CreateTag(int pageNumber, IUrlHelper urlHelper)
@@ -71,6 +73,7 @@ namespace HospitalWeb.TagHelpers
             link.AddCssClass("page-link");
             link.InnerHtml.Append(pageNumber.ToString());
             item.InnerHtml.AppendHtml(link);
+
             return item;
         }
     }
