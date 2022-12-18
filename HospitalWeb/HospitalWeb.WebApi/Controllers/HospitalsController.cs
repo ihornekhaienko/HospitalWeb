@@ -103,7 +103,8 @@ namespace HospitalWeb.WebApi.Controllers
                     include: p => p
                      .Include(p => p.Address)
                         .ThenInclude(a => a.Locality)
-                    .Include(p => p.Doctors));
+                    .Include(p => p.Doctors)
+                        .ThenInclude(d => d.Grades));
 
                 Response.Headers.Add("TotalCount", totalCount.ToString());
                 Response.Headers.Add("Count", hospitals.Count().ToString());
@@ -136,6 +137,7 @@ namespace HospitalWeb.WebApi.Controllers
                 var hospital = await _uow.Hospitals
                 .GetAsync(s => s.HospitalId == id,
                 include: s => s.Include(s => s.Doctors)
+                        .ThenInclude(d => d.Grades)
                     .Include(s => s.Address)
                         .ThenInclude(s => s.Locality));
 
@@ -169,6 +171,7 @@ namespace HospitalWeb.WebApi.Controllers
                 var hospital = await _uow.Hospitals
                 .GetAsync(s => s.HospitalName == name,
                 include: s => s.Include(s => s.Doctors)
+                        .ThenInclude(d => d.Grades)
                     .Include(s => s.Address)
                         .ThenInclude(s => s.Locality));
 

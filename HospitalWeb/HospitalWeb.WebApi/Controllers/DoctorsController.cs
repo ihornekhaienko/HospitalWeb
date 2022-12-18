@@ -146,7 +146,8 @@ namespace HospitalWeb.WebApi.Controllers
                     .Include(d => d.Hospital)
                         .ThenInclude(h => h.Address)
                                 .ThenInclude(a => a.Locality)
-                    .Include(d => d.Specialty));
+                    .Include(d => d.Specialty)
+                    .Include(d => d.Grades));
 
                 Response.Headers.Add("TotalCount", totalCount.ToString());
                 Response.Headers.Add("Count", doctors.Count().ToString());
@@ -184,7 +185,8 @@ namespace HospitalWeb.WebApi.Controllers
                 .Include(d => d.Hospital)
                     .ThenInclude(h => h.Address)
                             .ThenInclude(a => a.Locality)
-                .Include(d => d.Specialty));
+                .Include(d => d.Specialty)
+                .Include(d => d.Grades));
 
                 if (doctor == null)
                 {

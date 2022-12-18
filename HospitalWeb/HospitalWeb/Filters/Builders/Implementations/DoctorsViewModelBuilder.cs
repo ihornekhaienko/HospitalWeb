@@ -58,7 +58,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
                         Image = d.Image,
                         Specialty = d.Specialty.SpecialtyName,
                         Hospital = d.Hospital.HospitalName,
-                        Locality = d.Hospital.Address.Locality.LocalityName
+                        Locality = d.Hospital.Address.Locality.LocalityName,
+                        Rating = d.Rating
                     });
 
                 _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());

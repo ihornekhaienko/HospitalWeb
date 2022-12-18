@@ -9,5 +9,7 @@ namespace HospitalWeb.Filters.Models.DTO
         public string Hospital { get; set; }
 
         public string Locality { get; set; }
+
+        public double Rating { get; set; }
     }
 }

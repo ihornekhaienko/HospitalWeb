@@ -24,6 +24,16 @@ namespace HospitalWeb.DAL.Entities.Identity
 
         public ICollection<Grade> Grades { get; set; }
 
-        public double Rating { get => Grades.Average(g => g.Stars); }
+        public double Rating { 
+            get
+            {
+                if (Grades.Count == 0)
+                {
+                    return 0;
+                }
+
+                return Grades.Average(a => a.Stars);
+            }
+        }
     }
 }

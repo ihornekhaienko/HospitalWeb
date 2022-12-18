@@ -11,5 +11,7 @@
         public string Address { get; set; }
 
         public int DoctorsCount { get; set; }
+
+        public double Rating { get; set; }
     }
 }

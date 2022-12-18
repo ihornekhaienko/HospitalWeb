@@ -47,7 +47,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
                         HospitalName = h.HospitalName,
                         DoctorsCount = h.Doctors.Count,
                         Image = h.Image,
-                        Address = h.Address.ToString()
+                        Address = h.Address.ToString(),
+                        Rating = h.Rating
                     });
 
                 _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());
