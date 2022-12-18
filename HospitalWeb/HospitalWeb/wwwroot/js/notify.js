@@ -100,13 +100,22 @@ function notifySignUp(receiver, topic, message) {
 
 hubConnection.on("NotifySignUp", function (topic, message) {
     try {
-        document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-primary'));
+        let popover = document.getElementById("notifications");
+        popover.insertBefore(createNotificationDiv(topic, message, 'alert-primary'), popover.firstChild);
+        if (popover.children.length > 5) {
+            popover.removeChild(np.lastElementChild);
+        }
+
         let np = document.getElementById("notifications-profile");
         if (np) {
             let row = document.createElement('div');
             row.classList.add('row');
             row.appendChild(createNotificationDiv(topic, message, 'alert-primary'));
             np.insertBefore(row, np.firstChild);
+
+            if (np.children.length > 5) {
+                np.removeChild(np.lastElementChild);
+            }
         }
 
         increment();
@@ -126,13 +135,22 @@ function notifyCancel(receiver, topic, message) {
 
 hubConnection.on("NotifyCancel", function (topic, message) {
     try {
-        document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-danger'));
+        let popover = document.getElementById("notifications");
+        popover.insertBefore(createNotificationDiv(topic, message, 'alert-danger'), popover.firstChild);
+        if (popover.children.length > 5) {
+            popover.removeChild(np.lastElementChild);
+        }
+
         let np = document.getElementById("notifications-profile");
         if (np) {
             let row = document.createElement('div');
             row.classList.add('row');
             row.appendChild(createNotificationDiv(topic, message, 'alert-danger'));
             np.insertBefore(row, np.firstChild);
+
+            if (np.children.length > 5) {
+                np.removeChild(np.lastElementChild);
+            }
         }
 
         increment();
@@ -152,13 +170,22 @@ function notifyFill(receiver, topic, message) {
 
 hubConnection.on("NotifyFill", function (topic, message) {
     try {
-        document.getElementById("notifications").appendChild(createNotificationDiv(topic, message, 'alert-success'));
+        let popover = document.getElementById("notifications");
+        popover.insertBefore(createNotificationDiv(topic, message, 'alert-success'), popover.firstChild);
+        if (popover.children.length > 5) {
+            popover.removeChild(np.lastElementChild);
+        }
+
         let np = document.getElementById("notifications-profile");
         if (np) {
             let row = document.createElement('div');
             row.classList.add('row');
             row.appendChild(createNotificationDiv(topic, message, 'alert-success'));
             np.insertBefore(row, np.firstChild);
+
+            if (np.children.length > 5) {
+                np.removeChild(np.lastElementChild);
+            }
         }
 
         increment();
