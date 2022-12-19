@@ -16,6 +16,12 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="mb-3">
+                <label asp-for="Type" class="control-label"></label>
+                <br/>
+                <select asp-for="Type" asp-items="Html.GetEnumSelectList<HospitalType>()" class="mt-1"></select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
                 <label asp-for="Address" class="control-label"></label>
                 <input asp-for="Address" class="form-control input-validation-error" />
                 <span asp-validation-for="Address" class="text-danger"></span>

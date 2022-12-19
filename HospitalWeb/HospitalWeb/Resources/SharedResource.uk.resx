@@ -495,4 +495,7 @@
   <data name="Type" xml:space="preserve">
     <value>Тип</value>
   </data>
+  <data name="TypeRequiredErrorMessage" xml:space="preserve">
+    <value>Необхідно вказати тип лікарні</value>
+  </data>
 </root>

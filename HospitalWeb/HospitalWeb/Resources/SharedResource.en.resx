@@ -495,4 +495,7 @@
   <data name="Type" xml:space="preserve">
     <value>Type</value>
   </data>
+  <data name="TypeRequiredErrorMessage" xml:space="preserve">
+    <value>Hospital type is required</value>
+  </data>
 </root>

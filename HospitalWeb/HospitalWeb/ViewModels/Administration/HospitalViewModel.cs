@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HospitalWeb.DAL.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace HospitalWeb.ViewModels.Administration
 {
@@ -9,6 +10,10 @@ namespace HospitalWeb.ViewModels.Administration
         [Required(ErrorMessage = "TitleRequired")]
         [Display(Name = "Name")]
         public string Name { get; set; }
+
+        [Required(ErrorMessage = "TypeRequired")]
+        [Display(Name = "Type")]
+        public HospitalType Type { get; set; }
 
         [Required(ErrorMessage = "AddressRequired")]
         [Display(Name = "Address")]

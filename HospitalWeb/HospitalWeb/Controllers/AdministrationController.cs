@@ -319,6 +319,7 @@ namespace HospitalWeb.Controllers
                 var hospital = new HospitalResourceModel
                 {
                     HospitalName = model.Name,
+                    Type = model.Type,
                     AddressId = address.AddressId
                 };
 
