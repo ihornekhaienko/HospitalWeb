@@ -1,4 +1,5 @@
 ﻿using HospitalWeb.DAL.Entities.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HospitalWeb.DAL.Entities
 {
@@ -22,6 +23,10 @@ namespace HospitalWeb.DAL.Entities
         public string Prescription { get; set; }
         public DateTime AppointmentDate { get; set; }
         public State State { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal Price { get; set; }
+        public bool IsPaid { get; set; }
 
         public ICollection<Meeting> Meetings { get; set; }
 
