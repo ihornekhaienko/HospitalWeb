@@ -210,6 +210,12 @@ namespace HospitalWeb.Controllers
                 }
 
                 var entity = _api.Appointments.Read(response);
+
+                if (appointment.Price != 0)
+                {
+                    await RunPaymentChecker(entity.AppointmentId);
+                }
+
                 var meeting = _meetingService.CreateMeeting(entity);
                 _api.Meetings.Post(meeting, tokenResult.Token, tokenResult.Provider);
 
@@ -226,6 +232,17 @@ namespace HospitalWeb.Controllers
 
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
+        }
+
+        private async Task RunPaymentChecker(int id)
+        {
+            using var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Post, $"https://localhost:7271/jobs/removeUnpaid?{id}");
+            request.Headers.Add("Accept", "application/json");
+            request.Headers.Add("Access-Control-Allow-Origin", "*");
+
+            var response = await client.SendAsync(request);
+            Console.WriteLine(response.StatusCode);
         }
     }
 }

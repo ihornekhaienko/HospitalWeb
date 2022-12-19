@@ -641,6 +641,7 @@ namespace HospitalWeb.Controllers
                     EmailConfirmed = true,
                     CalendarId = calendarId,
                     Password = password,
+                    ServicePrice = model.ServicePrice,
                 };
 
                 var response = _api.Doctors.Post(doctor, tokenResult.Token, tokenResult.Provider);

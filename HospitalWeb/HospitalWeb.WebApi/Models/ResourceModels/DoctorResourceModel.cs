@@ -7,5 +7,7 @@ namespace HospitalWeb.WebApi.Models.ResourceModels
         public int SpecialtyId { get; set; }
 
         public int HospitalId { get; set; }
+
+        public decimal ServicePrice { get; set; }
     }
 }
