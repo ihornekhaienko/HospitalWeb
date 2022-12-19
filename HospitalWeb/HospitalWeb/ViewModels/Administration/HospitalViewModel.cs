@@ -9,7 +9,7 @@ namespace HospitalWeb.ViewModels.Administration
 
         [Required(ErrorMessage = "TitleRequired")]
         [Display(Name = "Name")]
-        public string Name { get; set; }
+        public string Name { get; set; } 
 
         [Required(ErrorMessage = "TypeRequired")]
         [Display(Name = "Type")]

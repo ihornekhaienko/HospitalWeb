@@ -29,5 +29,8 @@ namespace HospitalWeb.ViewModels.Administration
         [Required(ErrorMessage = "HospitalRequired")]
         [Display(Name = "Hospital")]
         public int Hospital { get; set; }
+
+        [Display(Name = "Price")]
+        public decimal ServicePrice { get; set; }
     }
 }

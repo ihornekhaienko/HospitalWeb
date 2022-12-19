@@ -1,4 +1,5 @@
-﻿@model DoctorViewModel
+﻿@using Newtonsoft.Json
+@model DoctorViewModel
 @inject IViewLocalizer Localizer
 @inject IHtmlLocalizer<SharedResource> SharedLocalizer
 @{
@@ -43,12 +44,18 @@
             </div>
             <div class="mb-3">
                 <label asp-for="Hospital" class="control-label"></label>
-                <select asp-for="Hospital" name="hospital" 
+                <br/>
+                <select asp-for="Hospital" name="hospital" class="mt-1" id="hospital-select"
                     asp-items="@(new SelectList(
                                 ViewBag.Hospitals, 
                                 "HospitalId", 
                                 "HospitalName"))">
                 </select>
+            </div>
+            <div class="mb-3 d-none" id="price">
+                <label asp-for="ServicePrice" class="control-label"></label>
+                <input asp-for="ServicePrice" class="form-control input-validation-error" type="number" value="0"/>
+                <span asp-validation-for="ServicePrice" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-success">@SharedLocalizer["Create"]</button>
@@ -60,3 +67,20 @@
 <div>
     <a asp-controller="Administration" asp-action="Doctors">@SharedLocalizer["BackToFullList"]</a>
 </div>
+
+@section scripts {
+    <script>
+        let private = @Html.Raw(@ViewBag.PrivateHospitals);
+
+        $("#hospital-select").change(function() {
+            let id = +this.value;
+
+            if (private.includes(id)) {
+                $('#price').removeClass('d-none');
+            }
+            else {
+                $('#price').addClass('d-none');
+            }
+        });
+    </script>
+}

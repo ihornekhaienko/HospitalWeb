@@ -11,6 +11,7 @@ using HospitalWeb.DAL.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using HospitalWeb.Services.Extensions;
 using HospitalWeb.ViewModels.Error;
+using Newtonsoft.Json;
 
 namespace HospitalWeb.Controllers
 {
@@ -602,10 +603,14 @@ namespace HospitalWeb.Controllers
                 return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
             }
 
-            ViewBag.Hospitals = _api.Hospitals
-                .ReadMany(response)
+            var hospitals = _api.Hospitals.ReadMany(response);
+            ViewBag.Hospitals = hospitals
                 .Select(h => new { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
                 .OrderBy(h => h.HospitalName);
+            ViewBag.PrivateHospitals = JsonConvert.SerializeObject(hospitals
+                .Where(h => h.Type == HospitalType.Private)
+                .Select(h => h.HospitalId)
+                .ToList());
 
             return View();
         }
@@ -671,10 +676,14 @@ namespace HospitalWeb.Controllers
                 .OrderBy(s => s);
 
             result = _api.Hospitals.Get();
-            ViewBag.Hospitals = _api.Hospitals
-                .ReadMany(result)
+            var hospitals = _api.Hospitals.ReadMany(result);
+            ViewBag.Hospitals = hospitals
                 .Select(h => new { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
                 .OrderBy(h => h.HospitalName);
+            ViewBag.PrivateHospitals = hospitals
+                .Where(h => h.Type == HospitalType.Private)
+                .Select(h => h.HospitalId)
+                .ToList();
 
             return View(model);
         }
