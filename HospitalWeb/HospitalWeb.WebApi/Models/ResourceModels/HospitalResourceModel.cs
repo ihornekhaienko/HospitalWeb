@@ -1,4 +1,6 @@
-﻿namespace HospitalWeb.WebApi.Models.ResourceModels
+﻿using HospitalWeb.DAL.Entities;
+
+namespace HospitalWeb.WebApi.Models.ResourceModels
 {
     public class HospitalResourceModel
     {
@@ -9,5 +11,7 @@
         public byte[] Image { get; set; }
 
         public int AddressId { get; set; }
+
+        public HospitalType Type { get; set; }
     }
 }

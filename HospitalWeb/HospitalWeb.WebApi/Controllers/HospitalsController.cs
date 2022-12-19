@@ -33,6 +33,7 @@ namespace HospitalWeb.WebApi.Controllers
         /// </summary>
         /// <param name="searchString">Search string that identifies Hospital</param>
         /// <param name="locality">Locality's Id</param>
+        /// <param name="type">Hospital type</param>
         /// <param name="sortOrder">Sorting order of the filtered list</param>
         /// <param name="pageSize">Count of the result on one page</param>
         /// <param name="pageNumber">Number of the page</param>
@@ -41,6 +42,7 @@ namespace HospitalWeb.WebApi.Controllers
         public async Task<ActionResult<IEnumerable<Hospital>>> Get(
             string searchString,
             int? locality,
+            int? type,
             HospitalSortState sortOrder = HospitalSortState.Id,
             int pageSize = 10,
             int pageNumber = 1)
@@ -61,6 +63,11 @@ namespace HospitalWeb.WebApi.Controllers
                     if (locality != null && locality != 0)
                     {
                         result = result && h.Address.Locality.LocalityId == locality;
+                    }
+
+                    if (type != null)
+                    {
+                        result = result && (int)h.Type == type;
                     }
 
                     return result;
