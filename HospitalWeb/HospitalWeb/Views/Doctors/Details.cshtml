@@ -25,6 +25,10 @@
                                 <p class="mb-1" style="color: #2b2a2a;">@Model.Hospital</p>
                                 <a class="mb-1" href="mailto:@Model.Email" style="text-decoration: none;">@Model.Email</a>
                                 <a class="mb-1" href="tel:@Model.Phone" style="text-decoration: none;">@Model.Phone</a>
+                                @if (Model.ServicePrice != 0) 
+                                {
+                                    <p class="card-text mb-0">@SharedLocalizer["Price"]: @Model.ServicePrice</p>
+                                }
                                 <p class="mb-1" style="color: #2b2a2a;">@SharedLocalizer["Rating"]:
                                     <span id="rating-overall-@Model.Id"> 
                                         @Model.Rating

@@ -107,6 +107,7 @@ namespace HospitalWeb.Controllers
                     Specialty = doctor.Specialty.SpecialtyName,
                     Hospital = doctor.Hospital.HospitalName,
                     Rating = doctor.Rating,
+                    ServicePrice = doctor.ServicePrice
                 };
 
                 var user = await _userManager.GetUserAsync(User);

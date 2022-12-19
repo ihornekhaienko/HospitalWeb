@@ -44,13 +44,14 @@ namespace HospitalWeb.Clients.Implementations
         public HttpResponseMessage Filter(
             string searchString,
             int? locality,
+            int? type,
             HospitalSortState sortOrder = HospitalSortState.Id,
             int pageSize = 10,
             int pageNumber = 1,
             string token = null,
             string provider = null)
         {
-            string query = $"?searchString={searchString}&locality={locality}&sortOrder={sortOrder}" +
+            string query = $"?searchString={searchString}&locality={locality}&type={type}&sortOrder={sortOrder}" +
                 $"&pageSize={pageSize}&pageNumber={pageNumber}";
             var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}{query}");
 

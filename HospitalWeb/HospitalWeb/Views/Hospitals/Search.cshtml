@@ -13,6 +13,16 @@
         <label>@SharedLocalizer["Search"]: </label>
         <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
         <span class="input-group-btn input-space"><label>@SharedLocalizer["Locality"]</label></span>
+        <span class="input-group-btn input-space"><label>@SharedLocalizer["Type"]</label></span>
+        <span class="input-group-btn input-space">
+            <select name="type" 
+                asp-items="@(new SelectList(
+                            Model.FilterModel.HospitalTypes, 
+                            "Value", 
+                            "Name",  
+                            Model.FilterModel.SelectedType))">
+            </select>
+        </span>
         <span class="input-group-btn input-space">
             <select name="locality" 
                 asp-items="@(new SelectList(
@@ -50,6 +60,7 @@
                     <h4 class="card-title">@hospital.HospitalName</h4>
                     <p class="card-text mb-0">@hospital.Address.ToString()</p>
                     <p class="card-text mb-0">@SharedLocalizer["DoctorsCount"]: @hospital.DoctorsCount</p>
+                    <p class="card-text mb-0">@SharedLocalizer["Type"]: @hospital.Type.ToString()</p>
                     <p class="card-text">@SharedLocalizer["Rating"]: @hospital.Rating</p>
                     <a asp-controller="Doctors" asp-action="Search" asp-route-hospital="@hospital.HospitalId" class="btn btn-primary">
                         @Localizer["ShowDoctors"]
@@ -69,5 +80,6 @@
 
 <page-link page-model="@(Model.PageModel)" page-action="Search"
 page-url-locality="@(Model.FilterModel.SelectedLocality)"
+page-url-type="@(Model.FilterModel.SelectedType)"
 page-url-searchString="@(Model.FilterModel.SearchString)"
 page-url-sortOrder="@(Model.SortModel.Current)"></page-link>

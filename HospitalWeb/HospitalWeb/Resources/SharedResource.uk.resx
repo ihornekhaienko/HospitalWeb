@@ -489,4 +489,10 @@
   <data name="Rating" xml:space="preserve">
     <value>Рейтинг</value>
   </data>
+  <data name="Price" xml:space="preserve">
+    <value>Ціна послуг</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Тип</value>
+  </data>
 </root>

@@ -16,6 +16,8 @@
 
         public string Hospital { get; set; }
 
+        public decimal ServicePrice { get; set; }
+
         public double Rating { get; set; }
 
         public int? MyGrade { get; set; }

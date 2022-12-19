@@ -11,5 +11,7 @@ namespace HospitalWeb.Filters.Models.DTO
         public string Locality { get; set; }
 
         public double Rating { get; set; }
+
+        public decimal ServicePrice { get; set; }
     }
 }

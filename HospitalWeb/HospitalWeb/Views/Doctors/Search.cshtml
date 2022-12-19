@@ -71,6 +71,10 @@
                     <h4 class="card-title">@doctor.ToString()</h4>
                     <p class="card-text mb-0">@doctor.Specialty</p>
                     <p class="card-text mb-0">@doctor.Hospital</p>
+                    @if (doctor.ServicePrice != 0) 
+                    {
+                        <p class="card-text mb-0">@SharedLocalizer["Price"]: @doctor.ServicePrice</p>
+                    }
                     <p class="card-text">@SharedLocalizer["Rating"]: 
                         <span id="rating-overall-@doctor.Id">
                             @doctor.Rating

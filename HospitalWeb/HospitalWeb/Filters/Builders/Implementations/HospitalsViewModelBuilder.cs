@@ -13,6 +13,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
     {
         private readonly ApiUnitOfWork _api;
         private readonly int? _locality;
+        private readonly int? _type;
         private readonly HospitalSortState _sortOrder;
         private IEnumerable<HospitalDTO> _hospitals;
         private PageModel _pageModel;
@@ -26,17 +27,19 @@ namespace HospitalWeb.Filters.Builders.Implementations
            string searchString,
            HospitalSortState sortOrder,
            int? locality = null,
+           int? type = null,
            int pageSize = 10
            ) : base(pageNumber, pageSize, searchString)
         {
             _api = api;
             _sortOrder = sortOrder;
             _locality = locality;
+            _type = type;
         }
 
         public override void BuildEntityModel()
         {
-            var response = _api.Hospitals.Filter(_searchString, _locality, _sortOrder, _pageSize, _pageNumber);
+            var response = _api.Hospitals.Filter(_searchString, _locality, _type, _sortOrder, _pageSize, _pageNumber);
 
             if (response.IsSuccessStatusCode)
             {
@@ -48,7 +51,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
                         DoctorsCount = h.Doctors.Count,
                         Image = h.Image,
                         Address = h.Address.ToString(),
-                        Rating = Math.Round(h.Rating, 2)
+                        Rating = Math.Round(h.Rating, 2),
+                        Type = h.Type
                     });
 
                 _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());
@@ -68,7 +72,7 @@ namespace HospitalWeb.Filters.Builders.Implementations
                .Select(l => new LocalityDTO { LocalityId = l.LocalityId, LocalityName = l.LocalityName })
                .ToList();
 
-            _filterModel = new HospitalFilterModel(_searchString, localities, _locality);
+            _filterModel = new HospitalFilterModel(_searchString, localities, _locality, _type);
         }
 
         public override void BuildPageModel()

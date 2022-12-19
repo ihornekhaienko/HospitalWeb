@@ -1,4 +1,6 @@
-﻿namespace HospitalWeb.Filters.Models.DTO
+﻿using HospitalWeb.DAL.Entities;
+
+namespace HospitalWeb.Filters.Models.DTO
 {
     public class HospitalDTO
     {
@@ -13,5 +15,7 @@
         public int DoctorsCount { get; set; }
 
         public double Rating { get; set; }
+
+        public HospitalType Type { get; set; }
     }
 }

@@ -4,7 +4,7 @@ namespace HospitalWeb.DAL.Entities
 {
     public enum HospitalType
     {
-        Public,
+        Public = 1,
         Private
     }
 
