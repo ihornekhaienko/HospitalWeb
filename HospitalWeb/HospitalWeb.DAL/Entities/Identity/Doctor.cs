@@ -12,6 +12,9 @@ namespace HospitalWeb.DAL.Entities.Identity
             Grades = new List<Grade>();
         }
 
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal ServicePrice { get; set; }
+
         public int SpecialtyId { get; set; }
         public Specialty Specialty { get; set; }
 

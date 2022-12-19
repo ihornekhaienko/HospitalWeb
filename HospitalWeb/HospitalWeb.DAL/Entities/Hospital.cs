@@ -2,6 +2,12 @@
 
 namespace HospitalWeb.DAL.Entities
 {
+    public enum HospitalType
+    {
+        Public,
+        Private
+    }
+
     public class Hospital
     {
         public int HospitalId { get; set; }
@@ -10,8 +16,9 @@ namespace HospitalWeb.DAL.Entities
 
         public byte[] Image { get; set; }
 
-        public int AddressId { get; set; }
+        public HospitalType Type { get; set; }
 
+        public int AddressId { get; set; }
         public Address Address { get; set; }
 
         public ICollection<Doctor> Doctors { get; set; }
