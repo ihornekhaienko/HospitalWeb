@@ -15,12 +15,33 @@ namespace HospitalWeb.WebApi.Controllers
         }
 
         [HttpPost]
+        [Route("jobs/removeUnpaid")]
+        public IActionResult RemoveUnpaid(int id)
+        {
+            BackgroundJob.Schedule(() => RemoveUnpaidAppointment(id), TimeSpan.FromHours(1));
+
+            return Ok();
+        }
+
+        [HttpPost]
         [Route("jobs/updateStates")]
         public IActionResult UpdateStates()
         {
             RecurringJob.AddOrUpdate(() => SetMissed(), Cron.Daily);
 
             return Ok();
+        }
+
+        public async Task RemoveUnpaidAppointment(int id)
+        {
+            var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
+
+            if (appointment.IsPaid)
+            {
+                return;
+            }
+
+            await _uow.Appointments.DeleteAsync(appointment);
         }
 
         public async Task SetMissed()
