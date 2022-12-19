@@ -193,7 +193,8 @@ namespace HospitalWeb.Controllers
                     AppointmentDate = date,
                     State = State.Planned,
                     DoctorId = doctor.Id,
-                    PatientId = patient.Id
+                    PatientId = patient.Id,
+                    Price = doctor.ServicePrice
                 };
 
                 var tokenResult = await _tokenManager.GetToken(patient);

@@ -498,4 +498,10 @@
   <data name="TypeRequiredErrorMessage" xml:space="preserve">
     <value>Необхідно вказати тип лікарні</value>
   </data>
+  <data name="PayOff" xml:space="preserve">
+    <value>Оплатити</value>
+  </data>
+  <data name="Unpaid" xml:space="preserve">
+    <value>Неоплачено</value>
+  </data>
 </root>

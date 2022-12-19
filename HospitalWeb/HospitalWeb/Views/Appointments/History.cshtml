@@ -62,18 +62,42 @@
                                 }
                                 @if (appointment.State == "Planned")
                                 {
-                                    <div class="mb-1">
-                                        <a asp-controller="Appointments" asp-action="Fill" asp-route-id="@appointment.AppointmentId" 
-                                        class="btn btn-primary btn-230 flex-grow-1">@SharedLocalizer["Fill"]</a>
-                                    </div>
-                                    <div class="mb-1">
-                                        <a asp-controller="Appointments" asp-action="Cancel" asp-route-id="@appointment.AppointmentId" 
+                                    if (appointment.Price == 0)
+                                    {
+                                        <div class="mb-1">
+                                            <a asp-controller="Appointments" asp-action="Fill" asp-route-id="@appointment.AppointmentId" 
+                                            class="btn btn-primary btn-230 flex-grow-1">@SharedLocalizer["Fill"]</a>
+                                        </div> 
+                                        <div class="mb-1">
+                                            <a asp-controller="Appointments" asp-action="Cancel" asp-route-id="@appointment.AppointmentId" 
+                                            onclick="notifyCancel('@appointment.PatientId', '@SharedLocalizer["CancelTopic"]', '@SharedLocalizer["YourAppointment"] @appointment.AppointmentDate.ToString("MM/dd/yyyy HH:mm") @SharedLocalizer["CancelMessage"]');"
+                                            class="btn btn-danger btn-230 flex-grow-1">@SharedLocalizer["Cancel"]</a>
+                                        </div>
+                                        <div class="mb-1">
+                                            <a href="@appointment.MeetingStartLink" target="_blank">@SharedLocalizer["Join"]</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        if (appointment.IsPaid)
+                                        {
+                                            <div class="mb-1">
+                                                <a asp-controller="Appointments" asp-action="Fill" asp-route-id="@appointment.AppointmentId" 
+                                            class="btn btn-primary btn-230 flex-grow-1">@SharedLocalizer["Fill"]</a>
+                                            </div>
+                                        }
+                                        <div class="mb-1">
+                                            <a asp-controller="Appointments" asp-action="Cancel" asp-route-id="@appointment.AppointmentId" 
                                         onclick="notifyCancel('@appointment.PatientId', '@SharedLocalizer["CancelTopic"]', '@SharedLocalizer["YourAppointment"] @appointment.AppointmentDate.ToString("MM/dd/yyyy HH:mm") @SharedLocalizer["CancelMessage"]');"
                                         class="btn btn-danger btn-230 flex-grow-1">@SharedLocalizer["Cancel"]</a>
-                                    </div>
-                                    <div class="mb-1">
-                                        <a href="@appointment.MeetingStartLink" target="_blank">@SharedLocalizer["Join"]</a>
-                                    </div>
+                                        </div>
+                                        if (appointment.IsPaid)
+                                        {
+                                            <div class="mb-1">
+                                                <a href="@appointment.MeetingStartLink" target="_blank">@SharedLocalizer["Join"]</a>
+                                            </div>
+                                        }
+                                    }                                                         
                                 }
                             </div>
                             <div class="flex-grow-1 ms-3">
@@ -89,6 +113,10 @@
                                         <p class="mb-0">@appointment.AppointmentDate.ToShortDateString()</p>
                                         <p class="small text-muted mb-1">@SharedLocalizer["Time"]</p>
                                         <p class="mb-0">@appointment.AppointmentDate.ToString("HH:mm")</p>
+                                        @if (appointment.Price != 0 && !appointment.IsPaid)
+                                        {
+                                            <p class="text-danger mb-0">@SharedLocalizer["Unpaid"]</p>
+                                        }
                                     </div>
                                 </div>
                             </div>

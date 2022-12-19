@@ -71,8 +71,18 @@
                                         onclick="notifyCancel('@appointment.DoctorId', '@SharedLocalizer["CancelTopic"]', '@SharedLocalizer["YourAppointment"] @appointment.AppointmentDate.ToString("MM/dd/yyyy hh:mm") @SharedLocalizer["CancelMessage"]');"
                                         class="btn btn-danger btn-230 flex-grow-1">@SharedLocalizer["Cancel"]</a>
                                     </div>
+                                    if (appointment.IsPaid || appointment.Price == 0)
+                                    {
+                                        <div class="mb-1">
+                                            <a href="@appointment.MeetingJoinLink" target="_blank">@SharedLocalizer["Join"]</a>
+                                        </div>
+                                    }
+                                }
+                                @if (appointment.Price != 0 && !appointment.IsPaid)
+                                {
                                     <div class="mb-1">
-                                        <a href="@appointment.MeetingJoinLink" target="_blank">@SharedLocalizer["Join"]</a>
+                                        <a asp-controller="Treatment" asp-action="PayOff" asp-route-id="@appointment.AppointmentId" 
+                                        class="btn btn-primary btn-230 flex-grow-1">@SharedLocalizer["PayOff"]</a>
                                     </div>
                                 }
                             </div>
@@ -88,6 +98,11 @@
                                         <p class="mb-0">@appointment.AppointmentDate.ToShortDateString()</p>
                                         <p class="small text-muted mb-1">@SharedLocalizer["Time"]</p>
                                         <p class="mb-0">@appointment.AppointmentDate.ToString("HH:mm")</p>
+                                        @if (appointment.Price != 0)
+                                        {
+                                            <p class="small text-muted mb-1">@SharedLocalizer["Price"]</p>
+                                            <p class="mb-0">@appointment.Price</p>
+                                        }
                                     </div>
                                 </div>
                             </div>

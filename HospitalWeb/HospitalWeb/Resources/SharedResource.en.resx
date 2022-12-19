@@ -498,4 +498,10 @@
   <data name="TypeRequiredErrorMessage" xml:space="preserve">
     <value>Hospital type is required</value>
   </data>
+  <data name="PayOff" xml:space="preserve">
+    <value>Pay off</value>
+  </data>
+  <data name="Unpaid" xml:space="preserve">
+    <value>Unpaid</value>
+  </data>
 </root>

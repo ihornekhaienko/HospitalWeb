@@ -35,5 +35,9 @@
         public string MeetingStartLink { get; set; }
 
         public string MeetingJoinLink { get; set; }
+
+        public decimal Price { get; set; }
+
+        public bool IsPaid { get; set; }
     }
 }

@@ -73,6 +73,8 @@ namespace HospitalWeb.Filters.Builders.Implementations
                         Hospital = a.Doctor.Hospital.HospitalName,
                         MeetingStartLink = a.Meetings.FirstOrDefault()?.StartLink,
                         MeetingJoinLink = a.Meetings.FirstOrDefault()?.JoinLink,
+                        Price = a.Price,
+                        IsPaid = a.IsPaid
                     });
 
                 _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());

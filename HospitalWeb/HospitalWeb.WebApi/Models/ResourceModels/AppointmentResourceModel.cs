@@ -15,5 +15,7 @@ namespace HospitalWeb.WebApi.Models.ResourceModels
         public string DoctorId { get; set; }
 
         public string PatientId { get; set; }
+
+        public decimal Price { get; set; }
     }
 }
