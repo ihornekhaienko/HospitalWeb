@@ -1,0 +1,52 @@
+﻿@model PaymentViewModel
+@inject IHtmlLocalizer<SharedResource> SharedLocalizer
+@{
+    ViewBag.Title = SharedLocalizer["Payment"];
+}
+
+<div class="container mt-5">
+    <div class="text-center">
+        <div style="width: 300px; display: inline-block" class="text-left">
+            <div class="panel">
+                <div class="panel-body">
+                    <form asp-controller="Treatment" asp-action="PayOff" method="post">
+						@Html.HiddenFor(m => m.AppointmentId)
+						@Html.HiddenFor(m => m.Amount)
+						@Html.HiddenFor(m => m.Description)
+
+                        <div class="card-js" data-capture-name="true" style="padding:10px; border:1px solid black; border-radius: 10px;">
+							<h6 class="mb-3">@Model.Description</h6>
+							<div class="card-number-wrapper">
+								<input asp-for="Card" class="card-number" type="tel" placeholder="@SharedLocalizer["Card"]" maxlength="19">
+								<div class="card-type-icon"></div>
+								<div class="icon" style="margin-top:-4px;"><i class="fa fa-credit-card"></i></div>
+							</div>
+							<div class="name-wrapper">
+								<input asp-for="Phone" class="name" type="tel" placeholder="@SharedLocalizer["Phone"]">
+								<div class="icon" style="margin-top:-4px;"><i class="fa fa-phone"></i></div>
+							</div>
+							<div class="expiry-container">
+								<div class="expiry-wrapper">
+									<div>
+										<input class="expiry" type="tel" placeholder="@SharedLocalizer["MM/YY"]" maxlength="7">
+										<input asp-for="CardExpirationMonth" type="hidden" name="expiry-month">
+										<input asp-for="CardExpirationYear" type="hidden" name="expiry-year">
+									</div>
+									<div class="icon" style="margin-top:-4px;"><i class="fa fa-calendar"></i></div>
+								</div>
+							</div>
+							<div class="cvc-container">
+								<div class="cvc-wrapper">
+									<input asp-for="Cvv" class="cvc" type="tel" placeholder="CVC/CVV" maxlength="3">
+									<div class="icon" style="margin-top:-4px;"><i class="fa fa-lock"></i></div>
+								</div>
+							</div>
+							<div class="mt-5 text-sm text-muted">@SharedLocalizer["ServicePrice"]: @Model.Amount</div>
+							<button type="submit" class="btn btn-dark mt-2">@SharedLocalizer["PayOff"]</button>
+						</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

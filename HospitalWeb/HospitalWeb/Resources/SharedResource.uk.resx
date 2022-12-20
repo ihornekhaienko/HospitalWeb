@@ -516,4 +516,13 @@
   <data name="PaymentDescRequired" xml:space="preserve">
     <value>Необхідно вказати опис платежу</value>
   </data>
+  <data name="MM/YY" xml:space="preserve">
+    <value>ММ / РР</value>
+  </data>
+  <data name="Payment" xml:space="preserve">
+    <value>Оплата</value>
+  </data>
+  <data name="ServicePrice" xml:space="preserve">
+    <value>Ціна послуги</value>
+  </data>
 </root>

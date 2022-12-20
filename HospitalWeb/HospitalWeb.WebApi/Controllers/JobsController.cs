@@ -36,7 +36,7 @@ namespace HospitalWeb.WebApi.Controllers
         {
             var appointment = await _uow.Appointments.GetAsync(a => a.AppointmentId == id);
 
-            if (appointment.IsPaid)
+            if (appointment == null || appointment.IsPaid)
             {
                 return;
             }

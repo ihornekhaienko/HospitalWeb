@@ -154,6 +154,7 @@ namespace HospitalWeb.Controllers
 
                 var model = new PaymentViewModel
                 {
+                    AppointmentId = appointment.AppointmentId,
                     Amount = appointment.Price,
                     Description = $"Appointment on {appointment.AppointmentDate.ToString("MM/dd/yyyy")}",
                     Phone = appointment.Patient.PhoneNumber

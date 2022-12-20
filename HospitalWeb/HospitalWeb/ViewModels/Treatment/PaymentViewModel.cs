@@ -4,6 +4,9 @@ namespace HospitalWeb.ViewModels.Treatment
 {
     public class PaymentViewModel
     {
+        [Required]
+        public int AppointmentId { get; set; }
+
         [Required(ErrorMessage = "AmountRequired")]
         public decimal Amount { get; set; }
 
