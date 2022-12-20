@@ -49,7 +49,7 @@ namespace HospitalWeb.Services.Implementations
         private string CreateSignature(string base64Encoded)
         {
             base64Encoded = _privateKey + base64Encoded + _privateKey;
-            using var sha1 = SHA1.Create(base64Encoded);
+            using var sha1 = SHA1.Create();
 
             return Convert.ToBase64String(sha1.ComputeHash(Encoding.UTF8.GetBytes(base64Encoded)));
         }

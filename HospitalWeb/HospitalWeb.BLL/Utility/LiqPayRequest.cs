@@ -32,5 +32,7 @@ namespace HospitalWeb.Services.Utility
         public string OrderId { get; set; }
         [JsonProperty("phone")]
         public string Phone { get; set; }
+        [JsonProperty("email")]
+        public string Email { get; set; }
     }
 }

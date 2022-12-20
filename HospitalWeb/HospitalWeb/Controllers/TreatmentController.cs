@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HospitalWeb.ViewModels.Treatment;
+using HospitalWeb.Services.Utility;
 
 namespace HospitalWeb.Controllers
 {
@@ -22,6 +23,7 @@ namespace HospitalWeb.Controllers
         private readonly ICalendarService _calendar;
         private readonly IFileManager _fileManager;
         private readonly ITokenManager _tokenManager;
+        private readonly ILiqPayClient _liqpay;
 
         public TreatmentController(
             ILogger<TreatmentController> logger,
@@ -30,7 +32,8 @@ namespace HospitalWeb.Controllers
             ApiUnitOfWork api,
             ICalendarService calendar,
             IFileManager fileManager,
-            ITokenManager tokenManager)
+            ITokenManager tokenManager,
+            ILiqPayClient liqpay)
         {
             _logger = logger;
             _environment = environment;
@@ -39,6 +42,7 @@ namespace HospitalWeb.Controllers
             _calendar = calendar;
             _fileManager = fileManager;
             _tokenManager = tokenManager;
+            _liqpay = liqpay;
         }
 
         [HttpGet]
@@ -157,7 +161,8 @@ namespace HospitalWeb.Controllers
                     AppointmentId = appointment.AppointmentId,
                     Amount = appointment.Price,
                     Description = $"Appointment on {appointment.AppointmentDate.ToString("MM/dd/yyyy")}",
-                    Phone = appointment.Patient.PhoneNumber
+                    Phone = appointment.Patient.PhoneNumber,
+                    Email = appointment.Patient.Email
                 };
 
                 return View(model);
@@ -165,6 +170,63 @@ namespace HospitalWeb.Controllers
             catch (Exception err)
             {
                 _logger.LogError($"Error in TreatmentController.PayOff.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PayOff(PaymentViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+
+                var request = new LiqPayRequest
+                {
+                    Email = model.Email,
+                    Action = LiqPayRequestAction.Pay,
+                    Phone = model.Phone,
+                    Amount = model.Amount,
+                    Currency = "UAH",
+                    Description = model.Description,
+                    OrderId = Guid.NewGuid().ToString(),
+                    Card = model.Card,
+                    CardExpiredMonth = model.CardExpirationMonth,
+                    CardExpiredYear = model.CardExpirationYear,
+                    CardCvv = model.Cvv
+                };
+
+                var liqpayResponse = await _liqpay.RequestAsync("request", request);
+
+                if (liqpayResponse.Status != LiqPayResponseStatus.Success)
+                {
+
+                }
+
+                var response = _api.Appointments.Get(model.AppointmentId);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Appointments.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+                var appointment = _api.Appointments.Read(response);
+
+                appointment.IsPaid = true;
+                _api.Appointments.Put(appointment);
+
+                return RedirectToAction("History", "Treatment");
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in TreatmentController.PayOff.Post: {err.Message}");
                 _logger.LogError($"Inner exception:\n{err.InnerException}");
                 _logger.LogTrace(err.StackTrace);
 
