@@ -242,7 +242,6 @@ namespace HospitalWeb.Controllers
             request.Headers.Add("Access-Control-Allow-Origin", "*");
 
             var response = await client.SendAsync(request);
-            Console.WriteLine(response.StatusCode);
         }
     }
 }
