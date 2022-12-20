@@ -12,5 +12,50 @@
       "wwwroot/js/rating.js",
       "wwwroot/js/general.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/css/cardjs/cardjs.css",
+    "inputFiles": [
+      "wwwroot/css/cardjs/themes/dark.css",
+      "wwwroot/css/cardjs/themes/stripe.css",
+      "wwwroot/css/cardjs/card-number.css",
+      "wwwroot/css/cardjs/card-type-icon.css",
+      "wwwroot/css/cardjs/cvc.css",
+      "wwwroot/css/cardjs/expiry.css",
+      "wwwroot/css/cardjs/icon.css",
+      "wwwroot/css/cardjs/input.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/bundle.css",
+    "inputFiles": [
+      "wwwroot/css/cardjs/themes/dark.css",
+      "wwwroot/css/cardjs/themes/stripe.css",
+      "wwwroot/css/cardjs/card-number.css",
+      "wwwroot/css/cardjs/card-type-icon.css",
+      "wwwroot/css/cardjs/cvc.css",
+      "wwwroot/css/cardjs/expiry.css",
+      "wwwroot/css/cardjs/input.css",
+      "wwwroot/css/cardjs/icon.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/cardjs.css",
+    "inputFiles": [
+      "wwwroot/css/cardjs/card-number.css",
+      "wwwroot/css/cardjs/themes/dark.css",
+      "wwwroot/css/cardjs/themes/stripe.css",
+      "wwwroot/css/cardjs/card-type-icon.css",
+      "wwwroot/css/cardjs/cvc.css",
+      "wwwroot/css/cardjs/expiry.css",
+      "wwwroot/css/cardjs/icon.css",
+      "wwwroot/css/cardjs/input.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/cardjs/card-js.min.js",
+    "inputFiles": [
+      "wwwroot/js/cardjs/card-js.js"
+    ]
   }
 ]
