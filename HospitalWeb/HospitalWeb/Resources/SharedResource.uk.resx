@@ -525,4 +525,7 @@
   <data name="ServicePrice" xml:space="preserve">
     <value>Ціна послуги</value>
   </data>
+  <data name="PayOffAlert" xml:space="preserve">
+    <value>Ця зустріч не безкоштовна. Будь ласка, оплатіть її, або вона буде автоматично скасована протягом години після підтвердження.</value>
+  </data>
 </root>

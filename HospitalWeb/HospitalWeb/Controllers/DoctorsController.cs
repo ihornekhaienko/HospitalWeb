@@ -211,16 +211,18 @@ namespace HospitalWeb.Controllers
 
                 var entity = _api.Appointments.Read(response);
 
-                if (appointment.Price != 0)
-                {
-                    await RunPaymentChecker(entity.AppointmentId);
-                }
-
                 var meeting = _meetingService.CreateMeeting(entity);
                 _api.Meetings.Post(meeting, tokenResult.Token, tokenResult.Provider);
 
                 await _calendar.CreateEvent(doctor, entity);
                 await _calendar.CreateEvent(patient, entity);
+
+                if (entity.Price != 0)
+                {
+                    await RunPaymentChecker(entity.AppointmentId);
+
+                    return RedirectToAction("PayOff", "Treatment", new { id = entity.AppointmentId });
+                }
 
                 return RedirectToAction("Details", "Doctors", new { id = doctorId });
             }

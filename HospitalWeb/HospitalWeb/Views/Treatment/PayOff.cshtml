@@ -6,7 +6,7 @@
 
 <div class="container mt-5">
     <div class="text-center">
-        <div style="width: 300px; display: inline-block" class="text-left">
+        <div style="width: 330px; display: inline-block" class="text-left">
             <div class="panel">
                 <div class="panel-body">
                     <form asp-controller="Treatment" asp-action="PayOff" method="post" id="card-form">
@@ -17,6 +17,7 @@
 
                         <div class="card-js" data-capture-name="true" style="padding:10px; border:1px solid black; border-radius: 10px;">
 							<h6 class="mb-3">@Model.Description</h6>
+							<div>@SharedLocalizer["PayOffAlert"]</div>
 							<div asp-validation-summary="All" class="text-danger"></div>
 							<div class="card-number-wrapper">
 								<input asp-for="Card" class="card-number" type="tel" placeholder="Card number" maxlength="19">

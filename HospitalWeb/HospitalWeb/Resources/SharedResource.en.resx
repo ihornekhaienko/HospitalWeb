@@ -528,4 +528,7 @@
   <data name="ServicePrice" xml:space="preserve">
     <value>Service price</value>
   </data>
+  <data name="PayOffAlert" xml:space="preserve">
+    <value>This appointment is not free. Please pay it off or it will be canceled automatically within an hour after confirmation.</value>
+  </data>
 </root>
