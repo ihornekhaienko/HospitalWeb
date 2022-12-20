@@ -504,4 +504,16 @@
   <data name="Unpaid" xml:space="preserve">
     <value>Неоплачено</value>
   </data>
+  <data name="CardRequired" xml:space="preserve">
+    <value>Необхідно вказати номер картки</value>
+  </data>
+  <data name="CvvRequired" xml:space="preserve">
+    <value>Необхідно вказати CVV</value>
+  </data>
+  <data name="ExpirationRequired" xml:space="preserve">
+    <value>Необхідно вказати термін дії картки</value>
+  </data>
+  <data name="PaymentDescRequired" xml:space="preserve">
+    <value>Необхідно вказати опис платежу</value>
+  </data>
 </root>

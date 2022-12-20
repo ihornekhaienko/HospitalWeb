@@ -504,4 +504,19 @@
   <data name="Unpaid" xml:space="preserve">
     <value>Unpaid</value>
   </data>
+  <data name="AmountRequired" xml:space="preserve">
+    <value>The payment amount is required</value>
+  </data>
+  <data name="CardRequired" xml:space="preserve">
+    <value>The card number is required</value>
+  </data>
+  <data name="CvvRequired" xml:space="preserve">
+    <value>CVV is required</value>
+  </data>
+  <data name="ExpirationRequired" xml:space="preserve">
+    <value>Card expiration is required</value>
+  </data>
+  <data name="PaymentDescRequired" xml:space="preserve">
+    <value>Payment description is required</value>
+  </data>
 </root>
