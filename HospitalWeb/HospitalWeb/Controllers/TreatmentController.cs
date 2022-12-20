@@ -8,6 +8,7 @@ using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using HospitalWeb.ViewModels.Treatment;
 
 namespace HospitalWeb.Controllers
 {
@@ -127,6 +128,42 @@ namespace HospitalWeb.Controllers
             catch (Exception err)
             {
                 _logger.LogError($"Error in TreatmentController.Cancel.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult PayOff(int id)
+        {
+            try
+            {
+                var response = _api.Appointments.Get(id, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Appointments.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                var appointment = _api.Appointments.Read(response);
+
+                var model = new PaymentViewModel
+                {
+                    Amount = appointment.Price,
+                    Description = $"Appointment on {appointment.AppointmentDate.ToString("MM/dd/yyyy")}",
+                    Phone = appointment.Patient.PhoneNumber
+                };
+
+                return View(model);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in TreatmentController.PayOff.Get: {err.Message}");
                 _logger.LogError($"Inner exception:\n{err.InnerException}");
                 _logger.LogTrace(err.StackTrace);
 
