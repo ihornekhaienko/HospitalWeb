@@ -68,5 +68,10 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddScoped<IAuthenticatorKeyService, AuthenticatorKeyService>();
         }
+
+        public static void AddLiqPayClient(this IServiceCollection services)
+        {
+            services.AddScoped<ILiqPayClient, LiqPayClient>();
+        }
     }
 }
