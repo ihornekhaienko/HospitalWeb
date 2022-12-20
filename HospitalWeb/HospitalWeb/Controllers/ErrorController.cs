@@ -45,5 +45,10 @@ namespace HospitalWeb.Controllers
         {
             return View(model);
         }
+
+        public IActionResult Acquiring(ErrorViewModel model)
+        {
+            return View(model);
+        }
     }
 }

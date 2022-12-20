@@ -206,7 +206,12 @@ namespace HospitalWeb.Controllers
 
                 if (liqpayResponse.Status != LiqPayResponseStatus.Success)
                 {
+                    _logger.LogError($"Error during requiring");
+                    _logger.LogError($"Status: {liqpayResponse.Status}");
+                    _logger.LogError($"Error code: {liqpayResponse.ErrorCode}");
+                    _logger.LogError($"Error description: {liqpayResponse.ErrorDescription}");
 
+                    return RedirectToAction("Acquiring", "Error", new ErrorViewModel { Message = liqpayResponse.ErrorDescription });
                 }
 
                 var response = _api.Appointments.Get(model.AppointmentId);
