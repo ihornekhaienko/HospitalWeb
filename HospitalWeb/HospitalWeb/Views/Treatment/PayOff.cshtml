@@ -9,15 +9,16 @@
         <div style="width: 300px; display: inline-block" class="text-left">
             <div class="panel">
                 <div class="panel-body">
-                    <form asp-controller="Treatment" asp-action="PayOff" method="post">
+                    <form asp-controller="Treatment" asp-action="PayOff" method="post" id="card-form">
 						@Html.HiddenFor(m => m.AppointmentId)
 						@Html.HiddenFor(m => m.Amount)
 						@Html.HiddenFor(m => m.Description)
 
                         <div class="card-js" data-capture-name="true" style="padding:10px; border:1px solid black; border-radius: 10px;">
 							<h6 class="mb-3">@Model.Description</h6>
+							<div asp-validation-summary="All" class="text-danger"></div>
 							<div class="card-number-wrapper">
-								<input asp-for="Card" class="card-number" type="tel" placeholder="@SharedLocalizer["Card"]" maxlength="19">
+								<input asp-for="Card" class="card-number" type="tel" placeholder="Card number" maxlength="19">
 								<div class="card-type-icon"></div>
 								<div class="icon" style="margin-top:-4px;"><i class="fa fa-credit-card"></i></div>
 							</div>
@@ -28,16 +29,16 @@
 							<div class="expiry-container">
 								<div class="expiry-wrapper">
 									<div>
-										<input class="expiry" type="tel" placeholder="@SharedLocalizer["MM/YY"]" maxlength="7">
-										<input asp-for="CardExpirationMonth" type="hidden" name="expiry-month">
-										<input asp-for="CardExpirationYear" type="hidden" name="expiry-year">
+										<input id="expiry" class="expiry" type="tel" placeholder="MM / YY" maxlength="5">
+										<input asp-for="CardExpirationMonth" type="hidden" id="expiry-month">
+										<input asp-for="CardExpirationYear" type="hidden" id="expiry-year">
 									</div>
 									<div class="icon" style="margin-top:-4px;"><i class="fa fa-calendar"></i></div>
 								</div>
 							</div>
 							<div class="cvc-container">
 								<div class="cvc-wrapper">
-									<input asp-for="Cvv" class="cvc" type="tel" placeholder="CVC/CVV" maxlength="3">
+									<input asp-for="Cvv" class="cvc" type="tel" placeholder="CVC" maxlength="3">
 									<div class="icon" style="margin-top:-4px;"><i class="fa fa-lock"></i></div>
 								</div>
 							</div>
@@ -50,3 +51,28 @@
         </div>
     </div>
 </div>
+
+@section scripts {
+	<script>	
+		$("#expiry").keydown(function() {
+			let text = this.value;
+
+            if (text.length == 2) {
+                this.value += '/';
+                return;
+			}
+
+            if (text.length == 3) {
+                this.value = text.substring(0, 2);
+                return;
+			}
+		});
+
+		$("#expiry").focusout(function() {
+            let expiry = this.value.split('/');
+
+            $("#expiry-month").val(expiry[0]);
+			$("#expiry-year").val(expiry[1]);
+		});
+	</script>
+}
