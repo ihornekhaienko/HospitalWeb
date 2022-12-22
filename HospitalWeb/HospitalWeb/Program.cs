@@ -17,9 +17,9 @@ var configuration = builder.Configuration;
 #region LOCALIZATION
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-builder.Services.AddControllersWithViews()
-    .AddDataAnnotationsLocalization(options =>
-        options.DataAnnotationLocalizerProvider = (type, factory) =>
+builder.Services.AddControllersWithViews(o => o.Filters.Add(typeof(PollyExceptionFilter)))
+    .AddDataAnnotationsLocalization(o =>
+        o.DataAnnotationLocalizerProvider = (type, factory) =>
             factory.Create(typeof(SharedResource)))
     .AddViewLocalization();
 

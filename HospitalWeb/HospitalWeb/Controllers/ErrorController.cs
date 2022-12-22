@@ -50,5 +50,15 @@ namespace HospitalWeb.Controllers
         {
             return View(model);
         }
+
+        public IActionResult Timeout()
+        {
+            return View();
+        }
+
+        public IActionResult BrokenCircuit()
+        {
+            return View();
+        }
     }
 }
