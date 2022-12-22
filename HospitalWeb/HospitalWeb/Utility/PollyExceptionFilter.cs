@@ -16,7 +16,7 @@ namespace HospitalWeb
 
         public void OnException(ExceptionContext context)
         {
-            if (context.Exception is TimeoutRejectedException timeoutError)
+            if (context.Exception is AggregateException aggExc && aggExc.InnerException is TimeoutRejectedException timeoutError)
             {
                 _logger.LogError($"Error: {timeoutError.Message}");
                 _logger.LogError($"Inner exception:\n{timeoutError.InnerException}");
@@ -35,7 +35,7 @@ namespace HospitalWeb
                 return;
             }
 
-            if (context.Exception is BrokenCircuitException cbError)
+            if (context.Exception is AggregateException aggError && aggError.InnerException is BrokenCircuitException cbError)
             {
                 _logger.LogError($"Error: {cbError.Message}");
                 _logger.LogError($"Inner exception:\n{cbError.InnerException}");

@@ -1,9 +1,9 @@
 ﻿@model ErrorViewModel
-@inject IHtmlLocalizer Localizer
+@inject IViewLocalizer Localizer
 @{
     ViewBag.Title = Localizer["Title"];
 }
-<div class="list-header clearfix text-danger">
+<div class="list-header clearfix text-danger mt-2">
     <h2>@Localizer["Error"]</h2>
     <p>@Localizer["Message"]</p>
     @if (Model != null )
