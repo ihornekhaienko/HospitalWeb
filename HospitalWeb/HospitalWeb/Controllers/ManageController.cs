@@ -136,30 +136,20 @@ namespace HospitalWeb.Controllers
                 admin.Name = model.Name;
                 admin.PhoneNumber = model.Phone;
 
-                var tokenResult = await _tokenManager.GetToken(admin);
+                var result = await _userManager.UpdateAsync(admin);
 
-                response = _api.Admins.Put(admin, tokenResult.Token, tokenResult.Provider);
-
-                if (response.IsSuccessStatusCode)
+                if (result.Succeeded)
                 {
                     return RedirectToAction("Profile", "Manage");
                 }
 
-                var errors = _api.Admins.ReadError<IEnumerable<IdentityError>>(response);
-
-                if (errors == null)
-                {
-                    var statusCode = response.StatusCode;
-                    var message = _api.Admins.ReadError<string>(response);
-
-                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-                }
-
-                foreach (var error in errors)
+                foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
             return View(model);
         }
@@ -233,30 +223,20 @@ namespace HospitalWeb.Controllers
                 doctor.Name = model.Name;
                 doctor.PhoneNumber = model.Phone;
 
-                var tokenResult = await _tokenManager.GetToken(doctor);
+                var result = await _userManager.UpdateAsync(doctor);
 
-                response = _api.Doctors.Put(doctor, tokenResult.Token, tokenResult.Provider);
-
-                if (response.IsSuccessStatusCode)
+                if (result.Succeeded)
                 {
                     return RedirectToAction("Profile", "Manage");
                 }
 
-                var errors = _api.Doctors.ReadError<IEnumerable<IdentityError>>(response);
-
-                if (errors == null)
-                {
-                    var statusCode = response.StatusCode;
-                    var message = _api.Doctors.ReadError<string>(response);
-
-                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-                }
-
-                foreach (var error in errors)
+                foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
             return View(model);
         }
@@ -338,30 +318,19 @@ namespace HospitalWeb.Controllers
                 patient.PhoneNumber = model.Phone;
                 patient.Address = address;
 
-                var tokenResult = await _tokenManager.GetToken(patient);
+                var result = await _userManager.UpdateAsync(patient);
 
-                response = _api.Patients.Put(patient, tokenResult.Token, tokenResult.Provider);
-
-                if (response.IsSuccessStatusCode)
+                if (result.Succeeded)
                 {
                     return RedirectToAction("Profile", "Manage");
                 }
 
-                var errors = _api.Patients.ReadError<IEnumerable<IdentityError>>(response);
-
-                if (errors == null)
-                {
-                    var statusCode = response.StatusCode;
-                    var message = _api.Patients.ReadError<string>(response);
-
-                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-                }
-
-                foreach (var error in errors)
+                foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+            ViewBag.Image = await _fileManager.GetBytes(Path.Combine(_environment.WebRootPath, "files/images/profile.jpg"));
 
             return View(model);
         }
