@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HospitalWeb.ViewModels.Treatment;
 using HospitalWeb.Services.Utility;
+using Microsoft.Extensions.Localization;
 
 namespace HospitalWeb.Controllers
 {
@@ -17,6 +18,7 @@ namespace HospitalWeb.Controllers
     public class TreatmentController : Controller
     {
         private readonly ILogger<TreatmentController> _logger;
+        private readonly IStringLocalizer<ExceptionResource> _errLocalizer;
         private readonly IWebHostEnvironment _environment;
         private readonly UserManager<AppUser> _userManager;
         private readonly ApiUnitOfWork _api;
@@ -27,6 +29,7 @@ namespace HospitalWeb.Controllers
 
         public TreatmentController(
             ILogger<TreatmentController> logger,
+            IStringLocalizer<ExceptionResource> errLocalizer,
             IWebHostEnvironment environment,
             UserManager<AppUser> userManager,
             ApiUnitOfWork api,
@@ -36,6 +39,7 @@ namespace HospitalWeb.Controllers
             ILiqPayClient liqpay)
         {
             _logger = logger;
+            _errLocalizer = errLocalizer;
             _environment = environment;
             _userManager = userManager;
             _api = api;
@@ -112,7 +116,7 @@ namespace HospitalWeb.Controllers
 
                 if (appointment.State != State.Planned)
                 {
-                    throw new Exception($"Appointment has to planned to cancel it, whereas it is {appointment.State}");
+                    throw new Exception(string.Format(_errLocalizer["MustBePlannedToCancel"], appointment.State));
                 }
 
                 appointment.State = State.Canceled;

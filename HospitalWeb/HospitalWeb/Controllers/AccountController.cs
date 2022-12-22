@@ -9,6 +9,7 @@ using HospitalWeb.ViewModels.Error;
 using System.Security.Claims;
 using HospitalWeb.Clients.Implementations;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using Microsoft.Extensions.Localization;
 
 namespace HospitalWeb.Controllers
 {
@@ -17,6 +18,7 @@ namespace HospitalWeb.Controllers
     public class AccountController : Controller
     {
         private readonly ILogger<AccountController> _logger;
+        private readonly IStringLocalizer<ExceptionResource> _errLocalizer;
         private readonly IWebHostEnvironment _environment;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
@@ -27,6 +29,7 @@ namespace HospitalWeb.Controllers
 
         public AccountController(
             ILogger<AccountController> logger,
+            IStringLocalizer<ExceptionResource> errLocalizer,
             IWebHostEnvironment environment,
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
@@ -37,6 +40,7 @@ namespace HospitalWeb.Controllers
             )
         {
             _logger = logger;
+            _errLocalizer = errLocalizer;
             _environment = environment;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -234,7 +238,7 @@ namespace HospitalWeb.Controllers
 
                     if (info == null)
                     {
-                        throw new ApplicationException("Error loading external login information during confirmation.");
+                        throw new ApplicationException(_errLocalizer["LoadingExternalLoginInfo"]);
                     }
 
                     var locality = _api.Localities.GetOrCreate(model.Locality);
@@ -297,7 +301,7 @@ namespace HospitalWeb.Controllers
 
                 if (user == null)
                 {
-                    throw new ApplicationException("Unable to load two-factor authentication user.");
+                    throw new ApplicationException(_errLocalizer["Load2FA"]);
                 }
 
                 var model = new LoginWith2faViewModel { RememberMe = rememberMe };
@@ -330,7 +334,7 @@ namespace HospitalWeb.Controllers
                 var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
                 if (user == null)
                 {
-                    throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                    throw new ApplicationException(string.Format(_errLocalizer["LoadUserWithId"].Value, _userManager.GetUserId(User)));
                 }
 
                 var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
@@ -367,7 +371,7 @@ namespace HospitalWeb.Controllers
                 var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
                 if (user == null)
                 {
-                    throw new ApplicationException($"Unable to load two-factor authentication user.");
+                    throw new ApplicationException(_errLocalizer["Load2FA"]);
                 }
 
                 ViewBag.ReturnUrl = returnUrl;
@@ -399,7 +403,7 @@ namespace HospitalWeb.Controllers
                 var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
                 if (user == null)
                 {
-                    throw new ApplicationException($"Unable to load two-factor authentication user.");
+                    throw new ApplicationException(_errLocalizer["Load2FA"]);
                 }
 
                 var recoveryCode = model.RecoveryCode.Replace(" ", string.Empty);
@@ -468,7 +472,7 @@ namespace HospitalWeb.Controllers
 
                 if (!result.Succeeded)
                 {
-                    throw new ApplicationException($"Failed email confirmation");
+                    throw new ApplicationException(_errLocalizer["FailedEmailConfirm"]);
                 }
 
                 return View("ConfirmEmail", "Account");
@@ -550,7 +554,7 @@ namespace HospitalWeb.Controllers
             {
                 if (code == null)
                 {
-                    throw new ApplicationException("A code must be supplied for password reset.");
+                    throw new ApplicationException(_errLocalizer["CodeMustBeSupplied"]);
                 }
 
                 var model = new ResetPasswordViewModel { Code = code };

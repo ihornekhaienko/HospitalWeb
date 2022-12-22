@@ -9,12 +9,14 @@ using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace HospitalWeb.Controllers
 {
     public class AppointmentsController : Controller
     {
         private readonly ILogger<AppointmentsController> _logger;
+        private readonly IStringLocalizer<ExceptionResource> _errLocalizer;
         private readonly IWebHostEnvironment _environment;
         private readonly ApiUnitOfWork _api;
         private readonly UserManager<AppUser> _userManager;
@@ -25,6 +27,7 @@ namespace HospitalWeb.Controllers
 
         public AppointmentsController(
             ILogger<AppointmentsController> logger,
+            IStringLocalizer<ExceptionResource> errLocalizer,
             IWebHostEnvironment environment,
             ApiUnitOfWork api,
             UserManager<AppUser> userManager,
@@ -35,6 +38,7 @@ namespace HospitalWeb.Controllers
             )
         {
             _logger = logger;
+            _errLocalizer = errLocalizer;
             _environment = environment;
             _api = api;
             _userManager = userManager;
@@ -188,7 +192,7 @@ namespace HospitalWeb.Controllers
 
                 if (appointment.State != State.Planned)
                 {
-                    throw new Exception($"Appointment has to planned to cancel it, whereas it is {appointment.State}");
+                    throw new Exception(string.Format(_errLocalizer["MustBePlannedToCancel"].Value, appointment.State));
                 }
 
                 var user = await _userManager.GetUserAsync(User);
@@ -278,7 +282,7 @@ namespace HospitalWeb.Controllers
 
                     if (appointment.State != State.Planned)
                     {
-                        throw new Exception($"Appointment has to be planned to submit it, whereas it is {appointment.State}");
+                        throw new Exception(string.Format(_errLocalizer["MustBePlannedToSubmit"].Value, appointment.State));
                     }
 
                     response = _api.Diagnoses.Get(model.Diagnosis);

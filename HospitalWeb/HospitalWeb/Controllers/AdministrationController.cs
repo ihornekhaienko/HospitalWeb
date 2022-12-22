@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using HospitalWeb.Services.Extensions;
 using HospitalWeb.ViewModels.Error;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Localization;
 
 namespace HospitalWeb.Controllers
 {
@@ -19,6 +20,7 @@ namespace HospitalWeb.Controllers
     public class AdministrationController : Controller
     {
         private readonly ILogger<AdministrationController> _logger;
+        private readonly IStringLocalizer<ExceptionResource> _errLocalizer;
         private readonly IWebHostEnvironment _environment;
         private readonly ApiUnitOfWork _api;
         private readonly UserManager<AppUser> _userManager;
@@ -30,6 +32,7 @@ namespace HospitalWeb.Controllers
 
         public AdministrationController(
             ILogger<AdministrationController> logger,
+            IStringLocalizer<ExceptionResource> errLocalizer,
             IWebHostEnvironment environment,
             ApiUnitOfWork api,
             UserManager<AppUser> userManager,
@@ -40,6 +43,7 @@ namespace HospitalWeb.Controllers
             INotifier notifier)
         {
             _logger = logger;
+            _errLocalizer = errLocalizer;
             _environment = environment;
             _api = api;
             _fileManager = fileManager;
@@ -470,14 +474,14 @@ namespace HospitalWeb.Controllers
             {
                 if (file == null)
                 {
-                    throw new Exception("Failed loading file");
+                    throw new Exception(_errLocalizer["LoadFile"]);
                 }
 
                 var bytes = await _fileManager.GetBytes(file);
 
                 if (bytes != null && bytes.IsImage())
                 {
-                    throw new Exception("Your file is not an image");
+                    throw new Exception(_errLocalizer["NotImage"]);
                 }
 
                 var response = _api.Hospitals.Get(id, null, null);

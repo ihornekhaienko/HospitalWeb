@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using Microsoft.Extensions.Localization;
 
 namespace HospitalWeb.Controllers
 {
@@ -17,6 +18,7 @@ namespace HospitalWeb.Controllers
     public class ManageController : Controller
     {
         private readonly ILogger<ManageController> _logger;
+        private readonly IStringLocalizer<ExceptionResource> _errLocalizer;
         private readonly IWebHostEnvironment _environment;
         private readonly ApiUnitOfWork _api;
         private readonly UserManager<AppUser> _userManager;
@@ -26,7 +28,8 @@ namespace HospitalWeb.Controllers
         private readonly IAuthenticatorKeyService _authenticator;
 
         public ManageController(
-            ILogger<ManageController> logger, 
+            ILogger<ManageController> logger,
+            IStringLocalizer<ExceptionResource> errLocalizer,
             IWebHostEnvironment environment,
             ApiUnitOfWork api,
             UserManager<AppUser> userManager,
@@ -36,6 +39,7 @@ namespace HospitalWeb.Controllers
             IAuthenticatorKeyService authenticator)
         {
             _logger = logger;
+            _errLocalizer = errLocalizer;
             _environment = environment;
             _api = api;
             _userManager = userManager;
@@ -342,14 +346,14 @@ namespace HospitalWeb.Controllers
             {
                 if (file == null)
                 {
-                    throw new Exception("Failed loading file");
+                    throw new Exception(_errLocalizer["LoadFile"]);
                 }
 
                 var bytes = await _fileManager.GetBytes(file);
 
                 if (bytes == null && !bytes.IsImage())
                 {
-                    throw new Exception("Your file is not an image");
+                    throw new Exception(_errLocalizer["NotImage"]);
                 }
 
                 var response = _api.AppUsers.Get(User.Identity.Name, null, null);
