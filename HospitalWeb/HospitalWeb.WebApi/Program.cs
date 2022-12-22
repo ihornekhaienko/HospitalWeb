@@ -6,9 +6,11 @@ using HospitalWeb.WebApi.Middlewares;
 using HospitalWeb.WebApi.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 
@@ -39,6 +41,10 @@ builder.Services.AddSwaggerGen(s =>
 });
 #endregion
 
+#region LOCALIZATION
+builder.Services.AddMultilangIdentityErrorDescriberFactory();
+#endregion
+
 #region DB
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -49,7 +55,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
-    .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
+    .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider)
+    .AddMultilangIdentityErrorDescriber();
 #endregion
 
 #region AUTHORIZATION
@@ -167,7 +174,7 @@ builder.Services.AddCors(options =>
 #endregion
 
 builder.Services.AddUnitOfWork();
-builder.Services.AddDbInitializer();
+//builder.Services.AddDbInitializer();
 
 var app = builder.Build();
 
@@ -178,6 +185,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseRequestLocalization();
+
 app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
@@ -185,7 +194,7 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseDbInitializer();
+//app.UseDbInitializer();
 
 app.UseHangfireDashboard("/dashboard");
 

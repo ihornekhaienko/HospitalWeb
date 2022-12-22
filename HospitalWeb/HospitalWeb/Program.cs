@@ -14,24 +14,6 @@ using Google.Apis.Auth.AspNetCore3;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-#region DB
-string connection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseSqlServer(connection);
-    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-});
-
-builder.Services.AddIdentity<AppUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders()
-    .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
-#endregion
-
-#region SIGNALR
-builder.Services.AddSignalR();
-#endregion
-
 #region LOCALIZATION
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
@@ -53,6 +35,27 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
 });
+
+builder.Services.AddMultilangIdentityErrorDescriberFactory();
+#endregion
+
+#region DB
+string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlServer(connection);
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
+
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders()
+    .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider)
+    .AddMultilangIdentityErrorDescriber();
+#endregion
+
+#region SIGNALR
+builder.Services.AddSignalR();
 #endregion
 
 #region AUTHORIZATION

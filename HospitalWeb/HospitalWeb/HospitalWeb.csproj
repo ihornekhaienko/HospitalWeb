@@ -35,6 +35,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="7.0.1" />
+    <PackageReference Include="PiotrTrojan.AspNetCore.IdentityErrorLocalization.Multilang" Version="1.0.7" />
     <PackageReference Include="Polly" Version="7.2.3" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
   </ItemGroup>

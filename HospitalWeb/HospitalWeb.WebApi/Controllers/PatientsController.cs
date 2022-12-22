@@ -200,6 +200,8 @@ namespace HospitalWeb.WebApi.Controllers
                     return BadRequest("Passing null object to the PatientsController.Post method");
                 }
 
+                var headers = Request.Headers;
+
                 var config = new MapperConfiguration(cfg => cfg.CreateMap<PatientResourceModel, Patient>()
                     .ForMember(d => d.Image, o => o.Ignore()));
                 var mapper = new Mapper(config);

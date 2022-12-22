@@ -1,5 +1,6 @@
 ﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.WebApi.Models.ResourceModels;
+using System.Globalization;
 using System.Net.Http.Headers;
 
 namespace HospitalWeb.Clients.Implementations
@@ -23,6 +24,7 @@ namespace HospitalWeb.Clients.Implementations
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             request.Headers.Add("Provider", provider);
+            request.Headers.Add("Accept-Language", CultureInfo.CurrentCulture.Name);
 
             return _client.SendAsync(request).Result;
         }
