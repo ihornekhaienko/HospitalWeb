@@ -27,7 +27,6 @@ namespace HospitalWeb.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            _logger.LogCritical("CurrentCulture is {0}.", CultureInfo.CurrentCulture.Name);
             return View();
         }
 

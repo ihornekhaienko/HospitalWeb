@@ -6,25 +6,28 @@ using HospitalWeb.DAL.Entities;
 using HospitalWeb.DAL.Entities.Identity;
 using HospitalWeb.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HospitalWeb.Services.Implementations
 {
     public class GoogleCalendarService : ICalendarService
     {
+        private readonly ILogger<GoogleCalendarService> _logger;
         private readonly IConfiguration _config;
         private readonly CalendarService _service;
 
-        public GoogleCalendarService(IConfiguration config)
+        public GoogleCalendarService(ILogger<GoogleCalendarService> logger, IConfiguration config)
         {
+            _logger = logger;
             _config = config;
 
             string[] scopes = { CalendarService.Scope.Calendar };
 
             var credential = new ServiceAccountCredential(
-                new ServiceAccountCredential.Initializer(_config["Calendar:ClientEmail"])
-                {
-                    Scopes = scopes
-                }.FromPrivateKey(_config["Calendar:PrivateKey"]));
+            new ServiceAccountCredential.Initializer(_config["Calendar:ClientEmail"])
+            {
+                Scopes = scopes
+            }.FromPrivateKey(_config["Calendar:PrivateKey"]));
 
             _service = new CalendarService(new BaseClientService.Initializer()
             {
@@ -59,12 +62,22 @@ namespace HospitalWeb.Services.Implementations
 
         public string GetCalendar(AppUser user)
         {
+            if (string.IsNullOrEmpty(user.CalendarId))
+            {
+                return null;
+            }
+
             return _config["Calendar:CalendarUrl"] + user.CalendarId + _config["Calendar:TimeZone"];
         }
 
         public async Task CreateEvent(AppUser user, Appointment appointment)
         {
             var calendarId = user.CalendarId;
+
+            if (string.IsNullOrEmpty(calendarId))
+            {
+                return;
+            }
 
             var calendarEvent = new Event()
             {
@@ -89,6 +102,12 @@ namespace HospitalWeb.Services.Implementations
         public async Task ConfirmEvent(AppUser user, Appointment appointment)
         {
             var calendarId = user.CalendarId;
+
+            if (string.IsNullOrEmpty(calendarId))
+            {
+                return;
+            }
+
             var eventId = "event_" + appointment.AppointmentId.ToString();
             var calendarEvent = await _service.Events.Get(calendarId, eventId).ExecuteAsync();
 
@@ -105,6 +124,12 @@ namespace HospitalWeb.Services.Implementations
         public async Task CancelEvent(AppUser user, Appointment appointment)
         {
             var calendarId = user.CalendarId;
+
+            if (string.IsNullOrEmpty(calendarId))
+            {
+                return;
+            }
+
             var eventId = "event" + appointment.AppointmentId.ToString();
             var calendarEvent = await _service.Events.Get(calendarId, eventId).ExecuteAsync();
 
@@ -121,6 +146,12 @@ namespace HospitalWeb.Services.Implementations
         public async Task DeleteCalendar(AppUser user)
         {
             var calendarId = user.CalendarId;
+
+            if (string.IsNullOrEmpty(calendarId))
+            {
+                return;
+            }
+
             await _service.Calendars.Delete(calendarId).ExecuteAsync();
         }
     }

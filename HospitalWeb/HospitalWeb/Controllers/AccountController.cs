@@ -71,8 +71,6 @@ namespace HospitalWeb.Controllers
                 Sex sex;
                 Enum.TryParse(model.Sex, out sex);
 
-                var calendarId = await _calendar.CreateCalendar(model.Email);
-
                 var resource = new PatientResourceModel
                 {
                     Name = model.Name,
@@ -83,9 +81,19 @@ namespace HospitalWeb.Controllers
                     AddressId = address.AddressId,
                     BirthDate = model.BirthDate,
                     Sex = sex,
-                    CalendarId = calendarId,
                     Password = model.Password
                 };
+
+                try
+                {
+                    var calendarId = await _calendar.CreateCalendar(model.Email);
+                    resource.CalendarId = calendarId;
+                }
+                catch (Exception err)
+                {
+                    _logger.LogError($"Google calendar error: {err.Message}");
+                    _logger.LogError($"Unable to create calendar for {model.Email}");
+                }
 
                 var response = _api.Patients.Post(resource);
 
@@ -246,8 +254,6 @@ namespace HospitalWeb.Controllers
                     Sex sex;
                     Enum.TryParse(model.Sex, out sex);
 
-                    var calendarId = await _calendar.CreateCalendar(model.Email);
-
                     var patient = new PatientResourceModel
                     {
                         Name = model.Name,
@@ -257,9 +263,19 @@ namespace HospitalWeb.Controllers
                         PhoneNumber = model.Phone,
                         AddressId = address.AddressId,
                         BirthDate = model.BirthDate,
-                        Sex = sex,
-                        CalendarId = calendarId
+                        Sex = sex
                     };
+
+                    try
+                    {
+                        var calendarId = await _calendar.CreateCalendar(model.Email);
+                        patient.CalendarId = calendarId;
+                    }
+                    catch (Exception err)
+                    {
+                        _logger.LogError($"Google calendar error: {err.Message}");
+                        _logger.LogError($"Unable to create calendar for {model.Email}");
+                    }
 
                     var response = _api.Patients.Post(patient);
 

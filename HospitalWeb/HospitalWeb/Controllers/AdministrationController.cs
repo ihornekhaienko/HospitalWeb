@@ -631,8 +631,6 @@ namespace HospitalWeb.Controllers
                 //var password = _passwordGenerator.GeneratePassword(null);
                 var password = "Pass_1111";
 
-                var calendarId = await _calendar.CreateCalendar(model.Email);
-
                 var doctor = new DoctorResourceModel
                 {
                     Name = model.Name,
@@ -643,10 +641,20 @@ namespace HospitalWeb.Controllers
                     SpecialtyId = specialty.SpecialtyId,
                     HospitalId = model.Hospital,
                     EmailConfirmed = true,
-                    CalendarId = calendarId,
                     Password = password,
                     ServicePrice = model.ServicePrice,
                 };
+
+                try
+                {
+                    var calendarId = await _calendar.CreateCalendar(model.Email);
+                    doctor.CalendarId = calendarId;
+                }
+                catch (Exception err)
+                {
+                    _logger.LogError($"Google calendar error: {err.Message}");
+                    _logger.LogError($"Unable to create calendar for {model.Email}");
+                }
 
                 var response = _api.Doctors.Post(doctor, tokenResult.Token, tokenResult.Provider);
 
