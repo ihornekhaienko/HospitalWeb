@@ -61,8 +61,6 @@ builder.Services.AddSignalR();
 #region AUTHORIZATION
 builder.Services.AddAuthentication(o =>
 {
-    o.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-    o.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
     o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
     .AddGoogleOpenIdConnect("Google", options =>   
