@@ -108,7 +108,7 @@ namespace HospitalWeb.Services.Implementations
                 return;
             }
 
-            var eventId = "event_" + appointment.AppointmentId.ToString();
+            var eventId = "event" + appointment.AppointmentId.ToString();
             var calendarEvent = await _service.Events.Get(calendarId, eventId).ExecuteAsync();
 
             if (calendarEvent == null)

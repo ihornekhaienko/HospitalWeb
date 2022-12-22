@@ -31,11 +31,14 @@
         <span class="input-group-btn"><button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button></span>
         <span class="input-group-btn input-space"><a asp-action="History"> @SharedLocalizer["ClearFilters"]</a></span>
     </div>
-    <div class="mb-2">
-        <a href="@ViewBag.Calendar" target="_blank">
-            @SharedLocalizer["Calendar"]
-        </a>
-    </div>
+    @if (ViewBag.Calendar != null)
+    {
+        <div class="mb-2">
+            <a href="@ViewBag.Calendar" target="_blank">
+                @SharedLocalizer["Calendar"]
+            </a>
+        </div>
+    }
 </form>
 
 <div class="container h-100">
