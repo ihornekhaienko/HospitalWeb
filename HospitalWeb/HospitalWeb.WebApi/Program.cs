@@ -174,7 +174,7 @@ builder.Services.AddCors(options =>
 #endregion
 
 builder.Services.AddUnitOfWork();
-//builder.Services.AddDbInitializer();
+builder.Services.AddDbInitializer();
 
 var app = builder.Build();
 
@@ -194,7 +194,7 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseDbInitializer();
+app.UseDbInitializer();
 
 app.UseHangfireDashboard("/dashboard");
 

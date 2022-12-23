@@ -1,4 +1,4 @@
-﻿namespace HospitalWeb.Services.Interfaces
+﻿namespace HospitalWeb.WebApi.Services.Interfaces
 {
     public interface IDbInitializer
     {

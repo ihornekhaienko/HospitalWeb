@@ -54,16 +54,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ICalendarService, GoogleCalendarService>();
         }
 
-        public static void AddDbInitializer(this IServiceCollection services, bool fullGenerate = false)
-        {
-            services.AddScoped<IDbInitializer, HospitalDbInitializer>(x =>
-                new HospitalDbInitializer(x.GetRequiredService<IConfiguration>(),
-                                          x.GetRequiredService<UserManager<AppUser>>(),
-                                          x.GetRequiredService<RoleManager<IdentityRole>>(),
-                                          x.GetRequiredService<IUnitOfWork>(),
-                                          fullGenerate));
-        }
-
         public static void AddAuthenticatorKeyService(this IServiceCollection services)
         {
             services.AddScoped<IAuthenticatorKeyService, AuthenticatorKeyService>();

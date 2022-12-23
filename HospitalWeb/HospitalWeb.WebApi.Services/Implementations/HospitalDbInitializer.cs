@@ -1,12 +1,12 @@
 ﻿using HospitalWeb.Domain.Entities;
 using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Domain.Services.Interfaces;
-using HospitalWeb.Services.Extensions;
-using HospitalWeb.Services.Interfaces;
+using HospitalWeb.WebApi.Services.Extensions;
+using HospitalWeb.WebApi.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 
-namespace HospitalWeb.Services.Implementations
+namespace HospitalWeb.WebApi.Services.Implementations
 {
     public class HospitalDbInitializer : IDbInitializer
     {

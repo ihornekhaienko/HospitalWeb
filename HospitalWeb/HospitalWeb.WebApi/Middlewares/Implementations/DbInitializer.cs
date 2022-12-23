@@ -1,5 +1,5 @@
 ﻿using HospitalWeb.Domain.Data;
-using HospitalWeb.Services.Interfaces;
+using HospitalWeb.WebApi.Services.Interfaces;
 
 namespace HospitalWeb.WebApi.Middlewares.Implementations
 {

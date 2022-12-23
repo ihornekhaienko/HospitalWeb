@@ -2,7 +2,7 @@
 using HospitalWeb.Domain.Entities;
 using HospitalWeb.Domain.Entities.Identity;
 
-namespace HospitalWeb.Services.Extensions
+namespace HospitalWeb.WebApi.Services.Extensions
 {
     public static class DataGenerator
     {
