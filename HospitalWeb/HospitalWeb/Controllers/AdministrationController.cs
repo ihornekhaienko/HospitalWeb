@@ -9,7 +9,6 @@ using HospitalWeb.Clients.Implementations;
 using HospitalWeb.Models.ResourceModels;
 using HospitalWeb.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
-using HospitalWeb.Services.Extensions;
 using HospitalWeb.ViewModels.Error;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Localization;
