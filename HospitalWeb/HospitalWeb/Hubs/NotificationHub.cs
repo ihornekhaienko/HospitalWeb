@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using HospitalWeb.Domain.Entities;
 using HospitalWeb.Clients.Implementations;
 using HospitalWeb.Models.ResourceModels;
 using Microsoft.AspNetCore.SignalR;

@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using HospitalWeb.Domain.Entities;
 
 namespace HospitalWeb.Models.ResourceModels
 {

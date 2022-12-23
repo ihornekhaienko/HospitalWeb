@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using HospitalWeb.Domain.Entities;
 using HospitalWeb.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

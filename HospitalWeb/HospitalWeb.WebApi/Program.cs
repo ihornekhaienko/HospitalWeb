@@ -1,7 +1,7 @@
 using Hangfire;
-using HospitalWeb.DAL.Data;
-using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Extensions;
+using HospitalWeb.Domain.Data;
+using HospitalWeb.Domain.Entities.Identity;
+using HospitalWeb.Domain.Services.Extensions;
 using HospitalWeb.WebApi.Middlewares;
 using HospitalWeb.WebApi.Utility;
 using Microsoft.AspNetCore.Authorization;

@@ -1,6 +1,6 @@
 ﻿using Hangfire;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Services.Interfaces;
+using HospitalWeb.Domain.Entities;
+using HospitalWeb.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.WebApi.Controllers

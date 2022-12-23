@@ -2,8 +2,8 @@
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Entities.Identity;
+using HospitalWeb.Domain.Entities;
+using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

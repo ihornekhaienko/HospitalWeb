@@ -1,5 +1,5 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Implementations;
+﻿using HospitalWeb.Domain.Entities.Identity;
+using HospitalWeb.Domain.Services.Implementations;
 using HospitalWeb.Filters.Builders.Interfaces;
 using HospitalWeb.Filters.Models;
 using HospitalWeb.Filters.Models.DTO;

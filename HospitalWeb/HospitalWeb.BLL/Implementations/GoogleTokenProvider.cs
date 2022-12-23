@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
+﻿using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.Services.Utility;
 using Microsoft.AspNetCore.Identity;

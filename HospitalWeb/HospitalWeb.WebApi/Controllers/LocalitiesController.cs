@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Services.Implementations;
-using HospitalWeb.DAL.Services.Interfaces;
+using HospitalWeb.Domain.Entities;
+using HospitalWeb.Domain.Services.Implementations;
+using HospitalWeb.Domain.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

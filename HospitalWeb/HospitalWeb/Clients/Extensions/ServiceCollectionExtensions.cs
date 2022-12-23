@@ -1,7 +1,7 @@
 ﻿using HospitalWeb.Clients.Implementations;
 using HospitalWeb.Clients.Interfaces;
-using HospitalWeb.DAL.Entities;
-using HospitalWeb.DAL.Entities.Identity;
+using HospitalWeb.Domain.Entities;
+using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Models.ResourceModels;
 using Polly;
 using Polly.Contrib.WaitAndRetry;

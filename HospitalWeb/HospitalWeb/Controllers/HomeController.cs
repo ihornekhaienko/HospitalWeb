@@ -1,5 +1,5 @@
 ﻿using HospitalWeb.Clients.Implementations;
-using HospitalWeb.DAL.Entities.Identity;
+using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Filters.Builders.Implementations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;

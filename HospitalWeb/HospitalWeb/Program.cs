@@ -1,6 +1,6 @@
-using HospitalWeb.DAL.Data;
-using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Extensions;
+using HospitalWeb.Domain.Data;
+using HospitalWeb.Domain.Entities.Identity;
+using HospitalWeb.Domain.Services.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HospitalWeb;

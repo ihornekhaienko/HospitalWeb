@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Services.Interfaces;
+﻿using HospitalWeb.Domain.Services.Interfaces;
 
 namespace HospitalWeb.Clients.Implementations
 {

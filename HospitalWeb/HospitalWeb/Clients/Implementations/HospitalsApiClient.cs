@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using HospitalWeb.Domain.Entities;
 using HospitalWeb.Models.ResourceModels;
 using HospitalWeb.Models.SortStates;
 using System.Globalization;

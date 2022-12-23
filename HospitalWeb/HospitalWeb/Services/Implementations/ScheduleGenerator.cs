@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
+﻿using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Doctors;
 using HospitalWeb.Clients.Implementations;

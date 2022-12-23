@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using HospitalWeb.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace HospitalWeb.ViewModels.Administration

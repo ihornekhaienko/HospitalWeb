@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Data;
+﻿using HospitalWeb.Domain.Data;
 using HospitalWeb.Services.Interfaces;
 
 namespace HospitalWeb.WebApi.Middlewares.Implementations

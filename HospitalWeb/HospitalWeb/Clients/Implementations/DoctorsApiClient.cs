@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities.Identity;
+﻿using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Models.ResourceModels;
 using HospitalWeb.Models.SortStates;
 using Microsoft.AspNetCore.Identity;

@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HospitalWeb.DAL\HospitalWeb.DAL.csproj" />
+    <ProjectReference Include="..\HospitalWeb.Domain\HospitalWeb.Domain.csproj" />
   </ItemGroup>
 
 </Project>

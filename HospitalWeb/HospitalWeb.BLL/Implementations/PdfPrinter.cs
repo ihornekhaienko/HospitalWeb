@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using HospitalWeb.Domain.Entities;
 using HospitalWeb.Services.Interfaces;
 using iText.Kernel.Colors;
 using iText.Kernel.Pdf;

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.DAL.Services.Interfaces;
+using HospitalWeb.Domain.Entities.Identity;
+using HospitalWeb.Domain.Services.Interfaces;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using HospitalWeb.WebApi.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;

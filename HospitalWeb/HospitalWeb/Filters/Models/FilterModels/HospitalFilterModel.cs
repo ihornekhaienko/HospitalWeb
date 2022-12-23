@@ -1,4 +1,4 @@
-﻿using HospitalWeb.DAL.Entities;
+﻿using HospitalWeb.Domain.Entities;
 using HospitalWeb.Filters.Models.DTO;
 
 namespace HospitalWeb.Filters.Models.FilterModels
