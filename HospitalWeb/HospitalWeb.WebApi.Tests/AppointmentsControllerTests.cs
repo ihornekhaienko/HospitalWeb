@@ -2,7 +2,7 @@
 using FluentAssertions;
 using HospitalWeb.Domain.Entities;
 using HospitalWeb.Domain.Services.Interfaces;
-using HospitalWeb.Services.Extensions;
+using HospitalWeb.WebApi.Services.Extensions;
 using HospitalWeb.WebApi.Controllers;
 using HospitalWeb.WebApi.Models.ResourceModels;
 using Microsoft.AspNetCore.Http;

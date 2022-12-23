@@ -19,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HospitalWeb.BLL\HospitalWeb.Services.csproj" />
     <ProjectReference Include="..\HospitalWeb.Domain\HospitalWeb.Domain.csproj" />
     <ProjectReference Include="..\HospitalWeb.Tests.Services\HospitalWeb.Tests.Services.csproj" />
+    <ProjectReference Include="..\HospitalWeb.WebApi.Services\HospitalWeb.WebApi.Services.csproj" />
     <ProjectReference Include="..\HospitalWeb.WebApi\HospitalWeb.WebApi.csproj" />
   </ItemGroup>
 
