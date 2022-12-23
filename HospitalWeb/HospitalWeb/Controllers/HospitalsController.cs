@@ -2,7 +2,7 @@
 using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.Clients.Implementations;
-using HospitalWeb.WebApi.Models.SortStates;
+using HospitalWeb.Models.SortStates;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalWeb.Controllers

@@ -7,7 +7,7 @@ using HospitalWeb.Filters.Models.FilterModels;
 using HospitalWeb.Filters.Models.SortModels;
 using HospitalWeb.Filters.Models.ViewModels;
 using HospitalWeb.Clients.Implementations;
-using HospitalWeb.WebApi.Models.SortStates;
+using HospitalWeb.Models.SortStates;
 
 namespace HospitalWeb.Filters.Builders.Implementations
 {

@@ -5,7 +5,7 @@ using HospitalWeb.Services.Interfaces;
 using HospitalWeb.ViewModels.Appointments;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.Clients.Implementations;
-using HospitalWeb.WebApi.Models.SortStates;
+using HospitalWeb.Models.SortStates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

@@ -1,5 +1,5 @@
 ﻿using HospitalWeb.DAL.Entities.Identity;
-using HospitalWeb.WebApi.Models.ResourceModels;
+using HospitalWeb.Models.ResourceModels;
 
 namespace HospitalWeb.Clients.Implementations
 {

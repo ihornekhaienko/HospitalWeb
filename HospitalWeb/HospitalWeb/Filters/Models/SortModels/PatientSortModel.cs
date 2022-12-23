@@ -1,4 +1,4 @@
-﻿using HospitalWeb.WebApi.Models.SortStates;
+﻿using HospitalWeb.Models.SortStates;
 
 namespace HospitalWeb.Filters.Models.SortModels
 {

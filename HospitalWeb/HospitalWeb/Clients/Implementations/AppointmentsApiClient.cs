@@ -1,6 +1,6 @@
 ﻿using HospitalWeb.DAL.Entities;
-using HospitalWeb.WebApi.Models.ResourceModels;
-using HospitalWeb.WebApi.Models.SortStates;
+using HospitalWeb.Models.ResourceModels;
+using HospitalWeb.Models.SortStates;
 using System.Globalization;
 using System.Net.Http.Headers;
 

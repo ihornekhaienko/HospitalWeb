@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using HospitalWeb.ViewModels.Error;
 using System.Security.Claims;
 using HospitalWeb.Clients.Implementations;
-using HospitalWeb.WebApi.Models.ResourceModels;
+using HospitalWeb.Models.ResourceModels;
 using Microsoft.Extensions.Localization;
 
 namespace HospitalWeb.Controllers

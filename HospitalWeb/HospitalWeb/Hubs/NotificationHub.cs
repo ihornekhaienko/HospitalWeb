@@ -1,6 +1,6 @@
 ﻿using HospitalWeb.DAL.Entities;
 using HospitalWeb.Clients.Implementations;
-using HospitalWeb.WebApi.Models.ResourceModels;
+using HospitalWeb.Models.ResourceModels;
 using Microsoft.AspNetCore.SignalR;
 
 namespace HospitalWeb.Hubs

@@ -1,5 +1,5 @@
 ﻿using HospitalWeb.DAL.Entities;
-using HospitalWeb.WebApi.Models.ResourceModels;
+using HospitalWeb.Models.ResourceModels;
 using System.Globalization;
 using System.Net.Http.Headers;
 
