@@ -1,7 +1,7 @@
 ﻿using HospitalWeb.Domain.Entities;
 using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Filters.Builders.Implementations;
-using HospitalWeb.Services.Interfaces;
+using HospitalWeb.Mvc.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.ViewModels.Manage;
 using HospitalWeb.Clients.Implementations;

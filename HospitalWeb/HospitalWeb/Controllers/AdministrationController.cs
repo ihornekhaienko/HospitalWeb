@@ -1,4 +1,4 @@
-﻿using HospitalWeb.Services.Interfaces;
+﻿using HospitalWeb.Mvc.Services.Interfaces;
 using HospitalWeb.Domain.Entities;
 using HospitalWeb.ViewModels.Administration;
 using Microsoft.AspNetCore.Mvc;

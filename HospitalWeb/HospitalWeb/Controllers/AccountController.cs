@@ -1,4 +1,4 @@
-﻿using HospitalWeb.Services.Interfaces;
+﻿using HospitalWeb.Mvc.Services.Interfaces;
 using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.ViewModels.Account;
 using Microsoft.AspNetCore.Authentication;

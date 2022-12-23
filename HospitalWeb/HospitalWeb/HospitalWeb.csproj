@@ -43,8 +43,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HospitalWeb.BLL\HospitalWeb.Services.csproj" />
     <ProjectReference Include="..\HospitalWeb.Domain\HospitalWeb.Domain.csproj" />
+    <ProjectReference Include="..\HospitalWeb.Mvc.Services\HospitalWeb.Mvc.Services.csproj" />
   </ItemGroup>
 
 </Project>

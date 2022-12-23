@@ -1,7 +1,7 @@
 ﻿using HospitalWeb.Domain.Entities;
 using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Filters.Builders.Implementations;
-using HospitalWeb.Services.Interfaces;
+using HospitalWeb.Mvc.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.Clients.Implementations;
 using HospitalWeb.Models.SortStates;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HospitalWeb.ViewModels.Treatment;
-using HospitalWeb.Services.Utility;
+using HospitalWeb.Mvc.Services.Utility;
 using Microsoft.Extensions.Localization;
 
 namespace HospitalWeb.Controllers

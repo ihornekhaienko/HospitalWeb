@@ -1,5 +1,5 @@
 ﻿using HospitalWeb.Filters.Builders.Implementations;
-using HospitalWeb.Services.Interfaces;
+using HospitalWeb.Mvc.Services.Interfaces;
 using HospitalWeb.ViewModels.Error;
 using HospitalWeb.Clients.Implementations;
 using HospitalWeb.Models.SortStates;

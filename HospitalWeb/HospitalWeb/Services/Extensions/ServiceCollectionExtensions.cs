@@ -1,5 +1,5 @@
-﻿using HospitalWeb.Services.Implementations;
-using HospitalWeb.Services.Interfaces;
+﻿using HospitalWeb.Mvc.Services.Implementations;
+using HospitalWeb.Mvc.Services.Interfaces;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

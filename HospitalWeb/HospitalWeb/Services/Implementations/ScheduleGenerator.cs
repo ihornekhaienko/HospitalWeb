@@ -1,9 +1,9 @@
 ﻿using HospitalWeb.Domain.Entities.Identity;
-using HospitalWeb.Services.Interfaces;
+using HospitalWeb.Mvc.Services.Interfaces;
 using HospitalWeb.ViewModels.Doctors;
 using HospitalWeb.Clients.Implementations;
 
-namespace HospitalWeb.Services.Implementations
+namespace HospitalWeb.Mvc.Services.Implementations
 {
     public class ScheduleGenerator : IScheduleGenerator
     {
