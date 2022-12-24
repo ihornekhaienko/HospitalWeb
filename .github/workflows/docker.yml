@@ -1,0 +1,29 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "Develope" ]
+  pull_request:
+    branches: [ "Develope" ] 
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Docker login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - name: Build Api
+      run: docker build . --file ./HospitalWeb/HospitalWeb.WebApi/Dockerfile --tag hospital_api:$(date +%s)
+    - name: Build Mvc
+      run: docker build . --file ./HospitalWeb/HospitalWeb.Mvc/Dockerfile --tag hospital_mvc:$(date +%s)
+    - name: Push Api
+      run: docker push ${{secrets.DOCKER_USER}}/hospital_api
+    - name: Push Mvc
+      run: docker push ${{secrets.DOCKER_USER}}/hospital_mvc
