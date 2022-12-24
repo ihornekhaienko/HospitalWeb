@@ -1,18 +1,25 @@
+using Azure.Security.KeyVault.Secrets;
+using Azure.Identity;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Google.Apis.Auth.AspNetCore3;
 using HospitalWeb.Domain.Data;
 using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Domain.Services.Extensions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using HospitalWeb.Mvc;
-using System.Globalization;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using HospitalWeb.Mvc.Hubs;
-using Google.Apis.Auth.AspNetCore3;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Globalization;
+
 
 var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
+var config = builder.Configuration;
+var secretClient = new SecretClient(new Uri(config["AZURE_KEY_VAULT"]), new DefaultAzureCredential());
+config.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
+
 
 #region LOCALIZATION
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -40,7 +47,7 @@ builder.Services.AddMultilangIdentityErrorDescriberFactory();
 #endregion
 
 #region DB
-string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+string connection = config.GetConnectionString("Default");
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(connection);
@@ -65,10 +72,10 @@ builder.Services.AddAuthentication(o =>
 })
     .AddGoogleOpenIdConnect("Google", options =>   
      {
-         options.Authority = configuration["OAuth:Google:Authority"];
-         options.CallbackPath = configuration["OAuth:Google:CallbackPath"];
-         options.ClientId = configuration["OAuth:Google:ClientId"];
-         options.ClientSecret = configuration["OAuth:Google:ClientSecret"];
+         options.Authority = config["OAuth:Google:Authority"];
+         options.CallbackPath = config["OAuth:Google:CallbackPath"];
+         options.ClientId = config["OAuth:Google:ClientId"];
+         options.ClientSecret = config["OAuth:Google:ClientSecret"];
          options.ResponseType = OpenIdConnectResponseType.Code;
 
          options.UsePkce = true;
@@ -85,8 +92,8 @@ builder.Services.AddAuthentication(o =>
      })
     .AddFacebook("Facebook", options =>
     {
-        options.ClientId = configuration["OAuth:Facebook:ClientId"];
-        options.ClientSecret = configuration["OAuth:Facebook:ClientSecret"];
+        options.ClientId = config["OAuth:Facebook:ClientId"];
+        options.ClientSecret = config["OAuth:Facebook:ClientSecret"];
         options.UsePkce = true;
         options.SaveTokens = true;
     })

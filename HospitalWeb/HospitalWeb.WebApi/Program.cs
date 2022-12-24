@@ -1,3 +1,6 @@
+using Azure.Security.KeyVault.Secrets;
+using Azure.Identity;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Hangfire;
 using HospitalWeb.Domain.Data;
 using HospitalWeb.Domain.Entities.Identity;
@@ -14,8 +17,11 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
+
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
+var secretClient = new SecretClient(new Uri(config["AZURE_KEY_VAULT"]), new DefaultAzureCredential());
+config.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
 
 #region NEWTONSOFT
 builder.Services.AddControllers().AddNewtonsoftJson(o =>
@@ -46,7 +52,7 @@ builder.Services.AddMultilangIdentityErrorDescriberFactory();
 #endregion
 
 #region DB
-string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+string connection = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(connection);
