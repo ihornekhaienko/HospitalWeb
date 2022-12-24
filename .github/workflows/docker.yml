@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker compose CD
 
 on:
   push:
@@ -19,11 +19,7 @@ jobs:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - name: Build Api
-      run: docker build . --file ./HospitalWeb/HospitalWeb.WebApi/Dockerfile --tag hospital_api:$(date +%s)
-    - name: Build Mvc
-      run: docker build . --file ./HospitalWeb/HospitalWeb.Mvc/Dockerfile --tag hospital_mvc:$(date +%s)
-    - name: Push Api
-      run: docker push ${{secrets.DOCKER_USER}}/hospital_api
-    - name: Push Mvc
-      run: docker push ${{secrets.DOCKER_USER}}/hospital_mvc
+    - name: Docker-compose build
+      run: docker-compose -f ./HospitalWeb/docker-compose.yml build
+    - name: Docker-compose push
+      run: docker-compose -f ./HospitalWeb/docker-compose.yml push
