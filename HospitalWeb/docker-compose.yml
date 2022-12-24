@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+    api:
+        image: yigal14/hospital_api:latest
+        build:
+            context: .
+            dockerfile: HospitalWeb.WebApi/Dockerfile
+        container_name: hospital-api
+        ports:
+            - "7080:80"
+            - "7443:443"
+        environment:
+            AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+            AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
+            AZURE_KEY_VAULT: ${AZURE_KEY_VAULT}
+            AZURE_TENANT_ID: ${AZURE_TENANT_ID}
+            ASPNETCORE_ENVIRONMENT: Development
+            ASPNETCORE_URLS: https://+443;http://+:80
+            ASPNETCORE_HTTPS_PORT: 7443
+            ASPNETCORE_Kestrel__Certificates__Default__Password: pass_1234
+            ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
+        volumes:
+            - ./HospitalWeb.WebApi/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro
+    
+    mvc:
+        image: yigal14/hospital_mvc:latest
+        build:
+            context: .
+            dockerfile: HospitalWeb.Mvc/Dockerfile
+        container_name: hospital-mvc
+        ports:
+            - "8080:80"
+            - "8443:443"
+        environment:
+            AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+            AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
+            AZURE_KEY_VAULT: ${AZURE_KEY_VAULT}
+            AZURE_TENANT_ID: ${AZURE_TENANT_ID}
+            ASPNETCORE_ENVIRONMENT: Development
+            ASPNETCORE_URLS: https://+443;http://+:80
+            ASPNETCORE_HTTPS_PORT: 8443
+            ASPNETCORE_Kestrel__Certificates__Default__Password: pass_1234
+            ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
+        volumes:
+            - ./HospitalWeb.Mvc/https/aspnetapp.pfx:/https/aspnetapp.pfx:ro
+    
