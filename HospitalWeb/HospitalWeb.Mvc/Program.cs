@@ -143,6 +143,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<NotificationHub>("/NotificationHub");
     endpoints.MapHub<RatingHub>("/RatingHub");
+    endpoints.MapHub<SupportHub>("/SupportHub");
 });
 
 app.MapControllerRoute(
