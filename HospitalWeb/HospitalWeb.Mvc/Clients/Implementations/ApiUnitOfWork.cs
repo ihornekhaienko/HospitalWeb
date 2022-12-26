@@ -17,6 +17,7 @@ namespace HospitalWeb.Mvc.Clients.Implementations
         private HospitalsApiClient _hospitalsApiClient;
         private LocalitiesApiClient _localitiesApiClient;
         private MeetingsApiClient _meetingsApiClient;
+        private MessagesApiClient _messagesApiClient;
         private NotificationsApiClient _notificationsApiClient;
         private PatientsApiClient _patientsApiClient;
         private SchedulesApiClient _schedulesApiClient;
@@ -125,6 +126,16 @@ namespace HospitalWeb.Mvc.Clients.Implementations
                 if (_meetingsApiClient == null)
                     _meetingsApiClient = new MeetingsApiClient(_config, _clientFactory);
                 return _meetingsApiClient;
+            }
+        }
+
+        public MessagesApiClient Messages
+        {
+            get
+            {
+                if (_messagesApiClient == null)
+                    _messagesApiClient = new MessagesApiClient(_config, _clientFactory);
+                return _messagesApiClient;
             }
         }
 
