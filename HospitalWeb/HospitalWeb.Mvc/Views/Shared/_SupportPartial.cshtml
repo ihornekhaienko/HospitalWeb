@@ -1,0 +1,64 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<AppUser> signInManager
+@inject UserManager<AppUser> userManager
+
+
+@if (signInManager.IsSignedIn(User))
+{
+    if (User.IsInRole("Admin"))
+    {
+        <div class="container">
+            <div class="chatbox">
+                <button class="chat-btn" id="chat-btn"> 
+                    <i class="fa-solid fa-comments"></i>
+                </button>
+                <div class="chat-popup">
+                    <button class="chat-badge chat-user d-none" id="chat-all-users">
+                        <i class="fa-solid fa-users"></i>
+                    </button>
+
+                    <div class="chat-list chat-area" id="chat-list">
+                    </div>
+
+                    <div class="chat-area chat-user d-none" id="chat-user">
+                    </div>
+
+                    <div class="input-area chat-user d-none">
+                        <input type="hidden" id="chat-user-id">
+                        <input type="text" id="message-text">
+                        <button class="chat-send" id="admin-send"> 
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    if (User.IsInRole("Patient"))
+    {
+        var user = await userManager.FindByEmailAsync(User.Identity.Name);
+        var userId = user.Id;
+
+        <div class="container">
+            <div class="chatbox">
+                <button class="chat-btn" id="chat-btn"> 
+                    <i class="fa-solid fa-comments"></i>
+                </button>
+
+                <div class="chat-popup">
+                    <div class="chat-area" id="msg-list">
+                    </div>
+
+                    <div class="input-area">
+                        <input type="hidden" id="chat-user-id" value="@userId">
+                        <input type="text" id="message-text">
+                        <button class="chat-send" id="user-send" > 
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

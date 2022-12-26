@@ -286,6 +286,22 @@ body {
     border-radius: 10px;
 }
 
+.chatlist-popup {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    right: 120px;
+    height: 400px;
+    width: 300px;
+    background-color: white;
+    /* display: flex; */
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.75rem;
+    box-shadow: 5px 5px 5px rgba(0,0,0,0.4);
+    border-radius: 10px;
+}
+
 .show {
     display: flex;
 }
@@ -299,6 +315,12 @@ body {
 .income-msg {
     display: flex;
     align-items: center;
+}
+
+.income-date {
+    text-align: left;
+    color: black;
+    font-size: 10pt;
 }
 
 .avatar {
@@ -373,9 +395,13 @@ input[type="text"] {
     align-items: center;
 }
 
+.out-date {
+    color: white;
+    font-size: 10pt;
+}
+
 .my-msg {
-    display: flex;
-    justify-content: flex-end;
+    text-align: right;
     margin: 0.75rem;
     padding: 0.5rem;
     background-color: #ddd;
@@ -392,4 +418,18 @@ input[type="text"] {
         right: 10%;
         width: 80vw;
     }
+}
+
+.chat-area .card {
+    text-align: left;
+}
+
+.chat-area .card p {
+    font-size: 10pt;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.chat-list {
+    height: 100%;
 }
