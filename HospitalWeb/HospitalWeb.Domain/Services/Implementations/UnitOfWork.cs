@@ -18,6 +18,7 @@ namespace HospitalWeb.Domain.Services.Implementations
         private GenericRepository<Hospital> _hospitalRepository;
         private GenericRepository<Locality> _localityRepository;
         private GenericRepository<Meeting> _meetingRepository;
+        private GenericRepository<Message> _messageRepository;
         private GenericRepository<Notification> _notificationRepository;
         private GenericRepository<Patient> _patientRepository;
         private GenericRepository<Schedule> _scheduleRepository;
@@ -130,6 +131,16 @@ namespace HospitalWeb.Domain.Services.Implementations
                 if (_meetingRepository == null)
                     _meetingRepository = new GenericRepository<Meeting>(_db);
                 return _meetingRepository;
+            }
+        }
+
+        public virtual IRepository<Message> Messages
+        {
+            get
+            {
+                if (_messageRepository == null)
+                    _messageRepository = new GenericRepository<Message>(_db);
+                return _messageRepository;
             }
         }
 

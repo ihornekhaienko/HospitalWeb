@@ -15,6 +15,7 @@ namespace HospitalWeb.Domain.Services.Interfaces
         IRepository<Hospital> Hospitals { get; }
         IRepository<Locality> Localities { get; }
         IRepository<Meeting> Meetings { get; }
+        IRepository<Message> Messages { get; }
         IRepository<Notification> Notifications { get; }
         IRepository<Patient> Patients { get; }
         IRepository<Schedule> Schedules { get; }

@@ -16,6 +16,7 @@ namespace HospitalWeb.Domain.Data
         public DbSet<Hospital> Hospitals { get; set; }
         public DbSet<Locality> Localities { get; set; }
         public DbSet<Meeting> Meetings { get; set; }
+        public DbSet<Message> Messages { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
