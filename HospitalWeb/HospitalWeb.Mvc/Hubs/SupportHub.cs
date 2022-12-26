@@ -27,7 +27,7 @@ namespace HospitalWeb.Mvc.Hubs
                 {
                     Text = message,
                     UserId = user,
-                    DateTime = datetime,
+                    DateTime = datetime.AddHours(2),
                     MessageType = MessageType.UserMessage
                 };
 
