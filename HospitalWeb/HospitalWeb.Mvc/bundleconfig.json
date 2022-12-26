@@ -6,14 +6,6 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/js/site.js",
-    "inputFiles": [
-      "wwwroot/js/notify.js",
-      "wwwroot/js/rating.js",
-      "wwwroot/js/general.js"
-    ]
-  },
-  {
     "outputFileName": "wwwroot/css/cardjs/cardjs.css",
     "inputFiles": [
       "wwwroot/css/cardjs/themes/dark.css",
@@ -56,6 +48,15 @@
     "outputFileName": "wwwroot/js/cardjs/card-js.min.js",
     "inputFiles": [
       "wwwroot/js/cardjs/card-js.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/site.js",
+    "inputFiles": [
+      "wwwroot/js/rating.js",
+      "wwwroot/js/notify.js",
+      "wwwroot/js/general.js",
+      "wwwroot/js/chat.js"
     ]
   }
 ]

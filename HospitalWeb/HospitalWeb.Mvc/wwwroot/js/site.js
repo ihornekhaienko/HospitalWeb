@@ -1,3 +1,26 @@
+const ratingHubConnection = new signalR.HubConnectionBuilder()
+    .withUrl('/RatingHub')
+    .build();
+
+function changeRating(stars, author, target) {
+    try {
+        ratingHubConnection.invoke("ChangeRating", stars, author, target);
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
+ratingHubConnection.on("ChangeRating", function (rating, target) {
+    try {
+        let span = document.getElementById(`rating-overall-${target}`);
+        span.innerHTML = rating;
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+ratingHubConnection.start();
+
 const notificationHubConnection = new signalR.HubConnectionBuilder()
     .withUrl('/NotificationHub')
     .build();
@@ -306,29 +329,6 @@ $(document).ready(function () {
 
 notificationHubConnection.start();
 
-const ratingHubConnection = new signalR.HubConnectionBuilder()
-    .withUrl('/RatingHub')
-    .build();
-
-function changeRating(stars, author, target) {
-    try {
-        ratingHubConnection.invoke("ChangeRating", stars, author, target);
-    } catch (err) {
-        console.log(err.message);
-    }
-}
-
-ratingHubConnection.on("ChangeRating", function (rating, target) {
-    try {
-        let span = document.getElementById(`rating-overall-${target}`);
-        span.innerHTML = rating;
-    } catch (err) {
-        console.log(err.message);
-    }
-});
-
-ratingHubConnection.start();
-
 $('#activator').click(function () {
     $('#uploader').click();
 });
@@ -360,3 +360,26 @@ function updateAppoitmentsStates() {
 }
 
 updateAppoitmentsStates();
+const popup = document.querySelector('.chat-popup');
+const chatBtn = document.querySelector('.chat-btn');
+const submitBtn = document.querySelector('.chat-send');
+const chatArea = document.querySelector('.chat-area');
+const inputElm = document.querySelector('#message-text');
+
+// chat button toggler 
+chatBtn.addEventListener('click', () => {
+    popup.classList.toggle('show');
+})
+
+// send msg 
+submitBtn.addEventListener('click', () => {
+    let userInput = inputElm.value;
+
+    let temp = `<div class="out-msg">
+    <span class="my-msg">${userInput}</span>
+    </div>`;
+
+    chatArea.insertAdjacentHTML("beforeend", temp);
+    inputElm.value = '';
+
+})
