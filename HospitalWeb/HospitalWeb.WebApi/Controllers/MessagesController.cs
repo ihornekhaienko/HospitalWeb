@@ -132,7 +132,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="message">Message to create</param>
         /// <returns>The Message object</returns>
         [HttpPost]
-        [Authorize(Policy = "DoctorsPatientsOnly")]
         public async Task<ActionResult<Message>> Post(MessageResourceModel message)
         {
             try
@@ -169,7 +168,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="message">The Message to update</param>
         /// <returns>The Message object</returns>
         [HttpPut]
-        [Authorize(Policy = "DoctorsPatientsOnly")]
         public async Task<ActionResult<Message>> Put(Message message)
         {
             try
@@ -201,7 +199,6 @@ namespace HospitalWeb.WebApi.Controllers
         /// <param name="id">Message's id</param>
         /// <returns>The Message object</returns>
         [HttpDelete("{id}")]
-        [Authorize(Policy = "DoctorsPatientsOnly")]
         public async Task<ActionResult<Message>> Delete(int id)
         {
             try

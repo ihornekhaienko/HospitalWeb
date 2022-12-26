@@ -1,4 +1,6 @@
-﻿namespace HospitalWeb.Mvc.Models.ResourceModels
+﻿using HospitalWeb.Domain.Entities;
+
+namespace HospitalWeb.Mvc.Models.ResourceModels
 {
     public class MessageResourceModel
     {
@@ -7,6 +9,8 @@
         public string Text { get; set; }
 
         public DateTime DateTime { get; set; }
+
+        public MessageType MessageType { get; set; }
 
         public string UserId { get; set; }
     }

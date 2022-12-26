@@ -1,4 +1,6 @@
-﻿namespace HospitalWeb.WebApi.Models.ResourceModels
+﻿using HospitalWeb.Domain.Entities;
+
+namespace HospitalWeb.WebApi.Models.ResourceModels
 {
     public class MessageResourceModel
     {
@@ -8,8 +10,8 @@
 
         public DateTime DateTime { get; set; }
 
-        public string SenderId { get; set; }
+        public MessageType MessageType { get; set; }
 
-        public string ReceiverId { get; set; }
+        public string UserId { get; set; }
     }
 }

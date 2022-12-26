@@ -19,7 +19,7 @@ namespace HospitalWeb.Mvc.Clients.Implementations
             string token = null, 
             string provider = null)
         {
-            string query = $"details?user={user}&pageSize={pageSize}&pageNumber={pageNumber}";
+            string query = $"details?user={user}&pageSize={int.MaxValue}&pageNumber={pageNumber}";
             var request = new HttpRequestMessage(HttpMethod.Get, $"{_client.BaseAddress}{_addressSuffix}/{query}");
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
