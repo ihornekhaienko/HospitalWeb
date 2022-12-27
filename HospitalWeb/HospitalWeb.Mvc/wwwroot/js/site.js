@@ -298,9 +298,82 @@ notificationHubConnection.on("NotifyFill", function (topic, message) {
     }
 });
 
-function notifyUserSendMessage() {
-    alert('here');
+function notifyUserSendMessage(fullName, message) {
+    try {
+        notificationHubConnection.invoke("NotifyUserSendMessage", fullName, message);
+    } catch (err) {
+        console.log(err.message);
+    }
 }
+
+notificationHubConnection.on("NotifyUserSendMessage", function (topic, message) {
+    try {
+        let popover = document.getElementById("notifications");
+        popover.insertBefore(createNotificationDiv(topic, message, 'alert-primary'), popover.firstChild);
+
+        if (popover.children.length > 5) {
+            np.removeChild(np.lastElementChild);
+            updatePageLink();
+        }
+
+        let np = document.getElementById("notifications-profile");
+        if (np) {
+            let row = document.createElement('div');
+            row.classList.add('row');
+            row.appendChild(createNotificationDiv(topic, message, 'alert-primary'));
+            np.insertBefore(row, np.firstChild);
+
+            if (np.children.length > 5) {
+                np.removeChild(np.lastElementChild);
+                updatePageLink();
+            }
+        }
+
+        increment();
+        updatePopover();
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+function notifyAdminSendMessage(userId, message) {
+    try {
+        notificationHubConnection.invoke("NotifyAdminSendMessage", userId, message);
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
+notificationHubConnection.on("NotifyAdminSendMessage", function (topic, message) {
+    try {
+        let popover = document.getElementById("notifications");
+        popover.insertBefore(createNotificationDiv(topic, message, 'alert-primary'), popover.firstChild);
+
+        if (popover.children.length > 5) {
+            np.removeChild(np.lastElementChild);
+            updatePageLink();
+        }
+
+        let np = document.getElementById("notifications-profile");
+        if (np) {
+            let row = document.createElement('div');
+            row.classList.add('row');
+            row.appendChild(createNotificationDiv(topic, message, 'alert-primary'));
+            np.insertBefore(row, np.firstChild);
+
+            if (np.children.length > 5) {
+                np.removeChild(np.lastElementChild);
+                updatePageLink();
+            }
+        }
+
+        increment();
+        updatePopover();
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
 
 function read(id) {
     try {
@@ -310,7 +383,7 @@ function read(id) {
             contentType: "application/json",
             success: function (response) {
                 let div = document.getElementById('alert-' + id);
-                console.log(div);
+
                 div.classList.remove('alert-success');
                 div.classList.remove('alert-danger');
                 div.classList.remove('alert-primary');
@@ -586,8 +659,9 @@ if (userSend.length) {
         let outcomeMsg = createOutcomeMessage(message, datetime);
         chatArea.insertAdjacentElement("beforeend", outcomeMsg);
         $('#message-text').val('');
+        chatArea.lastChild.scrollIntoView();
 
-        //notifyUserSendMessage(userId, message, datetime);
+        notifyUserSendMessage(fullName, message);
         sendMessageToAdmins(userId, fullName, message, datetime);
     });
 }
@@ -607,7 +681,7 @@ supportHubConnection.on("SendMessageToAdmins", function (user, fullName, message
         if ($('#chat-user-id').val() == user) {
             let outcomeMsg = createIncomeMessage(message, datetime);
             $('#chat-user').append(outcomeMsg);
-            $('#chat-user')..children().last()[0].scrollIntoView();
+            $('#chat-user').children().last()[0].scrollIntoView();
         }
 
         updateChats(user, message, datetime);
@@ -630,6 +704,7 @@ if (adminSend.length) {
 
         $('#message-text').val('');
 
+        notifyAdminSendMessage(userId, message);
         sendMessageToUser(userId, fullName, message, datetime);
     });
 }
@@ -650,7 +725,7 @@ supportHubConnection.on("SendMessageToUser", function (user, fullName, message, 
             if ($('#chat-user-id').val() == user) {
                 let outcomeMsg = createOutcomeMessage(message, datetime);
                 $('#chat-user').append(outcomeMsg);
-                $('#chat-user')..children().last()[0].scrollIntoView();
+                $('#chat-user').children().last()[0].scrollIntoView();
             }
 
             updateChats(user, message, datetime);

@@ -275,9 +275,82 @@ notificationHubConnection.on("NotifyFill", function (topic, message) {
     }
 });
 
-function notifyUserSendMessage() {
-    alert('here');
+function notifyUserSendMessage(fullName, message) {
+    try {
+        notificationHubConnection.invoke("NotifyUserSendMessage", fullName, message);
+    } catch (err) {
+        console.log(err.message);
+    }
 }
+
+notificationHubConnection.on("NotifyUserSendMessage", function (topic, message) {
+    try {
+        let popover = document.getElementById("notifications");
+        popover.insertBefore(createNotificationDiv(topic, message, 'alert-primary'), popover.firstChild);
+
+        if (popover.children.length > 5) {
+            np.removeChild(np.lastElementChild);
+            updatePageLink();
+        }
+
+        let np = document.getElementById("notifications-profile");
+        if (np) {
+            let row = document.createElement('div');
+            row.classList.add('row');
+            row.appendChild(createNotificationDiv(topic, message, 'alert-primary'));
+            np.insertBefore(row, np.firstChild);
+
+            if (np.children.length > 5) {
+                np.removeChild(np.lastElementChild);
+                updatePageLink();
+            }
+        }
+
+        increment();
+        updatePopover();
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
+function notifyAdminSendMessage(userId, message) {
+    try {
+        notificationHubConnection.invoke("NotifyAdminSendMessage", userId, message);
+    } catch (err) {
+        console.log(err.message);
+    }
+}
+
+notificationHubConnection.on("NotifyAdminSendMessage", function (topic, message) {
+    try {
+        let popover = document.getElementById("notifications");
+        popover.insertBefore(createNotificationDiv(topic, message, 'alert-primary'), popover.firstChild);
+
+        if (popover.children.length > 5) {
+            np.removeChild(np.lastElementChild);
+            updatePageLink();
+        }
+
+        let np = document.getElementById("notifications-profile");
+        if (np) {
+            let row = document.createElement('div');
+            row.classList.add('row');
+            row.appendChild(createNotificationDiv(topic, message, 'alert-primary'));
+            np.insertBefore(row, np.firstChild);
+
+            if (np.children.length > 5) {
+                np.removeChild(np.lastElementChild);
+                updatePageLink();
+            }
+        }
+
+        increment();
+        updatePopover();
+    } catch (err) {
+        console.log(err.message);
+    }
+});
+
 
 function read(id) {
     try {
@@ -287,7 +360,7 @@ function read(id) {
             contentType: "application/json",
             success: function (response) {
                 let div = document.getElementById('alert-' + id);
-                console.log(div);
+
                 div.classList.remove('alert-success');
                 div.classList.remove('alert-danger');
                 div.classList.remove('alert-primary');

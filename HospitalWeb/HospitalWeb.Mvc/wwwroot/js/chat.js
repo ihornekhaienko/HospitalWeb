@@ -220,8 +220,9 @@ if (userSend.length) {
         let outcomeMsg = createOutcomeMessage(message, datetime);
         chatArea.insertAdjacentElement("beforeend", outcomeMsg);
         $('#message-text').val('');
+        chatArea.lastChild.scrollIntoView();
 
-        //notifyUserSendMessage(userId, message, datetime);
+        notifyUserSendMessage(fullName, message);
         sendMessageToAdmins(userId, fullName, message, datetime);
     });
 }
@@ -241,7 +242,7 @@ supportHubConnection.on("SendMessageToAdmins", function (user, fullName, message
         if ($('#chat-user-id').val() == user) {
             let outcomeMsg = createIncomeMessage(message, datetime);
             $('#chat-user').append(outcomeMsg);
-            $('#chat-user')..children().last()[0].scrollIntoView();
+            $('#chat-user').children().last()[0].scrollIntoView();
         }
 
         updateChats(user, message, datetime);
@@ -264,6 +265,7 @@ if (adminSend.length) {
 
         $('#message-text').val('');
 
+        notifyAdminSendMessage(userId, message);
         sendMessageToUser(userId, fullName, message, datetime);
     });
 }
@@ -284,7 +286,7 @@ supportHubConnection.on("SendMessageToUser", function (user, fullName, message, 
             if ($('#chat-user-id').val() == user) {
                 let outcomeMsg = createOutcomeMessage(message, datetime);
                 $('#chat-user').append(outcomeMsg);
-                $('#chat-user')..children().last()[0].scrollIntoView();
+                $('#chat-user').children().last()[0].scrollIntoView();
             }
 
             updateChats(user, message, datetime);

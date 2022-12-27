@@ -97,5 +97,69 @@ namespace HospitalWeb.Mvc.Hubs
                 throw;
             }
         }
+
+        public async Task NotifyUserSendMessage(string fullName, string message)
+        {
+            try
+            {
+                string topic = $"You have a new message from {fullName}";
+                var admins = _api.Admins.ReadMany(_api.Admins.Get());
+
+                foreach (var admin in admins)
+                {
+                    var notification = new NotificationResourceModel
+                    {
+                        Topic = topic,
+                        Message = message,
+                        IsRead = false,
+                        Type = NotificationType.Primary,
+                        AppUserId = admin.Id
+                    };
+                    _api.Notifications.Post(notification);
+                }
+
+                await Clients.Group("Admin").SendAsync("NotifyUserSendMessage", topic, message);
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+                throw;
+            }
+        }
+
+        public async Task NotifyAdminSendMessage(string receiver, string message)
+        {
+            try
+            {
+                string topic = $"You have a response from admin";
+
+                var notification = new NotificationResourceModel
+                {
+                    Topic = topic,
+                    Message = message,
+                    IsRead = false,
+                    Type = NotificationType.Primary,
+                    AppUserId = receiver
+                };
+                _api.Notifications.Post(notification);
+
+                await Clients.User(receiver).SendAsync("NotifyUserSendMessage", topic, message);
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+                throw;
+            }
+        }
+
+        public override async Task OnConnectedAsync()
+        {
+            if (Context.User.IsInRole("Admin"))
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, "Admin");
+            }
+
+            await base.OnConnectedAsync();
+        }
     }
 }
