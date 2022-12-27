@@ -480,6 +480,8 @@ function openChat(userId) {
                     chat.appendChild(div);
                 }
             }
+
+            chat.children().last()[0].scrollIntoView();
         },
         error: function (err) {
             console.log(err);
@@ -544,6 +546,7 @@ $(document).ready(function () {
                     msgList.append(div);
                 }
             }
+            msgList.children().last()[0].scrollIntoView();
         },
         error: function (err) {
             console.log(err);
@@ -593,8 +596,6 @@ supportHubConnection.on("SendMessageToAdmins", function (user, message, datetime
         datetime = new Date(datetime);
 
         if ($('#chat-user-id').val() == user) {
-            alert('add outcome msg');
-
             let outcomeMsg = createIncomeMessage(message, datetime);
             $('#chat-user').append(outcomeMsg);
         }
