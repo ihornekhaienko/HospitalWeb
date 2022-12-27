@@ -25,6 +25,7 @@ if (allChatsBtn.length) {
         let chat = document.getElementById('chat-user');
         chat.innerHTML = '';
         $('#chat-user-id').val('');
+        $('#chat-user-name').val('');
     });
 }
 
@@ -93,13 +94,13 @@ function createChat(userId, fullName, datetime, message) {
     card.appendChild(cardBody);
 
     card.onclick = function() {
-        openChat(userId);
+        openChat(userId, fullName);
     }
 
     return card;
 }
 
-function openChat(userId) {
+function openChat(userId, fullName) {
     let chat = document.getElementById('chat-user');
 
     $.ajax({
@@ -119,7 +120,7 @@ function openChat(userId) {
                 }
             }
 
-            chat.children().last()[0].scrollIntoView();
+            chat.lastChild.scrollIntoView();
         },
         error: function (err) {
             console.log(err);
@@ -132,6 +133,7 @@ function openChat(userId) {
         elem.classList.toggle('d-none');
     }
     $('#chat-user-id').val(userId);
+    $('#chat-user-name').val(fullName);
 }
 
 var chats = []
@@ -194,18 +196,20 @@ $(document).ready(function () {
 
 function updateChats(user, message, datetime) {
     let filtered = chats.filter(c => c.userId == user);
+    let chat = createChat(user, filtered[0].fullName, datetime, message);
 
     if (filtered.length > 0) {
-        document.getElementById(`chat-${user}`).remove();
-        let chat = createChat(user, filtered[0].fullName, datetime, message);
-        $('#chat-list').prepend(chat);
+        document.getElementById(`chat-${user}`).remove();   
     }
+
+    $('#chat-list').prepend(chat);
 }
 
 let userSend = $('#user-send');
 if (userSend.length) {
     userSend.click(function () {
         let userId = $('#chat-user-id').val();
+        let fullName = $('#chat-user-name').val();
         let message = $('#message-text').val().trim();
         let datetime = new Date();
 
@@ -216,26 +220,28 @@ if (userSend.length) {
         let outcomeMsg = createOutcomeMessage(message, datetime);
         chatArea.insertAdjacentElement("beforeend", outcomeMsg);
         $('#message-text').val('');
-        
-        sendMessageToAdmins(userId, message, datetime);
+
+        //notifyUserSendMessage(userId, message, datetime);
+        sendMessageToAdmins(userId, fullName, message, datetime);
     });
 }
 
-function sendMessageToAdmins(user, message, datetime) {
+function sendMessageToAdmins(user, fullName, message, datetime) {
     try {
-        supportHubConnection.invoke("SendMessageToAdmins", user, message, datetime.toISOString());
+        supportHubConnection.invoke("SendMessageToAdmins", user, fullName, message, datetime.toISOString());
     } catch (err) {
         console.log(err.message);
     }
 }
 
-supportHubConnection.on("SendMessageToAdmins", function (user, message, datetime) {
+supportHubConnection.on("SendMessageToAdmins", function (user, fullName, message, datetime) {
     try {
         datetime = new Date(datetime);
 
         if ($('#chat-user-id').val() == user) {
             let outcomeMsg = createIncomeMessage(message, datetime);
             $('#chat-user').append(outcomeMsg);
+            $('#chat-user')..children().last()[0].scrollIntoView();
         }
 
         updateChats(user, message, datetime);
@@ -248,6 +254,7 @@ let adminSend = $('#admin-send');
 if (adminSend.length) {
     adminSend.click(function () {
         let userId = $('#chat-user-id').val();
+        let fullName = $('#chat-user-name').val();
         let message = $('#message-text').val().trim();
         let datetime = new Date();
 
@@ -257,19 +264,19 @@ if (adminSend.length) {
 
         $('#message-text').val('');
 
-        sendMessageToUser(userId, message, datetime);
+        sendMessageToUser(userId, fullName, message, datetime);
     });
 }
 
-function sendMessageToUser(user, message, datetime) {
+function sendMessageToUser(user, fullName, message, datetime) {
     try {
-        supportHubConnection.invoke("SendMessageToUser", user, message, datetime.toISOString());
+        supportHubConnection.invoke("SendMessageToUser", user, fullName, message, datetime.toISOString());
     } catch (err) {
         console.log(err.message);
     }
 }
 
-supportHubConnection.on("SendMessageToUser", function (user, message, datetime) {
+supportHubConnection.on("SendMessageToUser", function (user, fullName, message, datetime) {
     try {
         datetime = new Date(datetime);
 
@@ -277,6 +284,7 @@ supportHubConnection.on("SendMessageToUser", function (user, message, datetime) 
             if ($('#chat-user-id').val() == user) {
                 let outcomeMsg = createOutcomeMessage(message, datetime);
                 $('#chat-user').append(outcomeMsg);
+                $('#chat-user')..children().last()[0].scrollIntoView();
             }
 
             updateChats(user, message, datetime);

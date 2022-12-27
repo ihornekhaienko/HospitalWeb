@@ -14,26 +14,26 @@ namespace HospitalWeb.Mvc.Hubs
             _api = api;
         }
 
-        public async Task SendMessageToAdmins(string user, string message, DateTime datetime)
+        public async Task SendMessageToAdmins(string userId, string fullName, string message, DateTime datetime)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(user))
+                if (string.IsNullOrWhiteSpace(userId))
                 {
-                    throw new ArgumentNullException(nameof(user));
+                    throw new ArgumentNullException(nameof(userId));
                 }
 
                 var messageResource = new MessageResourceModel
                 {
                     Text = message,
-                    UserId = user,
+                    UserId = userId,
                     DateTime = datetime.AddHours(2),
                     MessageType = MessageType.UserMessage
                 };
 
                 var response = _api.Messages.Post(messageResource);
 
-                await Clients.Group("Admin").SendAsync("SendMessageToAdmins",user, message, datetime);
+                await Clients.Group("Admin").SendAsync("SendMessageToAdmins", userId, fullName, message, datetime);
             }
             catch (Exception err)
             {
@@ -41,27 +41,27 @@ namespace HospitalWeb.Mvc.Hubs
             }
         }
 
-        public async Task SendMessageToUser(string user, string message, DateTime datetime)
+        public async Task SendMessageToUser(string userId, string fullName, string message, DateTime datetime)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(user))
+                if (string.IsNullOrWhiteSpace(userId))
                 {
-                    throw new ArgumentNullException(nameof(user));
+                    throw new ArgumentNullException(nameof(userId));
                 }
 
                 var messageResource = new MessageResourceModel
                 {
                     Text = message,
-                    UserId = user,
+                    UserId = userId,
                     DateTime = datetime,
                     MessageType = MessageType.AdminMessage
                 };
 
                 var response = _api.Messages.Post(messageResource);
 
-                await Clients.Group("Admin").SendAsync("SendMessageToUser", user, message, datetime);
-                await Clients.User(user).SendAsync("SendMessageToUser", user, message, datetime);
+                await Clients.Group("Admin").SendAsync("SendMessageToUser", userId, fullName, message, datetime);
+                await Clients.User(userId).SendAsync("SendMessageToUser", userId, fullName, message, datetime);
             }
             catch (Exception err)
             {

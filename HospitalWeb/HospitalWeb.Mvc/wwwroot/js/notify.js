@@ -275,6 +275,10 @@ notificationHubConnection.on("NotifyFill", function (topic, message) {
     }
 });
 
+function notifyUserSendMessage() {
+    alert('here');
+}
+
 function read(id) {
     try {
         $.ajax({

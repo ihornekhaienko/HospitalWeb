@@ -25,6 +25,7 @@
 
                     <div class="input-area chat-user d-none">
                         <input type="hidden" id="chat-user-id">
+                        <input type="hidden" id="chat-user-name">
                         <input type="text" id="message-text">
                         <button class="chat-send" id="admin-send"> 
                             <i class="fa-solid fa-paper-plane"></i>
@@ -39,6 +40,7 @@
     {
         var user = await userManager.FindByEmailAsync(User.Identity.Name);
         var userId = user.Id;
+        var name = user.ToString();
 
         <div class="container">
             <div class="chatbox">
@@ -52,6 +54,7 @@
 
                     <div class="input-area">
                         <input type="hidden" id="chat-user-id" value="@userId">
+                        <input type="hidden" id="chat-user-name" value="@name">
                         <input type="text" id="message-text">
                         <button class="chat-send" id="user-send" > 
                             <i class="fa-solid fa-paper-plane"></i>
