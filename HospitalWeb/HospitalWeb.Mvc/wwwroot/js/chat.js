@@ -31,7 +31,7 @@ if (allChatsBtn.length) {
 function createIncomeMessage(message, datetime) {
     let incomeDate = document.createElement('div');
     incomeDate.classList.add('income-date');
-    incomeDate.appendChild(document.createTextNode(datetime.toLocaleString('uk-UA')));
+    incomeDate.appendChild(document.createTextNode(datetime.toLocaleString()));
 
     let msg = document.createElement('div');
     msg.classList.add('msg');
@@ -49,7 +49,7 @@ function createIncomeMessage(message, datetime) {
 function createOutcomeMessage(message, datetime) {
     let outDate = document.createElement('div');
     outDate.classList.add('out-date');
-    outDate.appendChild(document.createTextNode(datetime.toLocaleString('uk-UA')));
+    outDate.appendChild(document.createTextNode(datetime.toLocaleString()));
 
     let msg = document.createElement('div');
     msg.classList.add('my-msg');
@@ -74,7 +74,7 @@ function createChat(userId, fullName, datetime, message) {
 
     let cardDate = document.createElement('p');
     cardDate.classList.add('card-text', 'text-muted', 'text-sm', 'mb-0');
-    cardDate.appendChild(document.createTextNode(datetime.toLocaleString('uk-UA')));
+    cardDate.appendChild(document.createTextNode(datetime.toLocaleString()));
 
     let cardMsg = document.createElement('p');
     cardMsg.classList.add('card-text');
@@ -89,7 +89,7 @@ function createChat(userId, fullName, datetime, message) {
 
     let card = document.createElement('div');
     card.classList.add('card', 'mb-1');
-    card.id = 'chat-' + userId;
+    card.id = `chat-${userId}`;
     card.appendChild(cardBody);
 
     card.onclick = function() {
@@ -193,11 +193,9 @@ function updateChats(user, message, datetime) {
     let filtered = chats.filter(c => c.userId == user);
 
     if (filtered.length > 0) {
-        let chat = $(`#char-${userId}`);
-        let chatList = $('#chat-list');
-        chatList.remove(chat);
-        chat = createChat(user, filtered[0].fullName, datetime, message);
-        chatList.prepend(chat);
+        document.getElementById(`chat-${user}`).remove();
+        let chat = createChat(user, filtered[0].fullName, datetime, message);
+        $('#chat-list').prepend(chat);
     }
 }
 
@@ -215,7 +213,7 @@ if (userSend.length) {
         let outcomeMsg = createOutcomeMessage(message, datetime);
         chatArea.insertAdjacentElement("beforeend", outcomeMsg);
         $('#message-text').val('');
-
+        
         sendMessageToAdmins(userId, message, datetime);
     });
 }
@@ -230,7 +228,11 @@ function sendMessageToAdmins(user, message, datetime) {
 
 supportHubConnection.on("SendMessageToAdmins", function (user, message, datetime) {
     try {
+        datetime = new Date(datetime);
+
         if ($('#chat-user-id').val() == user) {
+            alert('add outcome msg');
+
             let outcomeMsg = createIncomeMessage(message, datetime);
             $('#chat-user').append(outcomeMsg);
         }
@@ -275,6 +277,7 @@ supportHubConnection.on("SendMessageToUser", function (user, message, datetime) 
                 let outcomeMsg = createOutcomeMessage(message, datetime);
                 $('#chat-user').append(outcomeMsg);
             }
+
             updateChats(user, message, datetime);
         }
         else {
