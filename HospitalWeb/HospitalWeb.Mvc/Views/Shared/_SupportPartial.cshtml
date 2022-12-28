@@ -36,7 +36,7 @@
         </div>
     }
 
-    if (User.IsInRole("Patient"))
+    if (User.IsInRole("Patient") || User.IsInRole("Doctor"))
     {
         var user = await userManager.FindByEmailAsync(User.Identity.Name);
         var userId = user.Id;
@@ -64,4 +64,27 @@
             </div>
         </div>
     }
+}
+else 
+{
+    <div class="container">
+            <div class="chatbox">
+                <button class="chat-btn" id="chat-btn"> 
+                    <i class="fa-solid fa-comments"></i>
+                </button>
+
+                <div class="chat-popup">
+                    <div class="chat-area" id="msg-list">
+                    </div>
+
+                    <div class="input-area">
+                        <input type="hidden" id="chat-guest-id">
+                        <input type="text" id="message-text">
+                        <button class="chat-send" id="guest-send" > 
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 }

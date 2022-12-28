@@ -69,6 +69,33 @@ namespace HospitalWeb.Mvc.Hubs
             }
         }
 
+        public async Task SendMessageFromUnauthorized(string message, DateTime datetime)
+        {
+            try
+            {
+                string connectionId = Context.ConnectionId;
+
+                await Clients.Group("Admin").SendAsync("SendMessageFromUnauthorized", connectionId, message, datetime);
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+            }
+        }
+
+        public async Task SendMessageToUnauthorized(string connectionId, string message, DateTime datetime)
+        {
+            try
+            {
+                await Clients.Client(connectionId).SendAsync("SendMessageToUnauthorized", connectionId, message, datetime);
+                await Clients.Group("Admin").SendAsync("SendMessageToUnauthorized", connectionId, message, datetime);
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+            }
+        }
+
         public override async Task OnConnectedAsync()
         {
             if (Context.User.IsInRole("Admin"))
