@@ -39,9 +39,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ITokenProvider, GoogleTokenProvider>();
         }
 
-        public static void AddInternalGoogleProvider(this IServiceCollection services)
+        public static void AddInternalTokenProvider(this IServiceCollection services)
         {
             services.AddScoped<ITokenProvider, InternalTokenProvider>();
+        }
+
+        public static void AddFacebookTokenProvider(this IServiceCollection services)
+        {
+            services.AddScoped<ITokenProvider, FacebookTokenProvider>();
         }
 
         public static void AddTokenManager(this IServiceCollection services)

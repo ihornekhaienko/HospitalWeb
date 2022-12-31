@@ -374,7 +374,7 @@ namespace HospitalWeb.Mvc.Controllers
                 patient.Surname = model.Surname;
                 patient.Name = model.Name;
                 patient.PhoneNumber = model.Phone;
-                patient.Address = address;
+                //patient.Address = address;
 
                 var result = await _userManager.UpdateAsync(patient);
 
