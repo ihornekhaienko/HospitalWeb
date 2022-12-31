@@ -1,10 +1,8 @@
 using Azure.Security.KeyVault.Secrets;
 using Azure.Identity;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
-using Google.Apis.Auth.AspNetCore3;
 using HospitalWeb.Domain.Data;
 using HospitalWeb.Domain.Entities.Identity;
-using HospitalWeb.Domain.Services.Extensions;
 using HospitalWeb.Mvc;
 using HospitalWeb.Mvc.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -105,20 +103,24 @@ builder.Services.AddAuthentication(o =>
     });
 
 builder.Services.AddAuthenticatorKeyService();
+
+builder.Services.AddGoogleTokenProvider();
+builder.Services.AddFacebookTokenProvider();
+builder.Services.AddInternalTokenProvider();
+builder.Services.AddTokenManager();
 #endregion
 
+#region WEB API
 builder.Services.AddApiClients();
 builder.Services.AddApi();
+#endregion
+
 builder.Services.AddEmailNotifier();
 builder.Services.AddPasswordGenerator();
 builder.Services.AddFileManager();
 builder.Services.AddScheduleGenerator();
 builder.Services.AddPdfPrinter();
 builder.Services.AddZoom();
-builder.Services.AddGoogleTokenProvider();
-builder.Services.AddFacebookTokenProvider();
-builder.Services.AddInternalTokenProvider();
-builder.Services.AddTokenManager();
 builder.Services.AddGoogleCalendar();
 builder.Services.AddLiqPayClient();
 

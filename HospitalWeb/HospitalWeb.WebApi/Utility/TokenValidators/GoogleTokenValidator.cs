@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Google.Apis.Auth;
 
-namespace HospitalWeb.WebApi.Utility
+namespace HospitalWeb.WebApi.Utility.TokenValidators
 {
     public class GoogleTokenValidator : ISecurityTokenValidator
     {

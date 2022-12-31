@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HospitalWeb.WebApi.Utility
+namespace HospitalWeb.WebApi.Utility.TokenValidators
 {
     public class InternalTokenValidator : ISecurityTokenValidator
     {
