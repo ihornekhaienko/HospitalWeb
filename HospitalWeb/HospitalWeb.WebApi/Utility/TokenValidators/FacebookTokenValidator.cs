@@ -3,7 +3,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Google.Apis.Auth;
 using Newtonsoft.Json;
 
 namespace HospitalWeb.WebApi.Utility.TokenValidators
@@ -31,7 +30,7 @@ namespace HospitalWeb.WebApi.Utility.TokenValidators
 
         public bool CanReadToken(string securityToken)
         {
-            return _tokenHandler.CanReadToken(securityToken);
+            return true;
         }
 
         public ClaimsPrincipal ValidateToken(string securityToken, TokenValidationParameters validationParameters, out SecurityToken validatedToken)
