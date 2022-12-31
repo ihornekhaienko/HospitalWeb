@@ -48,6 +48,7 @@ namespace HospitalWeb.Mvc.Controllers
             _pdfPrinter = pdfPrinter;
         }
 
+        #region DETAILS
         [Authorize(Roles = "Doctor, Patient")]
         [HttpGet]
         public IActionResult Details(int id)
@@ -78,7 +79,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return View(model);
         }
+        #endregion
 
+        #region HISTORY
         [Authorize(Roles = "Doctor")]
         [HttpGet]
         public async Task<IActionResult> History(
@@ -171,7 +174,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region CANCEL
         [Authorize(Roles = "Doctor")]
         [HttpGet]
         public async Task<IActionResult> Cancel(int id)
@@ -222,7 +227,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region FILL IN
         [Authorize(Roles = "Doctor")]
         [HttpGet]
         public IActionResult Fill(int id)
@@ -320,7 +327,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region PRINT
         [HttpGet]
         public IActionResult Print(int id)
         {
@@ -350,5 +359,6 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
     }
 }

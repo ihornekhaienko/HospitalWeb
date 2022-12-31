@@ -49,6 +49,7 @@ namespace HospitalWeb.Mvc.Controllers
             _authenticator = authenticator;
         }
 
+        #region PROFILE
         [Authorize]
         public IActionResult Profile()
         {
@@ -68,6 +69,55 @@ namespace HospitalWeb.Mvc.Controllers
             return RedirectToAction("NotFound", "Error");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UploadPhoto(IFormFile file)
+        {
+            try
+            {
+                if (file == null)
+                {
+                    throw new Exception(_errLocalizer["LoadFile"]);
+                }
+
+                var bytes = await _fileManager.GetBytes(file);
+
+                if (bytes == null && !bytes.IsImage())
+                {
+                    throw new Exception(_errLocalizer["NotImage"]);
+                }
+
+                var response = _api.AppUsers.Get(User.Identity.Name, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.AppUsers.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                var user = _api.AppUsers.Read(response);
+
+                user.Image = bytes;
+
+                var tokenResult = await _tokenManager.GetToken(user);
+
+                _api.AppUsers.Put(user, tokenResult.Token, tokenResult.Provider);
+
+                return RedirectToAction("Profile", "Manage");
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in ManageController.UploadPhoto.Post: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
+        }
+        #endregion
+
+        #region ADMIN PROFILE
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> AdminProfile(int page = 1)
@@ -157,7 +207,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return View(model);
         }
+        #endregion
 
+        #region DOCTOR PROFILE
         [Authorize(Roles = "Doctor")]
         [HttpGet]
         public async Task<IActionResult> DoctorProfile(int page = 1)
@@ -244,7 +296,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return View(model);
         }
+        #endregion
 
+        #region PATIENT PROFILE
         [Authorize(Roles = "Patient")]
         [HttpGet]
         public async Task<IActionResult> PatientProfile(int page = 1)
@@ -338,54 +392,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return View(model);
         }
+        #endregion
 
-        [HttpPost]
-        public async Task<IActionResult> UploadPhoto(IFormFile file)
-        {
-            try
-            {
-                if (file == null)
-                {
-                    throw new Exception(_errLocalizer["LoadFile"]);
-                }
-
-                var bytes = await _fileManager.GetBytes(file);
-
-                if (bytes == null && !bytes.IsImage())
-                {
-                    throw new Exception(_errLocalizer["NotImage"]);
-                }
-
-                var response = _api.AppUsers.Get(User.Identity.Name, null, null);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var statusCode = response.StatusCode;
-                    var message = _api.AppUsers.ReadError<string>(response);
-
-                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-                }
-
-                var user = _api.AppUsers.Read(response);
-
-                user.Image = bytes;
-
-                var tokenResult = await _tokenManager.GetToken(user);
-
-                _api.AppUsers.Put(user, tokenResult.Token, tokenResult.Provider);
-
-                return RedirectToAction("Profile", "Manage");
-            }
-            catch (Exception err)
-            {
-                _logger.LogError($"Error in ManageController.UploadPhoto.Post: {err.Message}");
-                _logger.LogError($"Inner exception:\n{err.InnerException}");
-                _logger.LogTrace(err.StackTrace);
-
-                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
-            }
-        }
-
+        #region CHANGE PASSWORD
         [HttpGet]
         public IActionResult ChangePassword()
         {
@@ -432,7 +441,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region NOTIFICATIONS
         public async Task<IActionResult> ReadNotification(int id)
         {
             var response = _api.Notifications.Get(id);
@@ -455,7 +466,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return Ok();
         }
+        #endregion
 
+        #region 2FA
         [HttpGet]
         public async Task<IActionResult> Enable2fa()
         {
@@ -566,5 +579,6 @@ namespace HospitalWeb.Mvc.Controllers
 
             return RedirectToAction("Profile", "Manage");
         }
+        #endregion
     }
 }

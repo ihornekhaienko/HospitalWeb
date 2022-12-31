@@ -49,6 +49,7 @@ namespace HospitalWeb.Mvc.Controllers
             _liqpay = liqpay;
         }
 
+        #region HISTORY
         [HttpGet]
         public async Task<IActionResult> History(
             string searchString,
@@ -93,7 +94,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region CANCEL
         [HttpGet]
         public async Task<IActionResult> Cancel(int id)
         {
@@ -142,7 +145,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region PAYMENT
         [HttpGet]
         public IActionResult PayOff(int id)
         {
@@ -242,5 +247,6 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
     }
 }

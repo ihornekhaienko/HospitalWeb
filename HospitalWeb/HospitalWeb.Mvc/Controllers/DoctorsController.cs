@@ -47,7 +47,8 @@ namespace HospitalWeb.Mvc.Controllers
             _scheduleGenerator = scheduleGenerator;
             _meetingService = meetingService;
         }
-         
+
+        #region SEARCH
         [HttpGet]
         public async Task<IActionResult> Search(
             string searchString,
@@ -77,7 +78,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region DETAILS
         [HttpGet]
         public async Task<IActionResult> Details(string id)
         {
@@ -162,7 +165,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return PartialView("_SchedulePartial", model);
         }
+        #endregion
 
+        #region SIGN UP
         [Authorize(Roles = "Patient")]
         public async Task<IActionResult> SignUpForAppointment(string doctorId, DateTime date)
         {
@@ -245,5 +250,6 @@ namespace HospitalWeb.Mvc.Controllers
 
             var response = await client.SendAsync(request);
         }
+        #endregion
     }
 }

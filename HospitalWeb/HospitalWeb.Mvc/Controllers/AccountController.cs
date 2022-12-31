@@ -50,6 +50,7 @@ namespace HospitalWeb.Mvc.Controllers
             _notifier = notifier;
         }
 
+        #region REGISTER
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null)
@@ -133,7 +134,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return View(model);
         }
+        #endregion
 
+        #region LOGIN
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)
@@ -177,7 +180,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return View(model);
         }
+        #endregion
 
+        #region EXTERNAL LOGIN
         [AllowAnonymous]
         [HttpPost]
         public IActionResult ExternalLogin(string provider, string returnUrl)
@@ -306,7 +311,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region LOGIN WITH 2FA
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
@@ -446,7 +453,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region LOGOUT
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout(string returnUrl = null)
@@ -502,7 +511,9 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
             }
         }
+        #endregion
 
+        #region PASSWORD RESTORATION
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPassword()
@@ -623,6 +634,7 @@ namespace HospitalWeb.Mvc.Controllers
         {
             return View();
         }
+        #endregion
 
         private IActionResult RedirectToLocal(string returnUrl)
         {

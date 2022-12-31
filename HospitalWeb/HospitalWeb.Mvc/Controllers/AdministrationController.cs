@@ -53,6 +53,7 @@ namespace HospitalWeb.Mvc.Controllers
             _notifier = notifier;
         }
 
+        #region ADMINS
         [HttpGet]
         public IActionResult Admins(
             string searchString,
@@ -264,7 +265,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return RedirectToAction("Admins", "Administration");
         }
+        #endregion
 
+        #region HOSPITALS
         [HttpGet]
         public IActionResult Hospitals(
             string searchString,
@@ -549,7 +552,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return RedirectToAction("Hospitals", "Administration");
         }
+        #endregion
 
+        #region DOCTORS
         [HttpGet]
         public IActionResult Doctors(
             string searchString,
@@ -852,7 +857,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return RedirectToAction("Doctors", "Administration");
         }
+        #endregion
 
+        #region PATIENTS
         [HttpGet]
         public IActionResult Patients(
             string searchString,
@@ -904,7 +911,9 @@ namespace HospitalWeb.Mvc.Controllers
 
             return RedirectToAction("Patients", "Administration");
         }
-        
+        #endregion
+
+        #region SCHEDULES
         public IActionResult DoctorSchedule(string id, string day)
         {
             if (_api.Schedules.Get(id, day).IsSuccessStatusCode)
@@ -1064,5 +1073,6 @@ namespace HospitalWeb.Mvc.Controllers
 
             return RedirectToAction("Doctors", "Administration");
         }
+        #endregion
     }
 }
