@@ -6,14 +6,12 @@ using HospitalWeb.Domain.Data;
 using HospitalWeb.Domain.Entities.Identity;
 using HospitalWeb.Domain.Services.Extensions;
 using HospitalWeb.WebApi.Middlewares;
-using HospitalWeb.WebApi.Utility;
+using HospitalWeb.WebApi.Utility.TokenValidators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System.Globalization;
 using System.Reflection;
 using System.Text;
 
@@ -74,6 +72,16 @@ builder.Services.AddAuthentication()
         o.SecurityTokenValidators.Add(new GoogleTokenValidator(config["OAuth:Google:ClientId"]));
         o.SaveToken = true;
     })
+    .AddJwtBearer("Facebook", o =>
+    {
+        o.IncludeErrorDetails = true;
+        o.SecurityTokenValidators.Clear();
+        o.SecurityTokenValidators.Add(new FacebookTokenValidator(
+            config["OAuth:Facebook:ClientId"],
+            config["OAuth:Facebook:ClientSecret"],
+            config["OAuth:Facebook:ApiEndpoint"]));
+        o.SaveToken = true;
+    })
     .AddJwtBearer("Internal", o =>
     {
         var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config["JWT:Key"]));
@@ -100,12 +108,11 @@ builder.Services.AddAuthentication()
     {
         o.ForwardDefaultSelector = context =>
         {
-            
-            var provider = context.Request.Headers["Provider"].First().ToString();
+            var provider = context.Request.Headers["Provider"].FirstOrDefault().ToString();
 
-            if (provider == "Google")
+            if (!string.IsNullOrWhiteSpace(provider))
             {
-                return "Google";
+                return provider;
             }
             else
             {
