@@ -44,14 +44,15 @@ namespace HospitalWeb.Mvc.Services.Implementations
         {
             await SendMessage(receiver,
                 "Confirm your email",
-                $"<a href={confirmationLink}>Confirmation link</a>");
+                $"<p>Thank you for registering on our Hospital service.</p>" +
+                $"<p>Please confirm your email by clicking <a href='{confirmationLink}'>here</a>.</p>");
         }
 
         public async Task SendResetPasswordLink(string receiver, string resetPasswordLink)
         {
             await SendMessage(receiver,
                 "Reset your password",
-                $"Please reset your password by clicking here: <a href='{resetPasswordLink}'>link</a>");
+                $"<p>Please reset your password by clicking <a href='{resetPasswordLink}'>here</a>.</p>");
         }
 
         public async Task SendMessage(string receiver, string subject, string message)
@@ -59,7 +60,7 @@ namespace HospitalWeb.Mvc.Services.Implementations
             var emailClient = new EmailClient(_connectionString);
 
             var emailContent = new EmailContent(subject);
-            emailContent.Html = $"<p>{message}</p>";
+            emailContent.Html = $"<div>{message}</div>";
 
             var emailRecipients = new EmailRecipients(
                 new List<EmailAddress>
