@@ -60,14 +60,14 @@
             @:<div class="row mb-3" >
         }
         <div class="col">
-            <div class="card mx-auto" style="width:300px;">
+            <div class="card mx-auto h-100" style="width:300px;">
                 @{
                     byte[] image = doctor.Image ?? ViewBag.Image;
                     var base64 = Convert.ToBase64String(image);
                     var Image = String.Format("data:image/gif;base64,{0}", base64);
                 }
                 <img src="@Image" class="card-img-top photo" alt="@SharedLocalizer["Doctor"] @counter">
-                <div class="card-body text-center">
+                <div class="card-body text-center d-flex flex-column">
                     <h4 class="card-title">@doctor.ToString()</h4>
                     <p class="card-text mb-0">@doctor.Specialty</p>
                     <p class="card-text mb-0">@doctor.Hospital</p>
@@ -80,7 +80,7 @@
                             @doctor.Rating
                         </span>
                     </p>
-                    <a asp-controller="Doctors" asp-action="Details" asp-route-id="@doctor.Id" class="btn btn-primary">
+                    <a asp-controller="Doctors" asp-action="Details" asp-route-id="@doctor.Id" class="btn btn-primary mt-auto">
                         @Localizer["MakeAppointment"]
                     </a>
                 </div>
