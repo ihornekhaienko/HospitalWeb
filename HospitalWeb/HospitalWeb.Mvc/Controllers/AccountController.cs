@@ -259,7 +259,7 @@ namespace HospitalWeb.Mvc.Controllers
                     Sex sex;
                     Enum.TryParse(model.Sex, out sex);
 
-                    var patient = new PatientResourceModel
+                    var patient = new Patient
                     {
                         Name = model.Name,
                         Surname = model.Surname,
@@ -282,20 +282,24 @@ namespace HospitalWeb.Mvc.Controllers
                         _logger.LogError($"Unable to create calendar for {model.Email}");
                     }
 
-                    var response = _api.Patients.Post(patient);
+                    var result = await _userManager.CreateAsync(patient);
 
-                    if (response.IsSuccessStatusCode)
+                    if (result.Succeeded)
                     {
-                        var entity = _api.Patients.Read(response);
-                        var result = await _userManager.AddLoginAsync(entity, info);
+                        result = await _userManager.AddLoginAsync(patient, info);
 
                         if (result.Succeeded)
                         {
-                            //await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
-                            await _signInManager.SignInAsync(entity, false);
+                            await _signInManager.SignInAsync(patient, false);
+                            await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
 
                             return RedirectToLocal(returnUrl);
                         }
+                    }
+
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
 
