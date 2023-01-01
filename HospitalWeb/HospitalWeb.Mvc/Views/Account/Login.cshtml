@@ -9,10 +9,11 @@
 <div class="row mt-5">
     <div class="col-lg-4 bg-white m-auto">
         <h2 class="text-center pt-3">@Localizer["Title"]</h2>
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div> 
         <div class="text-center mb-3">
             <a asp-controller="Account" asp-action="Register">@Localizer["Register"]</a>
         </div>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div> 
 
         <form method="post" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-antiforgery="true">
             <div class="mb-3">
