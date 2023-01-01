@@ -27,7 +27,7 @@ namespace HospitalWeb.Mvc.Controllers
         private readonly ICalendarService _calendar;
         private readonly IFileManager _fileManager;
         private readonly IPasswordGenerator _passwordGenerator;
-        private readonly INotifier _notifier;
+        private readonly IEmailService _email;
 
         public AdministrationController(
             ILogger<AdministrationController> logger,
@@ -39,7 +39,7 @@ namespace HospitalWeb.Mvc.Controllers
             ICalendarService calendar,
             IFileManager fileManager,
             IPasswordGenerator passwordGenerator,
-            INotifier notifier)
+            IEmailService email)
         {
             _logger = logger;
             _errLocalizer = errLocalizer;
@@ -50,7 +50,7 @@ namespace HospitalWeb.Mvc.Controllers
             _tokenManager = tokenManager;
             _calendar = calendar;
             _passwordGenerator = passwordGenerator;
-            _notifier = notifier;
+            _email = email;
         }
 
         #region ADMINS
@@ -102,7 +102,8 @@ namespace HospitalWeb.Mvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                var password = _passwordGenerator.GeneratePassword(null);
+                //var password = _passwordGenerator.GeneratePassword(null);
+                var password = "Pass_1111";
 
                 var admin = new AdminResourceModel
                 {
@@ -123,7 +124,7 @@ namespace HospitalWeb.Mvc.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    await _notifier.NotifyAdd(admin.Email, admin.Email, password);
+                    await _email.NotifyAdd(admin.Email, admin.Email, password);
 
                     return RedirectToAction("Admins", "Administration");
                 }
@@ -210,7 +211,7 @@ namespace HospitalWeb.Mvc.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    await _notifier.NotifyUpdate(admin.Email, admin.Email);
+                    await _email.NotifyUpdate(admin.Email, admin.Email);
 
                     return RedirectToAction("Admins", "Administration");
                 }
@@ -260,7 +261,7 @@ namespace HospitalWeb.Mvc.Controllers
 
             if (result.IsSuccessStatusCode)
             {
-                await _notifier.NotifyDelete(admin.Email, admin.Email);
+                await _email.NotifyDelete(admin.Email, admin.Email);
             }
 
             return RedirectToAction("Admins", "Administration");
@@ -665,7 +666,7 @@ namespace HospitalWeb.Mvc.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var entity = _api.Doctors.Read(response);
-                    await _notifier.NotifyAdd(entity.Email, entity.Email, password);
+                    await _email.NotifyAdd(entity.Email, entity.Email, password);
 
                     return RedirectToAction("Doctors", "Administration");
                 }
@@ -794,7 +795,7 @@ namespace HospitalWeb.Mvc.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    await _notifier.NotifyUpdate(doctor.Email, doctor.Email);
+                    await _email.NotifyUpdate(doctor.Email, doctor.Email);
 
                     return RedirectToAction("Doctors", "Administration");
                 }
@@ -852,7 +853,7 @@ namespace HospitalWeb.Mvc.Controllers
             if (response.IsSuccessStatusCode)
             {
                 await _calendar.DeleteCalendar(doctor);
-                await _notifier.NotifyDelete(doctor.Email, doctor.Email);
+                await _email.NotifyDelete(doctor.Email, doctor.Email);
             }
 
             return RedirectToAction("Doctors", "Administration");
@@ -906,7 +907,7 @@ namespace HospitalWeb.Mvc.Controllers
             if (response.IsSuccessStatusCode)
             {
                 await _calendar.DeleteCalendar(patient);
-                await _notifier.NotifyDelete(patient.Email, patient.Email);
+                await _email.NotifyDelete(patient.Email, patient.Email);
             }
 
             return RedirectToAction("Patients", "Administration");

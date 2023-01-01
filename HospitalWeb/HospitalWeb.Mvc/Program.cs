@@ -115,7 +115,7 @@ builder.Services.AddApiClients();
 builder.Services.AddApi();
 #endregion
 
-builder.Services.AddEmailNotifier();
+builder.Services.AddEmailService();
 builder.Services.AddPasswordGenerator();
 builder.Services.AddFileManager();
 builder.Services.AddScheduleGenerator();

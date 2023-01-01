@@ -24,7 +24,7 @@ namespace HospitalWeb.Mvc.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenManager _tokenManager;
         private readonly IFileManager _fileManager;
-        private readonly INotifier _notifier;
+        private readonly IEmailService _email;
         private readonly IAuthenticatorKeyService _authenticator;
 
         public ManageController(
@@ -35,7 +35,7 @@ namespace HospitalWeb.Mvc.Controllers
             UserManager<AppUser> userManager,
             ITokenManager tokenManager,
             IFileManager fileManager,
-            INotifier notifier,
+            IEmailService email,
             IAuthenticatorKeyService authenticator)
         {
             _logger = logger;
@@ -45,7 +45,7 @@ namespace HospitalWeb.Mvc.Controllers
             _userManager = userManager;
             _tokenManager = tokenManager;
             _fileManager = fileManager;
-            _notifier = notifier;
+            _email = email;
             _authenticator = authenticator;
         }
 
@@ -423,7 +423,7 @@ namespace HospitalWeb.Mvc.Controllers
 
                     if (result.Succeeded)
                     {
-                        await _notifier.NotifyUpdate(user.Email, user.Email);
+                        await _email.NotifyUpdate(user.Email, user.Email);
                         return RedirectToAction("Profile", "Manage");
                     }
 

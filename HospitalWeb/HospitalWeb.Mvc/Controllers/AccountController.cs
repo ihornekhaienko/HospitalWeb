@@ -25,7 +25,7 @@ namespace HospitalWeb.Mvc.Controllers
         private readonly ApiUnitOfWork _api;
         private readonly ICalendarService _calendar;
         private readonly IFileManager _fileManager;
-        private readonly INotifier _notifier;
+        private readonly IEmailService _email;
 
         public AccountController(
             ILogger<AccountController> logger,
@@ -36,7 +36,7 @@ namespace HospitalWeb.Mvc.Controllers
             ApiUnitOfWork api,
             ICalendarService calendar,
             IFileManager fileManager,
-            INotifier notifier
+            IEmailService email
             )
         {
             _logger = logger;
@@ -47,7 +47,7 @@ namespace HospitalWeb.Mvc.Controllers
             _api = api;
             _calendar = calendar;
             _fileManager = fileManager;
-            _notifier = notifier;
+            _email = email;
         }
 
         #region REGISTER
@@ -109,7 +109,7 @@ namespace HospitalWeb.Mvc.Controllers
                         new { userId = patient.Id, code = code },
                         protocol: HttpContext.Request.Scheme
                         );
-                    await _notifier.SendConfirmationLink(model.Email, callbackUrl);
+                    await _email.SendConfirmationLink(model.Email, callbackUrl);
 
                     await _signInManager.SignInAsync(patient, false);
 
@@ -290,8 +290,9 @@ namespace HospitalWeb.Mvc.Controllers
 
                         if (result.Succeeded)
                         {
+                            await _userManager.AddToRoleAsync(patient, "Patient");
                             await _signInManager.SignInAsync(patient, false);
-                            await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
+                            //await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
 
                             return RedirectToLocal(returnUrl);
                         }
@@ -556,7 +557,7 @@ namespace HospitalWeb.Mvc.Controllers
                         new { userId = user.Id, code = code },
                         protocol: HttpContext.Request.Scheme
                         );
-                    await _notifier.SendResetPasswordLink(model.Email, callbackUrl);
+                    await _email.SendResetPasswordLink(model.Email, callbackUrl);
 
                     return RedirectToAction("ForgotPasswordConfirm", "Account");
                 }
