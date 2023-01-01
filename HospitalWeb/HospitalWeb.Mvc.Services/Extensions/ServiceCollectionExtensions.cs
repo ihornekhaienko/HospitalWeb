@@ -9,9 +9,9 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddEmailNotifier(this IServiceCollection services)
+        public static void AddEmailService(this IServiceCollection services)
         {
-            services.AddScoped<INotifier, EmailNotifier>();
+            services.AddScoped<IEmailService, AzureEmailService>();
         }
 
         public static void AddPasswordGenerator(this IServiceCollection services)
