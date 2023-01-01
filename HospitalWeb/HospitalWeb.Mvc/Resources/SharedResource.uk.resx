@@ -528,4 +528,7 @@
   <data name="PayOffAlert" xml:space="preserve">
     <value>Ця зустріч не безкоштовна. Будь ласка, оплатіть її, або вона буде автоматично скасована протягом години після підтвердження.</value>
   </data>
+  <data name="EnterEmail" xml:space="preserve">
+    <value>Введіть свою електронну адресу, щоб надіслати посилання для відновлення пароля</value>
+  </data>
 </root>
