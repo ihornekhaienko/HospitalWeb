@@ -12,9 +12,9 @@
 <form method="get">
     <div class="mb-3">
         <label>@SharedLocalizer["Search"]: </label>
-        <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" />
+        <input name="searchString" value="@Model.FilterModel.SearchString" class="search-input" id="admin-search-input"/>
         <span class="input-group-btn input-space">
-            <button type="submit" class="btn btn-success btn-sm">@SharedLocalizer["Search"]</button>
+            <button type="submit" class="btn btn-success btn-sm" id="admin-search-btn">@SharedLocalizer["Search"]</button>
         </span>
         <span class="input-group-btn input-space"><a asp-action="Admins"> @SharedLocalizer["BackToFullList"]</a></span>
     </div>
@@ -24,44 +24,34 @@
     <thead>
         <tr>
             <th>
-                <a asp-action="Admins"
-                   asp-route-sortOrder="@(Model.SortModel.NameSort)"
-                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                <a name="@(Model.SortModel.NameSort)" class="admin-filter-link">
                    @SharedLocalizer["Name"]
                 </a>
             </th>
             <th>
-                <a asp-action="Admins"
-                   asp-route-sortOrder="@(Model.SortModel.SurnameSort)"
-                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                <a name="@(Model.SortModel.SurnameSort)" class="admin-filter-link">
                    @SharedLocalizer["Surname"]
                 </a>
             </th>
             <th>
-                <a asp-action="Admins"
-                   asp-route-sortOrder="@(Model.SortModel.EmailSort)"
-                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                <a name="@(Model.SortModel.EmailSort)" class="admin-filter-link">
                    @SharedLocalizer["Email"]
                 </a>
             </th>
             <th>
-                <a asp-action="Admins"
-                   asp-route-sortOrder="@(Model.SortModel.PhoneSort)"
-                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                <a name="@(Model.SortModel.PhoneSort)" class="admin-filter-link">
                    @SharedLocalizer["Phone"]
                 </a>
             </th>
             <th>
-                <a asp-action="Admins"
-                   asp-route-sortOrder="@(Model.SortModel.LevelSort)"
-                   asp-route-searchString="@(Model.FilterModel.SearchString)">
+                <a name="@(Model.SortModel.LevelSort)" class="admin-filter-link">
                    @SharedLocalizer["Level"]
                 </a>
             </th>
             <th></th>
         </tr>
     </thead>
-    <tbody> 
+    <tbody id="admin-table"> 
         @foreach(var admin in Model.Admins)
         {
             <tr>
@@ -104,3 +94,109 @@
 <page-link page-model="@(Model.PageModel)" page-action="Admins"
 page-url-searchString="@(Model.FilterModel.SearchString)"
 page-url-sortOrder="@(Model.SortModel.Current)"></page-link>
+
+@section scripts {
+    <script>
+        var searchString = '@Model.FilterModel.SearchString';
+        var page = +'@Model.PageModel.PageNumber';
+        var sortOrder = '@Model.SortModel.Current';
+
+        $('.page-link').click(function(event) {
+            event.preventDefault();
+            let target = event.target;
+
+            page = +target.innerHTML;           
+            $('.active').last().removeClass('active');
+            target.classList.add('active');
+
+            filterAdmins();
+        });
+
+        $('.admin-filter-link').click(function(event) {
+            event.preventDefault();
+            let target = event.target;
+
+            sortOrder = target.name;
+
+            filterAdmins();
+        });
+
+        $('#admin-search-btn').click(function(event) {
+            event.preventDefault();
+
+            filterAdmins();
+        });
+
+        function createRow(admin) {
+            let tr = document.createElement('tr');
+
+            let name = document.createElement('td');
+            name.innerHTML = admin.name;
+
+            let surname = document.createElement('td');
+            surname.innerHTML = admin.surname;
+
+            let email = document.createElement('td');
+            email.innerHTML = admin.email;
+
+            let phone = document.createElement('td');
+            phone.innerHTML = admin.phoneNumber;
+
+            let level = document.createElement('td');
+            if (admin.isSuperAdmin) {
+                level.innerHTML = '@SharedLocalizer["Super"]';
+            }
+            else {
+                level.innerHTML = '@SharedLocalizer["Admin"]';
+            }
+
+            let actions = document.createElement('td');
+            if ('@ViewBag.CurrentAdmin.Id' != admin.id && !admin.isSuperAdmin) {
+                let span = document.createElement('span');
+                let edit = document.createElement('a');
+                edit.href = `/Administration/EditAdmin/${admin.id}`;
+                edit.innerHTML = '@SharedLocalizer["Edit"]';
+                let del = document.createElement('a');
+                del.href = `/Administration/DeleteAdmin/${admin.id}`;
+                del.innerHTML = '@SharedLocalizer["Delete"]';
+                span.appendChild(edit);
+                span.appendChild(document.createTextNode(' | '));
+                span.appendChild(del);
+                actions.appendChild(span);
+            }
+
+            tr.appendChild(name);
+            tr.appendChild(surname);
+            tr.appendChild(email);
+            tr.appendChild(phone);
+            tr.appendChild(level);
+            tr.appendChild(actions);
+
+            return tr;
+        }
+
+        function filterAdmins() {
+            searchString = $('#admin-search-input').val();
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAdmins")',
+                dataType: "json",
+                contentType: "application/json",
+                data: {searchString: searchString, page: page, sortOrder: sortOrder},
+                success: function(admins) {
+                    let table = document.getElementById('admin-table');
+                    table.innerHTML = '';
+                    
+                    for (let admin of admins) {
+                        let row = createRow(admin);
+                        table.appendChild(row);
+                    }
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });
+        }
+    </script>
+}

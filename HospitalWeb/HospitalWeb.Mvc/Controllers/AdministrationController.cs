@@ -92,6 +92,43 @@ namespace HospitalWeb.Mvc.Controllers
         }
 
         [HttpGet]
+        public IActionResult GetAdmins(
+           string searchString,
+           int page = 1,
+           AdminSortState sortOrder = AdminSortState.Id)
+        {
+            try
+            {
+                var response = _api.Admins.Get(User.Identity.Name, null, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var statusCode = response.StatusCode;
+                    var message = _api.Admins.ReadError<string>(response);
+
+                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                }
+
+                ViewBag.CurrentAdmin = _api.Admins.Read(response);
+
+                var builder = new AdminsViewModelBuilder(_api, page, searchString, sortOrder);
+                var director = new ViewModelBuilderDirector();
+                director.MakeViewModel(builder);
+                var viewModel = builder.GetViewModel();
+
+                return Json(viewModel.Admins);
+            }
+            catch (Exception err)
+            {
+                _logger.LogError($"Error in AdministrationController.Admins.Get: {err.Message}");
+                _logger.LogError($"Inner exception:\n{err.InnerException}");
+                _logger.LogTrace(err.StackTrace);
+
+                return RedirectToAction("Index", "Error", new ErrorViewModel { Message = err.Message });
+            }
+        }
+
+        [HttpGet]
         public IActionResult CreateAdmin()
         {
             return View();
