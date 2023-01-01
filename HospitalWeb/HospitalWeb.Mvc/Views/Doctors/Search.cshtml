@@ -59,8 +59,8 @@
         {
             @:<div class="row mb-3" >
         }
-        <div class="col-sm-4 mx-auto">
-            <div class="card" style="width:300px;">
+        <div class="col">
+            <div class="card mx-auto" style="width:300px;">
                 @{
                     byte[] image = doctor.Image ?? ViewBag.Image;
                     var base64 = Convert.ToBase64String(image);
