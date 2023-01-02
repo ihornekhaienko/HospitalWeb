@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HospitalWeb.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("/")]
     public class TestController : ControllerBase
     {
         private readonly IDbInitializer _dbInitializer;

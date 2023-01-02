@@ -13,7 +13,7 @@ namespace HospitalWeb.WebApi.Controllers
     /// </summary>
     [Produces("application/json")]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("/")]
     public class DiagnosesController : ControllerBase
     {
         private readonly ILogger<DiagnosesController> _logger;
