@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static void AddApi(this IServiceCollection services)
         {
-            services.AddSingleton<ApiUnitOfWork>();
+            services.AddScoped<ApiUnitOfWork>();
         }
 
         public static void AddHttpClientWithPolicies<TInterface, TImplementation>(this IServiceCollection services, string name)
