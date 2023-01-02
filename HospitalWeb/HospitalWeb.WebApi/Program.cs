@@ -179,7 +179,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("https://localhost:7007")
+                          //policy.WithOrigins("https://localhost:7007")
+                           policy.WithOrigins("https://yigalhospitalmvc.azurewebsites.net")
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                       });

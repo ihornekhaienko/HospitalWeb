@@ -420,7 +420,7 @@ function confirmSignUp(message) {
 
 function updateAppoitmentsStates() {
     $.ajax({
-        url: 'https://localhost:7271/jobs/updateStates',
+        url: 'https://yigalhospitalapi.azurewebsites.net/jobs/updateStates',
         type: "POST",
         crossDomain: true,
         headers: {

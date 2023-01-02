@@ -244,7 +244,7 @@ namespace HospitalWeb.Mvc.Controllers
         private async Task RunPaymentChecker(int id)
         {
             using var client = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Post, $"https://localhost:7271/jobs/removeUnpaid?{id}");
+            var request = new HttpRequestMessage(HttpMethod.Post, $"https://yigalhospitalapi.azurewebsites.net/jobs/removeUnpaid?{id}");
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Access-Control-Allow-Origin", "*");
 
