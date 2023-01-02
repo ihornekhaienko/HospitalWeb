@@ -730,7 +730,7 @@ namespace HospitalWeb.Mvc.Controllers
                 .Select(s => s.SpecialtyName)
                 .OrderBy(s => s);
 
-            result = _api.Hospitals.Filter(null, pageSize: int.MaxValue);
+            result = _api.Hospitals.Filter(null, null, null, pageSize: int.MaxValue);
             var hospitals = _api.Hospitals.ReadMany(result);
             ViewBag.Hospitals = hospitals
                 .Select(h => new { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
