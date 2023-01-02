@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Globalization;
-
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -103,6 +103,14 @@ builder.Services.AddAuthentication(o =>
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     });
 
+builder.Services.Configure<ForwardedHeadersOptions>(options => {
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 builder.Services.AddAuthenticatorKeyService();
 
 builder.Services.AddGoogleTokenProvider();
@@ -135,6 +143,7 @@ if (builder.Environment.IsDevelopment())
 app.UseRequestLocalization();
 
 app.UseHttpsRedirection();
+app.UseForwardedHeaders();
 
 app.UseStaticFiles();
 
