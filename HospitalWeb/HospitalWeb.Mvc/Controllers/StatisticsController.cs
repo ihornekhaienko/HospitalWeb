@@ -32,6 +32,40 @@ namespace HospitalWeb.Mvc.Controllers
             return View(viewModel);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> TestAwait(int? locality = null,
+            DateTime? fromDate = null,
+            DateTime? toDate = null)
+        {
+            var start = DateTime.Now;
+
+            var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri("https://yigalhospitalapi.azurewebsites.net/api/");
+            var response = await httpClient.GetAsync("Appointments");
+            var appointments = await response.Content.ReadAsByteArrayAsync();
+
+            var end = DateTime.Now;
+
+            return Content($"start: {start}, end: {end}, dif: {(end - start).TotalSeconds}");
+        }
+
+        [HttpGet]
+        public IActionResult TestResult(int? locality = null,
+            DateTime? fromDate = null,
+            DateTime? toDate = null)
+        {
+            var start = DateTime.Now;
+
+            var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri("https://yigalhospitalapi.azurewebsites.net/api/");
+            var response = httpClient.GetAsync("Appointments").Result;
+            var appointments = response.Content.ReadAsByteArrayAsync().Result;
+
+            var end = DateTime.Now;
+
+            return Content($"start: {start}, end: {end}, dif: {(end - start).TotalSeconds}");
+        }
+
         [HttpPost]
         public IActionResult Attendance([FromBody] List<AppointmentDTO> appointments)
         {
