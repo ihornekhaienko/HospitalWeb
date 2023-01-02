@@ -28,6 +28,13 @@ namespace HospitalWeb.WebApi.Controllers
             _uow = uow;
         }
 
+        [HttpGet("test")]
+        public async Task<ActionResult<IEnumerable<Appointment>>> Get()
+        {
+            var apps = await _uow.Appointments.GetAllAsync();
+            return new ObjectResult(apps);
+        }
+
         /// <summary>
         /// Returns a filtered list of Appointments
         /// </summary>

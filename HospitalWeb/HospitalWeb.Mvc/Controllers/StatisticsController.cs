@@ -59,7 +59,7 @@ namespace HospitalWeb.Mvc.Controllers
 
             var httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri("https://yigalhospitalapi.azurewebsites.net/api/");
-            var response = await httpClient.GetAsync("Appointments");
+            var response = await httpClient.GetAsync("Appointments/details");
             var appointments = await response.Content.ReadAsByteArrayAsync();
 
             var end = DateTime.Now;
@@ -74,8 +74,10 @@ namespace HospitalWeb.Mvc.Controllers
         {
             var start = DateTime.Now;
 
-            var response = _api.Appointments.Filter(pageSize: int.MaxValue);
-            var appointments = _api.Appointments.ReadMany(response);
+            var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri("https://yigalhospitalapi.azurewebsites.net/api/");
+            var response = httpClient.GetAsync("Appointments/details").Result;
+            var appointments = response.Content.ReadAsByteArrayAsync().Result;
 
             var end = DateTime.Now;
 

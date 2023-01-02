@@ -75,7 +75,7 @@ namespace HospitalWeb.Mvc.Filters.Builders.Implementations
                         MeetingJoinLink = a.Meetings.FirstOrDefault()?.JoinLink,
                         Price = a.Price,
                         IsPaid = a.IsPaid
-                    });
+                    }).ToList();
 
                 _count = Convert.ToInt32(response.Headers.GetValues("TotalCount").FirstOrDefault());
             }
