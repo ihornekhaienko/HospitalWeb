@@ -14,7 +14,7 @@ namespace HospitalWeb.WebApi.Controllers
     /// Patients
     /// </summary>
     [ApiController]
-    [Route("/")]
+    [Route("api/[controller]")]
     public class PatientsController : ControllerBase
     {
         private readonly ILogger<PatientsController> _logger;
