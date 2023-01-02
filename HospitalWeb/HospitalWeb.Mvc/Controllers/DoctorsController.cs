@@ -203,6 +203,7 @@ namespace HospitalWeb.Mvc.Controllers
                 };
 
                 var tokenResult = await _tokenManager.GetToken(patient);
+                return Json(tokenResult);
 
                 response = _api.Appointments.Post(appointment, tokenResult.Token, tokenResult.Provider);
 
