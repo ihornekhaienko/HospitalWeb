@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Reflection;
 using System.Text;
-
+using HospitalWeb.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -204,9 +204,12 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseDbInitializer();
+//app.UseDbInitializer();
 
-app.UseHangfireDashboard("/dashboard");
+app.UseHangfireDashboard("/dashboard", new DashboardOptions
+{
+    Authorization = new[] { new HangfireAuthorizationFilter() }
+});
 
 app.MapControllers();
 
