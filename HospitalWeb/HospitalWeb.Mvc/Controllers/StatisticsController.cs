@@ -33,6 +33,24 @@ namespace HospitalWeb.Mvc.Controllers
         }
 
         [HttpGet]
+        public IActionResult IndexSpeed(
+            int? locality = null,
+            DateTime? fromDate = null,
+            DateTime? toDate = null)
+        {
+            var start = DateTime.Now;
+
+            var builder = new AppointmentsViewModelBuilder(_api, state: 5, locality: locality, fromTime: fromDate, toTime: toDate, pageSize: int.MaxValue);
+            var director = new ViewModelBuilderDirector();
+            director.MakeViewModel(builder);
+            var viewModel = builder.GetViewModel();
+
+            var end = DateTime.Now;
+
+            return Content($"start: {start}, end: {end}, dif: {(end - start).TotalSeconds}");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> TestAwait(int? locality = null,
             DateTime? fromDate = null,
             DateTime? toDate = null)
@@ -56,10 +74,8 @@ namespace HospitalWeb.Mvc.Controllers
         {
             var start = DateTime.Now;
 
-            var httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri("https://yigalhospitalapi.azurewebsites.net/api/");
-            var response = httpClient.GetAsync("Appointments").Result;
-            var appointments = response.Content.ReadAsByteArrayAsync().Result;
+            var response = _api.Appointments.Filter(pageSize: int.MaxValue);
+            var appointments = _api.Appointments.ReadMany(response);
 
             var end = DateTime.Now;
 
