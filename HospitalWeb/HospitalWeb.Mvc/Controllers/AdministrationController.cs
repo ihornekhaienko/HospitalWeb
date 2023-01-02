@@ -639,7 +639,7 @@ namespace HospitalWeb.Mvc.Controllers
                 .Select(s => s.SpecialtyName)
                 .OrderBy(s => s);
 
-            response = _api.Hospitals.Get();
+            response = _api.Hospitals.Filter(null, null, null, pageSize: int.MaxValue);
 
             if (!response.IsSuccessStatusCode)
             {
