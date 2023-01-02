@@ -24,7 +24,7 @@ namespace HospitalWeb.Mvc.ViewModels.Account
 
         [Required(ErrorMessage = "BirthDateRequired")]
         [Display(Name = "BirthDate")]
-        //[TimeLessThan("BirthDate")]
+        [DateOfBirth(ErrorMessage = "AdultsOnly")]
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime BirthDate { get; set; }
 

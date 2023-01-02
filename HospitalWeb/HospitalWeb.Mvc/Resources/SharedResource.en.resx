@@ -534,4 +534,7 @@
   <data name="EnterEmail" xml:space="preserve">
     <value>Enter your email to send a password recovery link</value>
   </data>
+  <data name="AdultsOnly" xml:space="preserve">
+    <value>Only users over the age of 18 are allowed</value>
+  </data>
 </root>

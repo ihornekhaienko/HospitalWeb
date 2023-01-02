@@ -534,4 +534,7 @@
   <data name="Hospitals" xml:space="preserve">
     <value>Клініки</value>
   </data>
+  <data name="AdultsOnly" xml:space="preserve">
+    <value>Тільки користувачі, які досягли 18 років, дозволені</value>
+  </data>
 </root>
