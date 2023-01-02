@@ -400,9 +400,9 @@ function read(id) {
     }
 }
 
-$(document).ready(function () {
-    loadLatest();
-});
+//$(document).ready(function () {
+//    loadLatest();
+//});
 
 notificationHubConnection.start();
 
@@ -436,7 +436,7 @@ function updateAppoitmentsStates() {
     });
 }
 
-updateAppoitmentsStates();
+//updateAppoitmentsStates();
 const supportHubConnection = new signalR.HubConnectionBuilder()
     .withUrl('/SupportHub')
     .build();

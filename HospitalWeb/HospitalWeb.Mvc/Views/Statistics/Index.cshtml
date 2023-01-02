@@ -93,11 +93,8 @@
                 contentType: "application/json",
                 data: JSON.stringify(appointments),
                 success: function(model) {
-                    console.log(model);
                     let dates = model.map((m) => m.visitDate);
                     let counts = model.map((m) => m.visitsCount);
-                    console.log(dates);
-                    console.log(counts);
 
                     plotAttendance(dates, counts);
                 },
@@ -135,11 +132,8 @@
                 contentType: "application/json",
                 data: JSON.stringify(appointments),
                 success: function(model) {
-                    console.log(model);
                     let values = model.map((m) => m.count);
                     let labels = model.map((m) => m.label);
-                    console.log(values);
-                    console.log(labels);
 
                     plotDiagnosis(labels, values);
                 },
@@ -186,11 +180,8 @@
                 contentType: "application/json",
                 data: JSON.stringify(appointments),
                 success: function(model) {
-                    console.log(model);
                     let values = model.map((m) => m.count);
                     let labels = model.map((m) => m.label);
-                    console.log(values);
-                    console.log(labels);
 
                     plotHospital(labels, values);
                 },
@@ -228,11 +219,8 @@
                 contentType: "application/json",
                 data: JSON.stringify(appointments),
                 success: function(model) {
-                    console.log(model);
                     let values = model.map((m) => m.count);
                     let labels = model.map((m) => m.label);
-                    console.log(values);
-                    console.log(labels);
 
                     plotSpecialty(labels, values);
                 },

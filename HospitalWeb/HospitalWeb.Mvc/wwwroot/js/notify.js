@@ -377,8 +377,8 @@ function read(id) {
     }
 }
 
-$(document).ready(function () {
-    loadLatest();
-});
+//$(document).ready(function () {
+//    loadLatest();
+//});
 
 notificationHubConnection.start();
