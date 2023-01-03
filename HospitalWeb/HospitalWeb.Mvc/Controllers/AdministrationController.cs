@@ -290,18 +290,6 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("NotFound", "Error", new ErrorViewModel { Message = "Admin wasn't found" });
             }
 
-            var response = _api.Admins.Get(id, null, null);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var statusCode = response.StatusCode;
-                var message = _api.Admins.ReadError<string>(response);
-
-                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-            }
-
-            var admin = _api.Admins.Read(response);
-
             var user = await _userManager.GetUserAsync(User);
             var tokenResult = await _tokenManager.GetToken(user);
 
@@ -309,6 +297,7 @@ namespace HospitalWeb.Mvc.Controllers
 
             if (result.IsSuccessStatusCode)
             {
+                var admin = _api.Admins.Read(result);
                 await _email.NotifyDelete(admin.Email, admin.Email);
             }
 
