@@ -203,7 +203,6 @@ namespace HospitalWeb.Mvc.Controllers
                 };
 
                 var tokenResult = await _tokenManager.GetToken(patient);
-                return Json(tokenResult);
 
                 response = _api.Appointments.Post(appointment, tokenResult.Token, tokenResult.Provider);
 
@@ -234,7 +233,6 @@ namespace HospitalWeb.Mvc.Controllers
             }
             catch (Exception err)
             {
-                return Json(err);
                 _logger.LogError($"Error in DoctorsController.SignUpForAppointment.Post: {err.Message}");
                 _logger.LogError($"Inner exception:\n{err.InnerException}");
                 _logger.LogTrace(err.StackTrace);
