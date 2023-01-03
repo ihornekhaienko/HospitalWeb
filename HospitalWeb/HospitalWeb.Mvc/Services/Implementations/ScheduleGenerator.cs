@@ -2,25 +2,33 @@
 using HospitalWeb.Mvc.Services.Interfaces;
 using HospitalWeb.Mvc.ViewModels.Doctors;
 using HospitalWeb.Mvc.Clients.Implementations;
+using HospitalWeb.Domain.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using HospitalWeb.Domain.Entities;
 
 namespace HospitalWeb.Mvc.Services.Implementations
 {
     public class ScheduleGenerator : IScheduleGenerator
     {
         private readonly ApiUnitOfWork _api;
+        private readonly IUnitOfWork _uow;
         private DateTime _today;
 
-        public ScheduleGenerator(ApiUnitOfWork api)
+        public ScheduleGenerator(ApiUnitOfWork api, IUnitOfWork uow)
         {
             _api = api;
+            _uow = uow;
             _today = DateTime.Now;
         }
 
-        public ScheduleViewModel GenerateDaySchedule(Doctor doctor, DateTime date)
+        public async Task<ScheduleViewModel> GenerateDaySchedule(Doctor doctor, DateTime date)
         {
-            var response = _api.Schedules.Get(doctor.Id, date.DayOfWeek.ToString());
+            var schedule = await _uow.Schedules.GetAsync(s => s.Doctor.Id == doctor.Id && s.DayOfWeek == date.DayOfWeek,
+                    include:
+                    s => s.Include(d => d.Doctor));
+            //var response = _api.Schedules.Get(doctor.Id, date.DayOfWeek.ToString());
 
-            if (!response.IsSuccessStatusCode || date < _today)
+            if (schedule == null || date < _today)
             {
                 return new ScheduleViewModel
                 {
@@ -28,8 +36,6 @@ namespace HospitalWeb.Mvc.Services.Implementations
                     Slots = new List<SlotViewModel>()
                 };
             }
-
-            var schedule = _api.Schedules.Read(response);
 
             List<SlotViewModel> slots = new List<SlotViewModel>();
             var startTime = new DateTime(date.Year, date.Month, date.Day, 
@@ -43,12 +49,12 @@ namespace HospitalWeb.Mvc.Services.Implementations
                 {
                     if (time.Hour - _today.Hour > 2)
                     {
-                        slots.Add(new SlotViewModel { Time = time, IsFree = _api.Appointments.IsDateFree(doctor.Id, time) });
+                        slots.Add(new SlotViewModel { Time = time, IsFree = await IsDateFree(doctor.Id, time) });
                     }
                 }
                 else
                 {
-                    slots.Add(new SlotViewModel { Time = time, IsFree = _api.Appointments.IsDateFree(doctor.Id, time) });
+                    slots.Add(new SlotViewModel { Time = time, IsFree = await IsDateFree(doctor.Id, time) });
                 }    
             }
 
@@ -62,8 +68,45 @@ namespace HospitalWeb.Mvc.Services.Implementations
             return model;
         }
 
-        public IEnumerable<ScheduleViewModel> GenerateWeekSchedule(Doctor doctor, DateTime startDate)
+        private async Task<bool> IsDateFree(string doctorId, DateTime time)
         {
+            var appointment = await _uow.Appointments
+                .GetAsync(a => a.Doctor.Id == doctorId && DateTime.Compare(a.AppointmentDate, time) == 0,
+                include: a => a
+                .Include(a => a.Diagnosis)
+                .Include(a => a.Meetings)
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Specialty)
+                .Include(a => a.Doctor)
+                    .ThenInclude(d => d.Hospital)
+                .Include(a => a.Patient)
+                    .ThenInclude(p => p.Address)
+                        .ThenInclude(a => a.Locality));
+
+            if (appointment != null)
+            {
+                if (appointment.State == State.Planned || appointment.State == State.Active || appointment.State == State.Completed)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public async Task<IEnumerable<ScheduleViewModel>> GenerateWeekSchedule(string doctorId, DateTime startDate)
+        {
+            var doctor = await _uow.Doctors.GetAsync(d => d.Id == doctorId || d.Email == doctorId,
+                include: d => d
+                .Include(d => d.Appointments)
+                    .ThenInclude(a => a.Diagnosis)
+                .Include(d => d.Schedules)
+                .Include(d => d.Hospital)
+                    .ThenInclude(h => h.Address)
+                            .ThenInclude(a => a.Locality)
+                .Include(d => d.Specialty)
+                .Include(d => d.Grades));
+
             _today = startDate;
             var date = startDate;
 
@@ -71,7 +114,7 @@ namespace HospitalWeb.Mvc.Services.Implementations
 
             for (int i = 0; i < 7; i++)
             {
-                var schedule = GenerateDaySchedule(doctor, date);
+                var schedule = await GenerateDaySchedule(doctor, date);
                 schedules.Add(schedule);
 
                 date = date.AddDays(1);

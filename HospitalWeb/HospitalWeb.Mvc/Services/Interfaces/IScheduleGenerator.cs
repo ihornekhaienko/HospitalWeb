@@ -5,8 +5,8 @@ namespace HospitalWeb.Mvc.Services.Interfaces
 {
     public interface IScheduleGenerator
     {
-        public IEnumerable<ScheduleViewModel> GenerateWeekSchedule(Doctor doctor, DateTime startDate);
+        public Task<IEnumerable<ScheduleViewModel>> GenerateWeekSchedule(string doctorId, DateTime startDate);
 
-        public ScheduleViewModel GenerateDaySchedule(Doctor doctor, DateTime date);
+        public Task<ScheduleViewModel> GenerateDaySchedule(Doctor doctor, DateTime date);
     }
 }

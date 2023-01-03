@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Globalization;
 using Microsoft.AspNetCore.HttpOverrides;
+using HospitalWeb.Domain.Services.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -132,6 +133,7 @@ builder.Services.AddPdfPrinter();
 builder.Services.AddZoom();
 builder.Services.AddGoogleCalendar();
 builder.Services.AddLiqPayClient();
+builder.Services.AddUnitOfWork();
 
 var app = builder.Build();
 

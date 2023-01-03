@@ -147,21 +147,21 @@ namespace HospitalWeb.Mvc.Controllers
         }
 
         [HttpGet]
-        public IActionResult Schedule(string id, DateTime date)
+        public async Task<IActionResult> Schedule(string id, DateTime date)
         {
-            var response = _api.Doctors.Get(id, null, null);
+            //var response = _api.Doctors.Get(id, null, null);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var statusCode = response.StatusCode;
-                var message = _api.Doctors.ReadError<string>(response);
+            //if (!response.IsSuccessStatusCode)
+            //{
+            //    var statusCode = response.StatusCode;
+            //    var message = _api.Doctors.ReadError<string>(response);
 
-                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-            }
+            //    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+            //}
 
-            var doctor = _api.Doctors.Read(id);
+            //var doctor = _api.Doctors.Read(id);
 
-            var model = _scheduleGenerator.GenerateWeekSchedule(doctor, date);
+            var model = await _scheduleGenerator.GenerateWeekSchedule(id, date);
 
             return PartialView("_SchedulePartial", model);
         }
