@@ -937,23 +937,15 @@ namespace HospitalWeb.Mvc.Controllers
 
         public async Task<IActionResult> DeletePatient(string id)
         {
-            var response = _api.Patients.Get(id, null, null);
-            if (!response.IsSuccessStatusCode)
-            {
-                var statusCode = response.StatusCode;
-                var message = _api.Patients.ReadError<string>(response);
-
-                return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-            }
-            var patient = _api.Patients.Read(response);
-
             var user = await _userManager.GetUserAsync(User);
             var tokenResult = await _tokenManager.GetToken(user);
 
-            response = _api.Patients.Delete(patient.Id, tokenResult.Token, tokenResult.Provider);
+            var response = _api.Patients.Delete(id, tokenResult.Token, tokenResult.Provider);
 
             if (response.IsSuccessStatusCode)
             {
+                var patient = _api.Patients.Read(response);
+
                 await _calendar.DeleteCalendar(patient);
                 await _email.NotifyDelete(patient.Email, patient.Email);
             }

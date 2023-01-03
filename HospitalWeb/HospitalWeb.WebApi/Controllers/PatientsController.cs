@@ -165,7 +165,7 @@ namespace HospitalWeb.WebApi.Controllers
                  include: p => p
                  .Include(p => p.Address)
                     .ThenInclude(a => a.Locality)
-                .Include(p => p.Appointments)
+                 .Include(p => p.Appointments)
                     .ThenInclude(a => a.Diagnosis));
 
                 if (patient == null)
