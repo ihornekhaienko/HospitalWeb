@@ -234,7 +234,8 @@ namespace HospitalWeb.Mvc.Controllers
                 var appointment = _api.Appointments.Read(response);
 
                 appointment.IsPaid = true;
-                _api.Appointments.Put(appointment);
+                response = _api.Appointments.Put(appointment);
+                return Json(response);
 
                 return RedirectToAction("History", "Treatment");
             }
