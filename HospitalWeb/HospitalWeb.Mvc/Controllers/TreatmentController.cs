@@ -231,11 +231,14 @@ namespace HospitalWeb.Mvc.Controllers
 
                     return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
                 }
+
+                var user = await _userManager.GetUserAsync(User);
+                var tokenResult = await _tokenManager.GetToken(user);
+
                 var appointment = _api.Appointments.Read(response);
 
                 appointment.IsPaid = true;
-                response = _api.Appointments.Put(appointment);
-                return Json(response);
+                response = _api.Appointments.Put(appointment, tokenResult.Token, tokenResult.Provider);
 
                 return RedirectToAction("History", "Treatment");
             }
