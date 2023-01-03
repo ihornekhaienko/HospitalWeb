@@ -142,7 +142,7 @@ namespace HospitalWeb.Mvc.Controllers
                 //var password = _passwordGenerator.GeneratePassword(null);
                 var password = "Pass_1111";
 
-                var admin = new AdminResourceModel
+                var admin = new Admin
                 {
                     Name = model.Name,
                     Surname = model.Surname,
@@ -150,31 +150,41 @@ namespace HospitalWeb.Mvc.Controllers
                     UserName = model.Email,
                     PhoneNumber = model.Phone,
                     IsSuperAdmin = model.IsSuperAdmin,
-                    EmailConfirmed = true,
-                    Password = password
+                    EmailConfirmed = true
                 };
 
-                var user = await _userManager.GetUserAsync(User);
-                var tokenResult = await _tokenManager.GetToken(user);
+                //var user = await _userManager.GetUserAsync(User);
+                //var tokenResult = await _tokenManager.GetToken(user);
 
-                var response = _api.Admins.Post(admin, tokenResult.Token, tokenResult.Provider);
+                //var response = _api.Admins.Post(admin, tokenResult.Token, tokenResult.Provider);
 
-                if (response.IsSuccessStatusCode)
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    await _email.NotifyAdd(admin.Email, admin.Email, password);
+
+                //    return RedirectToAction("Admins", "Administration");
+                //}
+
+                //var errors = _api.Admins.ReadError<IEnumerable<IdentityError>>(response);
+
+                //if (errors == null)
+                //{
+                //    var statusCode = response.StatusCode;
+                //    var message = _api.Admins.ReadError<string>(response);
+
+                //    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                //}
+
+                var result = await _userManager.CreateAsync(admin, password);
+                
+                if (result.Succeeded)
                 {
                     await _email.NotifyAdd(admin.Email, admin.Email, password);
 
                     return RedirectToAction("Admins", "Administration");
                 }
 
-                var errors = _api.Admins.ReadError<IEnumerable<IdentityError>>(response);
-
-                if (errors == null)
-                {
-                    var statusCode = response.StatusCode;
-                    var message = _api.Admins.ReadError<string>(response);
-
-                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-                }
+                var errors = result.Errors;
 
                 foreach (var error in errors)
                 {
@@ -222,17 +232,18 @@ namespace HospitalWeb.Mvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = _api.Admins.Get(model.Email, null, null);
+                //var response = _api.Admins.Get(model.Email, null, null);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var statusCode = response.StatusCode;
-                    var message = _api.Admins.ReadError<string>(response);
+                //if (!response.IsSuccessStatusCode)
+                //{
+                //    var statusCode = response.StatusCode;
+                //    var message = _api.Admins.ReadError<string>(response);
 
-                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-                }
+                //    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
+                //}
 
-                var admin = _api.Admins.Read(response);
+                //var admin = _api.Admins.Read(response);
+                var admin = await _userManager.FindByEmailAsync(model.Email) as Admin;
 
                 admin.UserName = model.Email;
                 admin.Email = model.Email;
@@ -244,7 +255,7 @@ namespace HospitalWeb.Mvc.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 var tokenResult = await _tokenManager.GetToken(user);
 
-                response = _api.Admins.Put(admin, tokenResult.Token, tokenResult.Provider);
+                var response = _api.Admins.Put(admin, tokenResult.Token, tokenResult.Provider);
 
                 if (response.IsSuccessStatusCode)
                 {

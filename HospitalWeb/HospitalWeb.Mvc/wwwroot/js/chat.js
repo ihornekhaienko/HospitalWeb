@@ -208,7 +208,7 @@ $(document).ready(function () {
     if (!msgList.length) {
         return;
     }
-
+    alert($('#chat-user-id').val());
     $.ajax({
         type: "POST",
         url: '/Chat/GetUserMessages',

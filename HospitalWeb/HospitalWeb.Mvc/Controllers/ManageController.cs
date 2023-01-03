@@ -86,23 +86,9 @@ namespace HospitalWeb.Mvc.Controllers
                     throw new Exception(_errLocalizer["NotImage"]);
                 }
 
-                var response = _api.AppUsers.Get(User.Identity.Name, null, null);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var statusCode = response.StatusCode;
-                    var message = _api.AppUsers.ReadError<string>(response);
-
-                    return RedirectToAction("Http", "Error", new { statusCode = statusCode, message = message });
-                }
-
-                var user = _api.AppUsers.Read(response);
-
+                var user = await _userManager.GetUserAsync(User);
                 user.Image = bytes;
-
-                var tokenResult = await _tokenManager.GetToken(user);
-
-                _api.AppUsers.Put(user, tokenResult.Token, tokenResult.Provider);
+                await _userManager.UpdateAsync(user);
 
                 return RedirectToAction("Profile", "Manage");
             }
