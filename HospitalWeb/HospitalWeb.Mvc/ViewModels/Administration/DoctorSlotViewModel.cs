@@ -1,5 +1,4 @@
-﻿using HospitalWeb.Mvc.Attributes.Validation;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace HospitalWeb.Mvc.ViewModels.Administration
 {

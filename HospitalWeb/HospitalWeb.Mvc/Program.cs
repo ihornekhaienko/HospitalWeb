@@ -42,6 +42,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 });
 
 builder.Services.AddMultilangIdentityErrorDescriberFactory();
+builder.Services.AddAttributesLocalization();
 #endregion
 
 #region DB

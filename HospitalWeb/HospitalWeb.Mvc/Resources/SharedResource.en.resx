@@ -484,7 +484,7 @@
     <value>Recovery code</value>
   </data>
   <data name="RememberDevice" xml:space="preserve">
-    <value>Запам'ятати цей пристрій</value>
+    <value>Remember this device</value>
   </data>
   <data name="Rating" xml:space="preserve">
     <value>Rating</value>
@@ -533,5 +533,8 @@
   </data>
   <data name="EnterEmail" xml:space="preserve">
     <value>Enter your email to send a password recovery link</value>
+  </data>
+  <data name="AdultsOnly" xml:space="preserve">
+    <value>Only users over the age of 18 are allowed</value>
   </data>
 </root>
