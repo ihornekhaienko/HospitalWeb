@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Globalization;
-
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -116,6 +116,16 @@ builder.Services.AddApiClients();
 builder.Services.AddApi();
 #endregion
 
+#region PROXY
+builder.Services.Configure<ForwardedHeadersOptions>(options => {
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+#endregion
+
 builder.Services.AddEmailService();
 builder.Services.AddPasswordGenerator();
 builder.Services.AddFileManager();
@@ -135,6 +145,7 @@ if (builder.Environment.IsDevelopment())
 app.UseRequestLocalization();
 
 app.UseHttpsRedirection();
+app.UseForwardedHeaders();
 
 app.UseStaticFiles();
 
