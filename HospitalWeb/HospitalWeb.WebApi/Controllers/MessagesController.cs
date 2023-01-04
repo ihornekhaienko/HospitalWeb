@@ -100,10 +100,7 @@ namespace HospitalWeb.WebApi.Controllers
                 {
                     var result = true;
 
-                    if (!string.IsNullOrWhiteSpace(user))
-                    {
-                        result = result && m.UserId == user;
-                    }
+                    result = result && m.UserId == user;
 
                     return result;
                 };
