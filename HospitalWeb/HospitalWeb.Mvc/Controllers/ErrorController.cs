@@ -28,7 +28,7 @@ namespace HospitalWeb.Mvc.Controllers
                 return RedirectToAction("InternalServer", "Error", new ErrorViewModel { Message = message });
             }
 
-            return RedirectToAction("Index", "Error", new ErrorViewModel { Message = message });
+            return RedirectToAction("Index", "Error", new ErrorViewModel { Message = $"Status code: {statusCode}" });
         }
 
         public IActionResult NotFound(ErrorViewModel model)
