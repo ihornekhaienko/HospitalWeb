@@ -233,8 +233,11 @@ namespace HospitalWeb.Mvc.Controllers
                 }
                 var appointment = _api.Appointments.Read(response);
 
+                var user = await _userManager.GetUserAsync(User);
+                var tokenResult = await _tokenManager.GetToken(user);
+
                 appointment.IsPaid = true;
-                _api.Appointments.Put(appointment);
+                _api.Appointments.Put(appointment, tokenResult.Token, tokenResult.Provider);
 
                 return RedirectToAction("History", "Treatment");
             }
