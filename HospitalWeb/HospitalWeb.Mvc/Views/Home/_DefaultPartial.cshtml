@@ -24,31 +24,31 @@
         </div>
     </div>
     <div class="row mt-4">
-        <div class="col-sm-4 mx-auto">
-            <div class="card" style="width:300px;">
-                    <img src="./files/images/doctor.png" class="card-img-top photo mt-1" alt="Find doctor">
-                    <div class="card-body text-center">
-                        <h4 class="card-title">@SharedLocalizer["FindDoctor"]</h4>
-                        <a asp-controller="Doctors" asp-action="Search" class="btn btn-primary">@SharedLocalizer["Find"]</a>
-                    </div>
+        <div class="col">
+            <div class="card mx-auto h-100" style="width:300px;">
+                <img src="./files/images/doctor.png" class="card-img-top photo mt-1" alt="Find doctor">
+                <div class="card-body text-center d-flex flex-column">
+                    <h4 class="card-title">@SharedLocalizer["FindDoctor"]</h4>
+                    <a asp-controller="Doctors" asp-action="Search" class="btn btn-primary mt-auto">@SharedLocalizer["Find"]</a>
+                </div>
             </div>
         </div>
-        <div class="col-sm-4 mx-auto">
-            <div class="card" style="width:300px;">
-                    <img src="./files/images/hospital.png" class="card-img-top photo mt-1" alt="Find hospital">
-                    <div class="card-body text-center">
-                        <h4 class="card-title">@SharedLocalizer["FindHospital"]</h4>
-                        <a asp-controller="Hospitals" asp-action="Search" class="btn btn-primary">@SharedLocalizer["Find"]</a>
-                    </div>
+        <div class="col">
+            <div class="card mx-auto h-100" style="width:300px;">
+                <img src="./files/images/hospital.png" class="card-img-top photo mt-1" alt="Find hospital">
+                <div class="card-body text-center d-flex flex-column">
+                    <h4 class="card-title">@SharedLocalizer["FindHospital"]</h4>
+                    <a asp-controller="Hospitals" asp-action="Search" class="btn btn-primary mt-auto">@SharedLocalizer["Find"]</a>
+                </div>
             </div>
         </div>
-        <div class="col-sm-4 mx-auto">
-            <div class="card" style="width:300px;">
-                    <img src="./files/images/stats.jpg" class="card-img-top photo mt-1" alt="Show stats">
-                    <div class="card-body text-center">
-                        <h4 class="card-title">@SharedLocalizer["LookForStatistics"]</h4>
-                        <a asp-controller="Stat" asp-action="Index" class="btn btn-primary">@SharedLocalizer["Show"]</a>
-                    </div>
+        <div class="col">
+            <div class="card mx-auto h-100" style="width:300px;">
+                <img src="./files/images/stats.jpg" class="card-img-top photo mt-1" alt="Show stats">
+                <div class="card-body text-center d-flex flex-column">
+                    <h4 class="card-title">@SharedLocalizer["LookForStatistics"]</h4>
+                    <a asp-controller="Stat" asp-action="Index" class="btn btn-primary mt-auto">@SharedLocalizer["Show"]</a>
+                </div>
             </div>
         </div>
     </div>

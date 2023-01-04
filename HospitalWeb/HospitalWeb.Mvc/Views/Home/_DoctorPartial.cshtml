@@ -2,31 +2,31 @@
 
 <div class="container">
     <div class="row mt-4">
-        <div class="col-sm-4 mx-auto">
-            <div class="card" style="width:300px;">
-                    <img src="./files/images/appointment.png" class="card-img-top photo mt-1" alt="Appointments">
-                    <div class="card-body text-center">
-                        <h4 class="card-title">@SharedLocalizer["ManageAppointments"]</h4>
-                        <a asp-controller="Appointments" asp-action="Index" class="btn btn-primary">@SharedLocalizer["Manage"]</a>
-                    </div>
+        <div class="col">
+            <div class="card mx-auto h-100" style="width:300px;">
+                <img src="./files/images/appointment.png" class="card-img-top photo mt-1" alt="Appointments">
+                <div class="card-body text-center d-flex flex-column">
+                    <h4 class="card-title">@SharedLocalizer["ManageAppointments"]</h4>
+                    <a asp-controller="Appointments" asp-action="Index" class="btn btn-primary mt-auto">@SharedLocalizer["Manage"]</a>
+                </div>
             </div>
         </div>
-        <div class="col-sm-4 mx-auto">
-            <div class="card" style="width:300px;">
-                    <img src="./files/images/history.png" class="card-img-top photo mt-1 ml-1 mr-1" alt="History">
-                    <div class="card-body text-center">
-                        <h4 class="card-title">@SharedLocalizer["ShowHistory"]</h4>
-                        <a asp-controller="Appointments" asp-action="History" class="btn btn-primary">@SharedLocalizer["Show"]</a>
-                    </div>
+        <div class="col">
+            <div class="card mx-auto h-100" style="width:300px;">
+                <img src="./files/images/history.png" class="card-img-top photo mt-1 ml-1 mr-1" alt="History">
+                <div class="card-body text-center d-flex flex-column">
+                    <h4 class="card-title">@SharedLocalizer["ShowHistory"]</h4>
+                    <a asp-controller="Appointments" asp-action="History" class="btn btn-primary mt-auto">@SharedLocalizer["Show"]</a>
+                </div>
             </div>
         </div>
-        <div class="col-sm-4 mx-auto">
-            <div class="card" style="width:300px;">
-                    <img src="./files/images/stats.jpg" class="card-img-top photo mt-1" alt="Show stats">
-                    <div class="card-body text-center">
-                        <h4 class="card-title">@SharedLocalizer["LookForStatistics"]</h4>
-                        <a asp-controller="Stat" asp-action="Index" class="btn btn-primary">@SharedLocalizer["Show"]</a>
-                    </div>
+        <div class="col">
+            <div class="card mx-auto h-100" style="width:300px;">
+                <img src="./files/images/stats.jpg" class="card-img-top photo mt-1" alt="Show stats">
+                <div class="card-body text-center d-flex flex-column">
+                    <h4 class="card-title">@SharedLocalizer["LookForStatistics"]</h4>
+                    <a asp-controller="Stat" asp-action="Index" class="btn btn-primary mt-auto">@SharedLocalizer["Show"]</a>
+                </div>
             </div>
         </div>
     </div>
