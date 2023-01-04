@@ -602,7 +602,7 @@ namespace HospitalWeb.Mvc.Controllers
                 .Select(s => s.SpecialtyName)
                 .OrderBy(s => s);
 
-            response = _api.Hospitals.Get();
+            response = _api.Hospitals.Filter(null, null, null, pageSize: int.MaxValue);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -633,8 +633,7 @@ namespace HospitalWeb.Mvc.Controllers
                 var tokenResult = await _tokenManager.GetToken(user);
 
                 var specialty = _api.Specialties.GetOrCreate(model.Specialty, tokenResult.Token, tokenResult.Provider);
-                //var password = _passwordGenerator.GeneratePassword(null);
-                var password = "Pass_1111";
+                var password = _passwordGenerator.GeneratePassword(null);
 
                 var doctor = new DoctorResourceModel
                 {
@@ -693,7 +692,7 @@ namespace HospitalWeb.Mvc.Controllers
                 .Select(s => s.SpecialtyName)
                 .OrderBy(s => s);
 
-            result = _api.Hospitals.Get();
+            result = _api.Hospitals.Filter(null, null, null, pageSize: int.MaxValue);
             var hospitals = _api.Hospitals.ReadMany(result);
             ViewBag.Hospitals = hospitals
                 .Select(h => new { HospitalId = h.HospitalId, HospitalName = h.HospitalName })
