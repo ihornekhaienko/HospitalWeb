@@ -24,9 +24,9 @@ The solution is currently consists of 7 projects:
 - Hospital.WebApi.Tests - Project with unit tests for HospitalWeb.WebApi project
 - HospitalWeb.Tests.Services - Common services for testing
 - HospitalWeb.Mvc - Client based on ASP NET CORE MVC 
-- Hospital.Mvc.Services - Services for HospitalWeb.Mvc project
+- HospitalWeb.Mvc.Services - Services for HospitalWeb.Mvc project
 
-### API integrations & used technologies
+### Features
 The project includes:
 - Internal authentication with ASP NET CORE Identity and cstom JWT tokens for the access to WebApi 
 - External authentication with Google and Facebook
@@ -40,6 +40,8 @@ The project includes:
 - Microsoft Azure Email communication service integration 
 - iText framework for building PDF-reports
 - Unit tests using xUnit, Moq, Fluent Assertions and Bogus frameworks
+- EN and UA localization
+- Swagger OpenAPI integration
 
 ### CI/CD pipeline
 The CI/CD pipeline works as follows:
@@ -51,3 +53,35 @@ The CI/CD pipeline works as follows:
 6) Docker-compose push to the hub
 7) Pushed containers could be connected to the Azure app service or any other cloud
 
+
+## Views samples
+<div align="center">  
+
+![alt text](https://imgur.com/dYzd0Po)
+Home page
+
+![alt text](https://imgur.com/LIMTjCH)
+Google registration page
+
+![alt text](https://imgur.com/epn6vX2)
+Authenticator QR-code
+
+![alt text](https://imgur.com/9QaCPL8)
+Swagger OpenAPI
+
+![alt text](https://imgur.com/gSqGanH)
+Searching a doctor
+
+![alt text](https://imgur.com/GyePl6Y)
+Signing up for an appointment
+
+![alt text](https://imgur.com/zAML6aN)
+Payment form
+
+![alt text](https://imgur.com/gADQjPl)
+Statistics page
+
+![alt text](https://imgur.com/9YKjF4V)
+Treatment history page
+
+</div>  
