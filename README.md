@@ -57,7 +57,7 @@ The CI/CD pipeline works as follows:
 ## Views samples
 <div align="center">  
 
-![alt text](https://imgur.com/dYzd0Po)
+![alt text](https://imgur.com/dYzd0Po.png)
 Home page
 
 ![alt text](https://imgur.com/LIMTjCH)
