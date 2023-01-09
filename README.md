@@ -60,28 +60,28 @@ The CI/CD pipeline works as follows:
 ![alt text](https://imgur.com/dYzd0Po.png)
 Home page
 
-![alt text](https://imgur.com/LIMTjCH)
+![alt text](https://imgur.com/LIMTjCH.png)
 Google registration page
 
-![alt text](https://imgur.com/epn6vX2)
+![alt text](https://imgur.com/epn6vX2.png)
 Authenticator QR-code
 
-![alt text](https://imgur.com/9QaCPL8)
+![alt text](https://imgur.com/9QaCPL8.png)
 Swagger OpenAPI
 
-![alt text](https://imgur.com/gSqGanH)
+![alt text](https://imgur.com/gSqGanH.png)
 Searching a doctor
 
-![alt text](https://imgur.com/GyePl6Y)
+![alt text](https://imgur.com/GyePl6Y.png)
 Signing up for an appointment
 
-![alt text](https://imgur.com/zAML6aN)
+![alt text](https://imgur.com/zAML6aN.png)
 Payment form
 
-![alt text](https://imgur.com/gADQjPl)
+![alt text](https://imgur.com/gADQjPl.png)
 Statistics page
 
-![alt text](https://imgur.com/9YKjF4V)
+![alt text](https://imgur.com/9YKjF4V.png)
 Treatment history page
 
 </div>  
